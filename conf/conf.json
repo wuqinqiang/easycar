@@ -1,7 +1,12 @@
-db:
-  url: '127.0.0.1'
-  user: 'root'
-  password: 'root',
-  maxLifetime: '100',
-  maxIdleNumber: '50'
-  maxOpenNumber: '50'
+{
+  "db": {
+    "url": "127.0.0.1",
+    "dbName": "easycar",
+    "port": 3306,
+    "user": "root",
+    "password": "root",
+    "maxLifetime": 100,
+    "maxIdleNumber": 50,
+    "maxOpenNumber": 50
+  }
+}

@@ -15,3 +15,9 @@ func WrapDbErr(err error) error {
 	}
 	return err
 }
+
+func ErrToPanic(err error) {
+	if err != nil {
+		panic(err)
+	}
+}

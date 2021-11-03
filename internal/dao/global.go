@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/wuqinqiang/easycar/internal/model"
 	"github.com/wuqinqiang/easycar/internal/query"
+	"github.com/wuqinqiang/easycar/pkg/mysql"
 	"github.com/wuqinqiang/easycar/pkg/utils"
 )
 
@@ -27,8 +28,8 @@ type GlobalImpl struct {
 	query *query.Query
 }
 
-func NewGlobalImpl(q *query.Query) GlobalDao {
-	return GlobalImpl{query: q}
+func NewGlobalImpl() GlobalDao {
+	return GlobalImpl{query: query.Use(mysql.NewDb())}
 }
 
 func (g GlobalImpl) Create(ctx context.Context, global *model.Global) (int32, error) {
