@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/wuqinqiang/easycar/internal/model"
 	"github.com/wuqinqiang/easycar/internal/query"
+	"github.com/wuqinqiang/easycar/pkg/mysql"
 	"github.com/wuqinqiang/easycar/pkg/utils"
 )
 
@@ -26,8 +27,8 @@ type BranchImpl struct {
 	query *query.Query
 }
 
-func NewBranchImpl(q *query.Query) BranchDao {
-	return BranchImpl{query: q}
+func NewBranchImpl() BranchDao {
+	return BranchImpl{query: query.Use(mysql.NewDb())}
 }
 
 func (g BranchImpl) CreateInBatches(ctx context.Context, branch []*model.Branch) error {
