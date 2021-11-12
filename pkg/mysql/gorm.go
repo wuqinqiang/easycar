@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"encoding/json"
+
 	"fmt"
 	"github.com/wuqinqiang/easycar/pkg/utils"
 	"gorm.io/driver/mysql"

@@ -7,7 +7,7 @@ package query
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/internal/model"
+	"github.com/wuqinqiang/easycar/internal/gorm/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -26,7 +26,7 @@ func newGlobal(db *gorm.DB) global {
 	_global.ALL = field.NewField(tableName, "*")
 	_global.ID = field.NewInt32(tableName, "id")
 	_global.Gid = field.NewString(tableName, "gid")
-	_global.BranchType = field.NewInt32(tableName, "branch_type")
+	_global.TransactionName = field.NewInt32(tableName, "transaction_name")
 	_global.State = field.NewString(tableName, "state")
 	_global.Protocol = field.NewString(tableName, "protocol")
 	_global.CreateTime = field.NewTime(tableName, "create_time")
@@ -38,7 +38,7 @@ func newGlobal(db *gorm.DB) global {
 	_global.fieldMap = make(map[string]field.Expr, 10)
 	_global.fieldMap["id"] = _global.ID
 	_global.fieldMap["gid"] = _global.Gid
-	_global.fieldMap["branch_type"] = _global.BranchType
+	_global.fieldMap["transaction_name"] = _global.TransactionName
 	_global.fieldMap["state"] = _global.State
 	_global.fieldMap["protocol"] = _global.Protocol
 	_global.fieldMap["create_time"] = _global.CreateTime
@@ -53,17 +53,17 @@ func newGlobal(db *gorm.DB) global {
 type global struct {
 	globalDo globalDo
 
-	ALL          field.Field
-	ID           field.Int32
-	Gid          field.String
-	BranchType   field.Int32
-	State        field.String
-	Protocol     field.String
-	CreateTime   field.Time
-	UpdateTime   field.Time
-	CommitTime   field.Time
-	FinishTime   field.Time
-	RollbackTime field.Time
+	ALL             field.Field
+	ID              field.Int32
+	Gid             field.String
+	TransactionName field.Int32
+	State           field.String
+	Protocol        field.String
+	CreateTime      field.Time
+	UpdateTime      field.Time
+	CommitTime      field.Time
+	FinishTime      field.Time
+	RollbackTime    field.Time
 
 	fieldMap map[string]field.Expr
 }

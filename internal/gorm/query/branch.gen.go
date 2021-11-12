@@ -7,7 +7,7 @@ package query
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/internal/model"
+	"github.com/wuqinqiang/easycar/internal/gorm/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -27,7 +27,7 @@ func newBranch(db *gorm.DB) branch {
 	_branch.ID = field.NewInt32(tableName, "id")
 	_branch.Gid = field.NewString(tableName, "gid")
 	_branch.URL = field.NewString(tableName, "url")
-	_branch.ApplicationData = field.NewString(tableName, "application_data")
+	_branch.ReqData = field.NewString(tableName, "req_data")
 	_branch.BranchID = field.NewString(tableName, "branch_id")
 	_branch.BranchType = field.NewInt32(tableName, "branch_type")
 	_branch.State = field.NewString(tableName, "state")
@@ -39,7 +39,7 @@ func newBranch(db *gorm.DB) branch {
 	_branch.fieldMap["id"] = _branch.ID
 	_branch.fieldMap["gid"] = _branch.Gid
 	_branch.fieldMap["url"] = _branch.URL
-	_branch.fieldMap["application_data"] = _branch.ApplicationData
+	_branch.fieldMap["req_data"] = _branch.ReqData
 	_branch.fieldMap["branch_id"] = _branch.BranchID
 	_branch.fieldMap["branch_type"] = _branch.BranchType
 	_branch.fieldMap["state"] = _branch.State
@@ -53,17 +53,17 @@ func newBranch(db *gorm.DB) branch {
 type branch struct {
 	branchDo branchDo
 
-	ALL             field.Field
-	ID              field.Int32
-	Gid             field.String
-	URL             field.String
-	ApplicationData field.String
-	BranchID        field.String
-	BranchType      field.Int32
-	State           field.String
-	FinishTime      field.Time
-	CreateTime      field.Time
-	UpdateTime      field.Time
+	ALL        field.Field
+	ID         field.Int32
+	Gid        field.String
+	URL        field.String
+	ReqData    field.String
+	BranchID   field.String
+	BranchType field.Int32
+	State      field.String
+	FinishTime field.Time
+	CreateTime field.Time
+	UpdateTime field.Time
 
 	fieldMap map[string]field.Expr
 }
