@@ -1,31 +1,42 @@
 package service
 
-import "github.com/wuqinqiang/easycar/internal/dao"
+import (
+	"context"
+	"github.com/wuqinqiang/easycar/internal/dao"
+	"github.com/wuqinqiang/easycar/internal/service/entity"
+)
 
-type RMOption func(rm *RM)
+type TMInterface interface {
+}
 
-type RM struct {
+type TMOption func(rm *TM)
+
+type TM struct {
 	dao dao.TransactionDao
 }
 
-func NewRm(dao dao.TransactionDao) *RM {
-	return &RM{dao: dao}
+func NewTM(dao dao.TransactionDao) *TM {
+	return &TM{dao: dao}
 }
 
-// Begin  begin a new transaction, return globleId
-func (rm *RM) Begin() (gId string, err error) {
-	panic("dc")
+// Begin  begin a new transaction, return globalId
+func (rm *TM) Begin(ctx context.Context, entity *entity.Global) (gId string, err error) {
+	_, err = rm.dao.Create(ctx, entity)
+	if err != nil {
+		return "", BeginTransactionErr
+	}
+	return entity.GetGId(), nil
 }
 
 // Submit summit transaction
-func (rm *RM) Submit(gId string) {
+func (rm *TM) Submit(gId string) {
 	panic("dd")
 }
 
-func (rm *RM) RegisterTccBranch() {
+func (rm *TM) RegisterTccBranch() {
 
 }
 
-func (rm *RM) BranchRollBack() {
+func (rm *TM) BranchRollBack() {
 
 }

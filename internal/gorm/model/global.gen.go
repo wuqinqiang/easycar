@@ -14,7 +14,7 @@ type Global struct {
 	Gid             string    `gorm:"column:gid;type:varchar(128);not null" json:"gid"`                         // 事务全局id
 	TransactionName int32     `gorm:"column:transaction_name;type:tinyint(4);not null" json:"transaction_name"` // 事务分类
 	State           string    `gorm:"column:state;type:varchar(12);not null" json:"state"`                      // 全局事务的状态 prepared | submitted | aborting | finished | rollbacked
-	Protocol        string    `gorm:"column:protocol;type:varchar(45);not null" json:"protocol"`                // 通信协议 http | grpc
+	Protocol        string    `gorm:"column:protocol;type:varchar(45);not null" json:"protocol"`                // 通信协议 router | grpc
 	CreateTime      time.Time `gorm:"column:create_time;type:datetime" json:"create_time"`
 	UpdateTime      time.Time `gorm:"column:update_time;type:datetime" json:"update_time"`
 	CommitTime      time.Time `gorm:"column:commit_time;type:datetime" json:"commit_time"`
