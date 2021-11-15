@@ -1,5 +1,5 @@
 package main
 
 func main() {
-	//mysql.NewDb()
+	// todo cmd
 }

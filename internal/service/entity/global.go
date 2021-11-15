@@ -2,12 +2,12 @@ package entity
 
 type (
 	GlobalState     uint8
-	TransactionType string
+	TransactionName string
 )
 
 const (
-	TCC  TransactionType = "tcc"
-	SAGA TransactionType = "saga"
+	TCC  TransactionName = "tcc"
+	SAGA TransactionName = "saga"
 
 	PreparedState GlobalState = iota + 1
 	SubmittedState
@@ -17,7 +17,7 @@ const (
 
 type Global struct {
 	gId             string
-	transactionName TransactionType
+	transactionName TransactionName
 	state           GlobalState
 	protocol        string
 }
@@ -36,11 +36,11 @@ func (g *Global) GetGId() string {
 	return g.gId
 }
 
-func (g *Global) SetBranchType(transactionName TransactionType) {
+func (g *Global) SetBranchType(transactionName TransactionName) {
 	g.transactionName = transactionName
 }
 
-func (g *Global) GetBranchType() TransactionType {
+func (g *Global) GetBranchName() TransactionName {
 	return g.transactionName
 }
 
