@@ -8,6 +8,8 @@ import (
 	"github.com/wuqinqiang/easycar/internal/service/entity"
 	"github.com/wuqinqiang/easycar/pkg/mysql"
 	"github.com/wuqinqiang/easycar/pkg/utils"
+	"strconv"
+	"time"
 )
 
 type BranchImpl struct {
@@ -18,11 +20,26 @@ func NewBranchImpl() dao.BranchDao {
 	return BranchImpl{query: query.Use(mysql.NewDb())}
 }
 
-func (g BranchImpl) CreateInBatches(ctx context.Context, branchEntities []*entity.Branch) error {
+func (g BranchImpl) CreateBatches(ctx context.Context, gId string, list []*entity.Branch) error {
 	var (
-		branch []*model.Branch
+		branchList []*model.Branch
 	)
-	err := g.query.Branch.WithContext(ctx).CreateInBatches(branch, len(branch))
+
+	for i := range list {
+		branchList = append(branchList, &model.Branch{
+			Gid:        gId,
+			URL:        list[i].GetUrl(),
+			ReqData:    list[i].GetReqData(),
+			BranchID:   gId + strconv.Itoa(i),
+			BranchType: int32(list[i].GetBranchType()),
+			State:      string(list[i].GetBranchState()),
+			FinishTime: time.Now(),
+			CreateTime: time.Time{},
+			UpdateTime: time.Time{},
+		})
+	}
+
+	err := g.query.Branch.WithContext(ctx).CreateInBatches(branchList, len(branchList))
 	err = utils.WrapDbErr(err)
 	return err
 }

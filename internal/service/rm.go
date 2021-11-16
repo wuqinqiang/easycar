@@ -33,8 +33,16 @@ func (rm *TM) Submit(gId string) {
 	panic("dd")
 }
 
-func (rm *TM) RegisterTccBranch() {
-
+func (rm *TM) RegisterTccBranch(ctx context.Context, gId string, branchList []*entity.Branch) error {
+	_, err := rm.dao.First(ctx, gId)
+	if err != nil {
+		return NotFindTransaction
+	}
+	err = rm.dao.CreateBatches(ctx, gId, branchList)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (rm *TM) BranchRollBack() {
