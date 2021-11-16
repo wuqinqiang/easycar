@@ -2,13 +2,13 @@ package entity
 
 type (
 	BranchType  uint8
-	BranchState uint8
+	BranchState string
 )
 
 const (
-	BranchCommittedState BranchState = iota + 1
-	BranchFinishedState
-	BranchRolledBackState
+	BranchCommittedState  = "committed"
+	BranchFinishedState   = "finished"
+	BranchRolledBackState = "rolledback"
 )
 
 type Branch struct {
