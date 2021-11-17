@@ -6,9 +6,9 @@ type (
 )
 
 const (
-	BranchCommittedState  = "committed"
-	BranchFinishedState   = "finished"
-	BranchRolledBackState = "rolledback"
+	BranchReadyState    = "ready"
+	BranchSucceedState  = "succeed"
+	BranchFinishedState = "fail"
 )
 
 type Branch struct {

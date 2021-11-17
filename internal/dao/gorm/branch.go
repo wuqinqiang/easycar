@@ -53,11 +53,10 @@ func (g BranchImpl) List(ctx context.Context, gid string) ([]*entity.Branch, err
 	return []*entity.Branch{}, err
 }
 
-func (g BranchImpl) UpdateBranchStateByGid(ctx context.Context, gid string, branchId string,
-	state entity.BranchState) (int64, error) {
+func (g BranchImpl) UpdateBranchStateByGid(ctx context.Context, gid string, state entity.BranchState) (int64, error) {
 	branch := g.query.Branch
 	result, err := g.query.Branch.WithContext(ctx).
-		Where(branch.Gid.Eq(gid), branch.BranchID.Eq(branchId)).
+		Where(branch.Gid.Eq(gid)).
 		Update(branch.State, state)
 	err = utils.WrapDbErr(err)
 	return result.RowsAffected, err

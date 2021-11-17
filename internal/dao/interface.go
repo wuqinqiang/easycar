@@ -13,7 +13,7 @@ type TransactionDao interface {
 type BranchDao interface {
 	CreateBatches(ctx context.Context, gId string, branch []*entity.Branch) error
 	List(ctx context.Context, gid string) ([]*entity.Branch, error)
-	UpdateBranchStateByGid(ctx context.Context, gid string, branchId string,
+	UpdateBranchStateByGid(ctx context.Context, gid string,
 		state entity.BranchState) (int64, error)
 }
 
