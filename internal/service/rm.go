@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"github.com/wuqinqiang/easycar/internal/dao"
+	"github.com/wuqinqiang/easycar/internal/dao/gorm"
 	"github.com/wuqinqiang/easycar/internal/service/entity"
 )
 
@@ -29,8 +30,28 @@ func (rm *TM) Begin(ctx context.Context, entity *entity.Global) (gId string, err
 }
 
 // Submit summit transaction
-func (rm *TM) Submit(gId string) {
-	panic("dd")
+func (rm *TM) Submit(ctx context.Context, gId string) (err error) {
+	var (
+		rowsAffected, rowsAffectedBranch int64
+	)
+	defer func() {
+		if err == nil && (rowsAffected == 0 || rowsAffectedBranch == 0) {
+			panic("submit something wrong")
+		}
+	}()
+
+	// todo 严重依赖gorm
+	return gorm.GenManager.BeginTransaction(ctx, func(ctx context.Context) error {
+		rowsAffected, err = rm.dao.UpdateGlobalStateByGid(ctx, gId, entity.SubmittedState)
+		if err != nil {
+			return err
+		}
+		rowsAffectedBranch, err = rm.dao.UpdateBranchStateByGid(ctx, gId, entity.BranchSucceedState)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (rm *TM) RegisterTccBranch(ctx context.Context, gId string, branchList []*entity.Branch) error {
