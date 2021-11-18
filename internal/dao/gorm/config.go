@@ -6,6 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// 暂时废弃
 var GenManager *genManager
 
 func InitGormDb(db *gorm.DB) {

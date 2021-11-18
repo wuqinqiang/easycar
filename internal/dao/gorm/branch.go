@@ -2,14 +2,15 @@ package gorm
 
 import (
 	"context"
+	"strconv"
+	"time"
+
 	"github.com/wuqinqiang/easycar/internal/dao"
 	"github.com/wuqinqiang/easycar/internal/gorm/model"
 	"github.com/wuqinqiang/easycar/internal/gorm/query"
 	"github.com/wuqinqiang/easycar/internal/service/entity"
 	"github.com/wuqinqiang/easycar/pkg/mysql"
 	"github.com/wuqinqiang/easycar/pkg/utils"
-	"strconv"
-	"time"
 )
 
 type BranchImpl struct {
@@ -44,7 +45,7 @@ func (g BranchImpl) CreateBatches(ctx context.Context, gId string, list []*entit
 	return err
 }
 
-func (g BranchImpl) List(ctx context.Context, gid string) ([]*entity.Branch, error) {
+func (g BranchImpl) GetBranchList(ctx context.Context, gid string) ([]*entity.Branch, error) {
 	branch := g.query.Branch
 	_, err := g.query.Branch.WithContext(ctx).
 		Where(branch.Gid.Eq(gid)).
