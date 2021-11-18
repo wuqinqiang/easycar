@@ -2,6 +2,7 @@ package gorm
 
 import (
 	"context"
+
 	"github.com/wuqinqiang/easycar/internal/dao"
 	"github.com/wuqinqiang/easycar/internal/gorm/model"
 	"github.com/wuqinqiang/easycar/internal/gorm/query"
@@ -29,11 +30,18 @@ func (g GlobalImpl) Create(ctx context.Context, globalEntity *entity.Global) (in
 
 func (g GlobalImpl) First(ctx context.Context, gid string) (*entity.Global, error) {
 	global := g.query.Global
-	_, err := g.query.Global.WithContext(ctx).
+	first, err := g.query.Global.WithContext(ctx).
 		Where(global.Gid.Eq(gid)).
 		First()
-	err = utils.WrapDbErr(err)
-	return &entity.Global{}, err
+	if err != nil {
+		return nil, utils.WrapDbErr(err)
+	}
+	globalEntity := new(entity.Global)
+	globalEntity.SetGId(first.Gid)
+	globalEntity.SetTransactionName(entity.TransactionName(first.TransactionName))
+	globalEntity.SetProtocol(first.Protocol)
+	globalEntity.SetState(entity.GlobalState(first.State))
+	return globalEntity, err
 }
 
 func (g GlobalImpl) UpdateGlobalStateByGid(ctx context.Context, gid string,

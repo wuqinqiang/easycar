@@ -2,22 +2,38 @@ package service
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/wuqinqiang/easycar/internal/dao"
-	"github.com/wuqinqiang/easycar/internal/dao/gorm"
 	"github.com/wuqinqiang/easycar/internal/service/entity"
 )
 
 type TMInterface interface {
 }
 
-type TMOption func(rm *TM)
+type AddProcessorFunc func(global *entity.Global) Processor
+
+type Processor interface {
+	HandleBranches(ctx context.Context, branchList []*entity.Branch) error
+}
 
 type TM struct {
-	dao dao.TransactionDao
+	dao              dao.TransactionDao
+	processorManager map[entity.TransactionName]AddProcessorFunc
 }
 
 func NewTM(dao dao.TransactionDao) *TM {
-	return &TM{dao: dao}
+	tm := &TM{dao: dao}
+	tm.processorManager["tcc"] = func(global *entity.Global) Processor {
+		return &TCC{global}
+	}
+
+	// todo saga and more
+	return tm
+}
+
+func (rm *TM) GetGlobal(ctx context.Context, gId string) (*entity.Global, error) {
+	return rm.dao.First(ctx, gId)
 }
 
 // Begin  begin a new transaction, return globalId
@@ -39,19 +55,15 @@ func (rm *TM) Submit(ctx context.Context, gId string) (err error) {
 			panic("submit something wrong")
 		}
 	}()
-
-	// todo 严重依赖gorm
-	return gorm.GenManager.BeginTransaction(ctx, func(ctx context.Context) error {
-		rowsAffected, err = rm.dao.UpdateGlobalStateByGid(ctx, gId, entity.SubmittedState)
-		if err != nil {
-			return err
-		}
-		rowsAffectedBranch, err = rm.dao.UpdateBranchStateByGid(ctx, gId, entity.BranchSucceedState)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	rowsAffected, err = rm.dao.UpdateGlobalStateByGid(ctx, gId, entity.SucceedState)
+	if err != nil {
+		return err
+	}
+	rowsAffectedBranch, err = rm.dao.UpdateBranchStateByGid(ctx, gId, entity.BranchSucceedState)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (rm *TM) RegisterTccBranch(ctx context.Context, gId string, branchList []*entity.Branch) error {
@@ -66,6 +78,23 @@ func (rm *TM) RegisterTccBranch(ctx context.Context, gId string, branchList []*e
 	return nil
 }
 
-func (rm *TM) BranchRollBack() {
+func (rm *TM) Abort(ctx context.Context, gId string) error {
+	global, err := rm.dao.First(ctx, gId)
+	if err != nil {
+		return err
+	}
+	list, err := rm.dao.GetBranchList(ctx, gId)
+	if err != nil {
+		return err
+	}
+	if len(list) == 0 {
+		return fmt.Errorf("branch  must not empty")
+	}
+	err = rm.processorManager[global.GetTransactionName()](global).HandleBranches(ctx, list)
 
+	// todo if handle branch err, must update global state
+	if err != nil {
+		return err
+	}
+	return nil
 }
