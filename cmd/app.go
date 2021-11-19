@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/wuqinqiang/easycar/internal/handler"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/wuqinqiang/easycar/core/handler"
 )
 
 type App struct {

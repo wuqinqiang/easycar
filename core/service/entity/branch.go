@@ -67,3 +67,7 @@ func (b *Branch) Setstate(state BranchState) {
 func (b *Branch) GetBranchState() BranchState {
 	return b.state
 }
+
+func (b *Branch) CanHandle() bool {
+	return !(b.GetBranchState() == BranchSucceedState || b.GetBranchState() == BranchFinishedState)
+}

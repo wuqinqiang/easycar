@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"github.com/wuqinqiang/easycar/internal/service"
+	"github.com/wuqinqiang/easycar/core/service"
 )
 
 type EasyCarHttpHandler struct {

@@ -7,7 +7,7 @@ package query
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/internal/gorm/model"
+	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"

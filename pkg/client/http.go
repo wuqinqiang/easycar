@@ -1,8 +1,12 @@
 package client
 
 import (
+	"time"
+
 	"github.com/go-resty/resty/v2"
 )
+
+var RestyClient = httpClient{}
 
 func init() {
 	client := resty.New()
@@ -16,19 +20,17 @@ func init() {
 	//})
 }
 
-var RestyClient = httpClient{}
-
 type httpClient struct {
 	*resty.Client
 }
 
 type HttpOption func(client *httpClient)
 
-//func SetTimeOut(time time.Duration) HttpOption {
-//	return func(client *httpClient) {
-//		client.SetTimeout(time)
-//	}
-//}
+func SetTimeOut(time time.Duration) HttpOption {
+	return func(client *httpClient) {
+		client.SetTimeout(time)
+	}
+}
 
 func (h *httpClient) PostJson(uri string, body interface{}, result interface{}, options ...HttpOption) error {
 	for _, option := range options {

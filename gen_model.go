@@ -11,7 +11,7 @@ func main() {
 	// specify the output directory (default: "./query")
 	// ### if you want to query without context constrain, set mode gen.WithoutContext ###
 
-	outPath := "./internal/gorm/query"
+	outPath := "./core/dao/gorm/query"
 
 	g := gen.NewGenerator(gen.Config{
 		OutPath: outPath,
