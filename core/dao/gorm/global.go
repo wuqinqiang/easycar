@@ -3,10 +3,10 @@ package gorm
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/internal/dao"
-	"github.com/wuqinqiang/easycar/internal/gorm/model"
-	"github.com/wuqinqiang/easycar/internal/gorm/query"
-	"github.com/wuqinqiang/easycar/internal/service/entity"
+	"github.com/wuqinqiang/easycar/core/dao"
+	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
+	"github.com/wuqinqiang/easycar/core/dao/gorm/query"
+	"github.com/wuqinqiang/easycar/core/service/entity"
 	"github.com/wuqinqiang/easycar/pkg/mysql"
 	"github.com/wuqinqiang/easycar/pkg/utils"
 )

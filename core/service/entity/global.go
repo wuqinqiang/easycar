@@ -1,5 +1,7 @@
 package entity
 
+import "strings"
+
 type (
 	GlobalState     string
 	TransactionName string
@@ -57,4 +59,8 @@ func (g *Global) SetProtocol(protocol string) {
 
 func (g *Global) GetProtocol() string {
 	return g.protocol
+}
+
+func (g *Global) IsGrpc() bool {
+	return strings.HasSuffix(g.protocol, "grpc")
 }

@@ -3,7 +3,7 @@ package dao
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/internal/service/entity"
+	"github.com/wuqinqiang/easycar/core/service/entity"
 )
 
 type TransactionDao interface {

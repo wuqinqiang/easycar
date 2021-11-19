@@ -2,7 +2,8 @@ package gorm
 
 import (
 	"context"
-	"github.com/wuqinqiang/easycar/internal/gorm/query"
+
+	"github.com/wuqinqiang/easycar/core/dao/gorm/query"
 	"gorm.io/gorm"
 )
 
