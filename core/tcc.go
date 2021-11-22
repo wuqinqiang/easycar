@@ -1,21 +1,21 @@
-package service
+package core
 
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/core/service/entity"
+	entity2 "github.com/wuqinqiang/easycar/core/entity"
 )
 
 type TCC struct {
-	*entity.Global
+	*entity2.Global
 }
 
-func (t *TCC) HandleBranches(ctx context.Context, branchList []*entity.Branch) error {
+func (t *TCC) HandleBranches(ctx context.Context, branchList []*entity2.Branch) error {
 	if len(branchList) == 0 {
 		return nil
 	}
 	globalState := t.GetState()
-	if globalState == entity.SucceedState || globalState == entity.FailedState {
+	if globalState == entity2.SucceedState || globalState == entity2.FailedState {
 		return nil
 	}
 
