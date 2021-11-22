@@ -4,14 +4,15 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/wuqinqiang/easycar/core"
+
 	"github.com/gin-gonic/gin"
-	"github.com/wuqinqiang/easycar/core/handler"
 )
 
 type App struct {
 	engine *gin.Engine
 	Cof    *Config
-	http   *handler.EasyCarHttpHandler
+	http   *core.EasyCarHttpHandler
 	// todo grpc handler
 }
 

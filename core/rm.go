@@ -1,32 +1,32 @@
-package service
+package core
 
 import (
 	"context"
 	"fmt"
 
 	"github.com/wuqinqiang/easycar/core/dao"
-	"github.com/wuqinqiang/easycar/core/service/entity"
+	entity2 "github.com/wuqinqiang/easycar/core/entity"
 )
 
 type TMInterface interface {
 }
 
-type AddProcessorFunc func(global *entity.Global) Processor
+type AddProcessorFunc func(global *entity2.Global) Processor
 
 type Processor interface {
-	HandleBranches(ctx context.Context, branchList []*entity.Branch) error
+	HandleBranches(ctx context.Context, branchList []*entity2.Branch) error
 }
 
 type TM struct {
 	dao              dao.TransactionDao
-	processorManager map[entity.TransactionName]AddProcessorFunc
+	processorManager map[entity2.TransactionName]AddProcessorFunc
 }
 
 func NewTM(dao dao.TransactionDao) *TM {
 	tm := &TM{dao: dao}
 
 	// tcc
-	tm.processorManager["tcc"] = func(global *entity.Global) Processor {
+	tm.processorManager["tcc"] = func(global *entity2.Global) Processor {
 		return &TCC{global}
 	}
 
@@ -34,12 +34,12 @@ func NewTM(dao dao.TransactionDao) *TM {
 	return tm
 }
 
-func (tm *TM) GetGlobal(ctx context.Context, gId string) (*entity.Global, error) {
+func (tm *TM) GetGlobal(ctx context.Context, gId string) (*entity2.Global, error) {
 	return tm.dao.First(ctx, gId)
 }
 
 // Begin  begin a new transaction, return globalId
-func (tm *TM) Begin(ctx context.Context, entity *entity.Global) (gId string, err error) {
+func (tm *TM) Begin(ctx context.Context, entity *entity2.Global) (gId string, err error) {
 	_, err = tm.dao.Create(ctx, entity)
 	if err != nil {
 		return "", BeginTransactionErr
@@ -58,18 +58,18 @@ func (tm *TM) Submit(ctx context.Context, gId string) (err error) {
 		}
 	}()
 
-	rowsAffected, err = tm.dao.UpdateGlobalStateByGid(ctx, gId, entity.SucceedState)
+	rowsAffected, err = tm.dao.UpdateGlobalStateByGid(ctx, gId, entity2.SucceedState)
 	if err != nil {
 		return err
 	}
-	rowsAffectedBranch, err = tm.dao.UpdateBranchStateByGid(ctx, gId, entity.BranchSucceedState)
+	rowsAffectedBranch, err = tm.dao.UpdateBranchStateByGid(ctx, gId, entity2.BranchSucceedState)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (tm *TM) RegisterTccBranch(ctx context.Context, gId string, branchList []*entity.Branch) error {
+func (tm *TM) RegisterTccBranch(ctx context.Context, gId string, branchList []*entity2.Branch) error {
 	_, err := tm.dao.First(ctx, gId)
 	if err != nil {
 		return NotFindTransaction
@@ -101,6 +101,6 @@ func (tm *TM) Abort(ctx context.Context, gId string) error {
 	return nil
 }
 
-func (tm *TM) GetProcessorByName(name entity.TransactionName, global *entity.Global) Processor {
+func (tm *TM) GetProcessorByName(name entity2.TransactionName, global *entity2.Global) Processor {
 	return tm.processorManager[name](global)
 }

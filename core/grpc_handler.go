@@ -1,4 +1,4 @@
-package handler
+package core
 
 type EasyCarGrpcHandler struct {
 }

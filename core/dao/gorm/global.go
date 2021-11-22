@@ -3,10 +3,11 @@ package gorm
 import (
 	"context"
 
+	entity2 "github.com/wuqinqiang/easycar/core/entity"
+
 	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/query"
-	"github.com/wuqinqiang/easycar/core/service/entity"
 	"github.com/wuqinqiang/easycar/pkg/mysql"
 	"github.com/wuqinqiang/easycar/pkg/utils"
 )
@@ -19,7 +20,7 @@ func NewGlobalImpl() dao.GlobalDao {
 	return GlobalImpl{query: query.Use(mysql.NewDb())}
 }
 
-func (g GlobalImpl) Create(ctx context.Context, globalEntity *entity.Global) (int32, error) {
+func (g GlobalImpl) Create(ctx context.Context, globalEntity *entity2.Global) (int32, error) {
 	var (
 		global model.Global
 	)
@@ -28,7 +29,7 @@ func (g GlobalImpl) Create(ctx context.Context, globalEntity *entity.Global) (in
 	return global.ID, err
 }
 
-func (g GlobalImpl) First(ctx context.Context, gid string) (*entity.Global, error) {
+func (g GlobalImpl) First(ctx context.Context, gid string) (*entity2.Global, error) {
 	global := g.query.Global
 	first, err := g.query.Global.WithContext(ctx).
 		Where(global.Gid.Eq(gid)).
@@ -36,16 +37,16 @@ func (g GlobalImpl) First(ctx context.Context, gid string) (*entity.Global, erro
 	if err != nil {
 		return nil, utils.WrapDbErr(err)
 	}
-	globalEntity := new(entity.Global)
+	globalEntity := new(entity2.Global)
 	globalEntity.SetGId(first.Gid)
-	globalEntity.SetTransactionName(entity.TransactionName(first.TransactionName))
+	globalEntity.SetTransactionName(entity2.TransactionName(first.TransactionName))
 	globalEntity.SetProtocol(first.Protocol)
-	globalEntity.SetState(entity.GlobalState(first.State))
+	globalEntity.SetState(entity2.GlobalState(first.State))
 	return globalEntity, err
 }
 
 func (g GlobalImpl) UpdateGlobalStateByGid(ctx context.Context, gid string,
-	state entity.GlobalState) (int64, error) {
+	state entity2.GlobalState) (int64, error) {
 	global := g.query.Global
 	result, err := g.query.Global.WithContext(ctx).
 		Where(global.Gid.Eq(gid)).Update(global.State, state)
