@@ -6,12 +6,17 @@ type RM struct {
 	// todo some timeout config
 }
 
-func NewRM() *RM {
-	return &RM{}
+type TransactionInterface interface {
+	GetTransactionName() string
+}
+
+func NewRM(serverAddress string) *RM {
+	return &RM{serverAddress: serverAddress}
 }
 
 // Start start for a transaction
 func (r *RM) Start() {
+
 }
 
 // RegisterBranch Register transaction branch to server

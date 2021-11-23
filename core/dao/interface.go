@@ -3,6 +3,8 @@ package dao
 import (
 	"context"
 
+	"github.com/wuqinqiang/easycar/pkg/common"
+
 	entity2 "github.com/wuqinqiang/easycar/core/entity"
 )
 
@@ -22,5 +24,5 @@ type GlobalDao interface {
 	Create(ctx context.Context, global *entity2.Global) (int32, error)
 	First(ctx context.Context, gid string) (*entity2.Global, error)
 	UpdateGlobalStateByGid(ctx context.Context, gid string,
-		state entity2.GlobalState) (int64, error)
+		state common.GlobalState) (int64, error)
 }

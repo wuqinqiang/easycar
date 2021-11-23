@@ -4,11 +4,14 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/wuqinqiang/easycar/pkg/common"
+
 	"github.com/wuqinqiang/easycar/core/dao"
 	entity2 "github.com/wuqinqiang/easycar/core/entity"
 )
 
 type TMInterface interface {
+	Begin(ctx context.Context, entity *entity2.Global) (gId string, err error)
 }
 
 type AddProcessorFunc func(global *entity2.Global) Processor
@@ -19,7 +22,7 @@ type Processor interface {
 
 type TM struct {
 	dao              dao.TransactionDao
-	processorManager map[entity2.TransactionName]AddProcessorFunc
+	processorManager map[common.TransactionName]AddProcessorFunc
 }
 
 func NewTM(dao dao.TransactionDao) *TM {
@@ -58,7 +61,7 @@ func (tm *TM) Submit(ctx context.Context, gId string) (err error) {
 		}
 	}()
 
-	rowsAffected, err = tm.dao.UpdateGlobalStateByGid(ctx, gId, entity2.SucceedState)
+	rowsAffected, err = tm.dao.UpdateGlobalStateByGid(ctx, gId, common.SucceedState)
 	if err != nil {
 		return err
 	}
@@ -101,6 +104,6 @@ func (tm *TM) Abort(ctx context.Context, gId string) error {
 	return nil
 }
 
-func (tm *TM) GetProcessorByName(name entity2.TransactionName, global *entity2.Global) Processor {
+func (tm *TM) GetProcessorByName(name common.TransactionName, global *entity2.Global) Processor {
 	return tm.processorManager[name](global)
 }

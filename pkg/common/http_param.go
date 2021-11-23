@@ -1,6 +1,27 @@
-package client
+package common
 
 import "strconv"
+
+type GlobalData struct {
+	transactionName TransactionName
+	protocol        string
+}
+
+func (g *GlobalData) SetTransactionName(name TransactionName) {
+	g.transactionName = name
+}
+
+func (g *GlobalData) GetTransactionName() TransactionName {
+	return g.transactionName
+}
+
+func (g *GlobalData) SetProtocol(protocol string) {
+	g.protocol = protocol
+}
+
+func (g *GlobalData) GetProtocol() string {
+	return g.protocol
+}
 
 // BranchData client transaction data
 type BranchData struct {
