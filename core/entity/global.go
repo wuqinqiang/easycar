@@ -1,25 +1,15 @@
 package entity
 
-import "strings"
+import (
+	"strings"
 
-type (
-	GlobalState     string
-	TransactionName string
-)
-
-const (
-	TCC  TransactionName = "tcc"
-	SAGA TransactionName = "saga"
-
-	PreparedState GlobalState = "prepared"
-	SucceedState  GlobalState = "succeed"
-	FailedState   GlobalState = "failed"
+	"github.com/wuqinqiang/easycar/pkg/common"
 )
 
 type Global struct {
 	gId             string
-	transactionName TransactionName
-	state           GlobalState
+	transactionName common.TransactionName
+	state           common.GlobalState
 	protocol        string
 }
 
@@ -37,19 +27,19 @@ func (g *Global) GetGId() string {
 	return g.gId
 }
 
-func (g *Global) SetTransactionName(transactionName TransactionName) {
+func (g *Global) SetTransactionName(transactionName common.TransactionName) {
 	g.transactionName = transactionName
 }
 
-func (g *Global) GetTransactionName() TransactionName {
+func (g *Global) GetTransactionName() common.TransactionName {
 	return g.transactionName
 }
 
-func (g *Global) SetState(state GlobalState) {
+func (g *Global) SetState(state common.GlobalState) {
 	g.state = state
 }
 
-func (g *Global) GetState() GlobalState {
+func (g *Global) GetState() common.GlobalState {
 	return g.state
 }
 

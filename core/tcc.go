@@ -3,6 +3,8 @@ package core
 import (
 	"context"
 
+	"github.com/wuqinqiang/easycar/pkg/common"
+
 	entity2 "github.com/wuqinqiang/easycar/core/entity"
 )
 
@@ -15,7 +17,7 @@ func (t *TCC) HandleBranches(ctx context.Context, branchList []*entity2.Branch) 
 		return nil
 	}
 	globalState := t.GetState()
-	if globalState == entity2.SucceedState || globalState == entity2.FailedState {
+	if globalState == common.SucceedState || globalState == common.FailedState {
 		return nil
 	}
 

@@ -38,7 +38,9 @@ func NewApp() *App {
 }
 
 func (app *App) RegisterRouter() {
+	handler := core.NewEasyCarHttpHandler()
 	app.engine.POST("/easycar/begin", func(context *gin.Context) {
+		handler.Begin(context)
 	})
 }
 
