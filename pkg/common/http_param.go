@@ -2,25 +2,46 @@ package common
 
 import "strconv"
 
-type GlobalData struct {
+type ReqGlobalData struct {
 	transactionName TransactionName
 	protocol        string
 }
 
-func (g *GlobalData) SetTransactionName(name TransactionName) {
+func (g *ReqGlobalData) SetTransactionName(name TransactionName) {
 	g.transactionName = name
 }
 
-func (g *GlobalData) GetTransactionName() TransactionName {
+func (g *ReqGlobalData) GetTransactionName() TransactionName {
 	return g.transactionName
 }
 
-func (g *GlobalData) SetProtocol(protocol string) {
+func (g *ReqGlobalData) SetProtocol(protocol string) {
 	g.protocol = protocol
 }
 
-func (g *GlobalData) GetProtocol() string {
+func (g *ReqGlobalData) GetProtocol() string {
 	return g.protocol
+}
+
+type RespBase struct {
+	Msg string
+	Err error
+}
+
+func (respBase RespBase) GetMsg() string {
+	return respBase.Msg
+}
+func (respBase RespBase) GetError() error {
+	return respBase.Err
+}
+
+type RespGlobalData struct {
+	RespBase
+	GId string
+}
+
+func (globalResp RespGlobalData) GetGId() string {
+	return globalResp.GId
 }
 
 // BranchData client transaction data

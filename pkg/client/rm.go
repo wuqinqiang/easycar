@@ -1,5 +1,12 @@
 package client
 
+import (
+	"context"
+	"fmt"
+
+	"github.com/wuqinqiang/easycar/pkg/common"
+)
+
 type RM struct {
 	// server Address
 	serverAddress string
@@ -7,7 +14,8 @@ type RM struct {
 }
 
 type TransactionInterface interface {
-	GetTransactionName() string
+	GetTransactionName() common.TransactionName
+	GetProtocol() string
 }
 
 func NewRM(serverAddress string) *RM {
@@ -15,11 +23,24 @@ func NewRM(serverAddress string) *RM {
 }
 
 // Start start for a transaction
-func (r *RM) Start() {
+func (r *RM) Start(tran TransactionInterface) (gId string, err error) {
+	if r.serverAddress == "" {
+		return "", fmt.Errorf("no serverAddress url")
+	}
+	req := new(common.ReqGlobalData)
+	req.SetTransactionName(tran.GetTransactionName())
+	req.SetProtocol(tran.GetProtocol())
 
+	resp := new(common.RespGlobalData)
+	err = common.RestyClient.PostJson(r.serverAddress, req, resp)
+	if err != nil {
+		// todo common err handler
+		return
+	}
+	return resp.GetGId(), nil
 }
 
-// RegisterBranch Register transaction branch to server
-func (r *RM) RegisterBranch() {
+// RegisterBranch Register transaction branchList to server
+func (r *RM) RegisterBranch(ctx context.Context, branchList []common.BranchData) {
 
 }
