@@ -18,13 +18,12 @@ func NewEasyCarHttpHandler() EasyCarHttpHandler {
 }
 
 func (e *EasyCarHttpHandler) Begin(c *gin.Context) {
-	var req common.GlobalData
+	var req common.ReqGlobalData
 	if err := BindJSONData(c, &req); err != nil {
 		// todo
 		return
 	}
 	// todo ctx in all request
-
 	var (
 		param entity.Global
 	)

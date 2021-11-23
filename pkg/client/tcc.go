@@ -1,5 +1,7 @@
 package client
 
+import "github.com/wuqinqiang/easycar/pkg/common"
+
 var _ TransactionInterface = &TCC{}
 
 type TCCOption func(tcc *TCC)
@@ -20,7 +22,7 @@ func NewTCC(options ...TCCOption) *TCC {
 	return tcc
 }
 
-func (t *TCC) GetTransactionName() string {
+func (t *TCC) GetTransactionName() common.TransactionName {
 	return "tcc"
 }
 
