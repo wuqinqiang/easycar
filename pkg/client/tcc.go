@@ -17,7 +17,6 @@ var (
 type RMFunc func(rmFunc *RM) ([]common.BranchData, error)
 
 type TCC struct {
-	RM
 	protoCol string
 }
 
@@ -37,14 +36,10 @@ func (tcc *TCC) GetProtocol() string {
 	return tcc.protoCol
 }
 
-func (tcc *TCC) RegisterBranch(ctx context.Context) {
-	tcc.RM.RegisterBranch(ctx, nil)
-}
-
 // WeGo begin a transaction for tcc
 func (tcc *TCC) WeGo(ctx context.Context, serverAddress string, rmFunc RMFunc) error {
 	rm := NewRM(serverAddress)
-	gId, err := rm.Start(tcc)
+	_, err := rm.Start(tcc)
 	if err != nil {
 		// todo log
 		return err
@@ -56,8 +51,33 @@ func (tcc *TCC) WeGo(ctx context.Context, serverAddress string, rmFunc RMFunc) e
 		// todo log
 		return err
 	}
-	rm.RegisterBranch(ctx, branchList)
 
+	// first register all branch
+	err = rm.RegisterBranch(ctx, branchList)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if err != nil {
+			// to abort
+		}
+
+		// to commit
+	}()
+
+	// then call every branch try url,we should abort handler when any branch call err,
+	// if err ==nil util last branch call over, it means that the transaction is success
+	for _, branch := range branchList {
+		var (
+			resp common.RespBase
+		)
+		err = common.RestyClient.PostJson(branch.GetUrl(), branch.GetReqData(),
+			&resp, common.SetTimeOut(5))
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 

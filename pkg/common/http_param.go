@@ -80,7 +80,11 @@ func (b *BranchData) SetReqData(data interface{}) {
 	b.reqData = data
 }
 
-func (b *BranchData) SetBranId() {
+func (b *BranchData) GetReqData() interface{} {
+	return b.GetReqData()
+}
+
+func (b *BranchData) GetBranId() {
 	b.branId = b.gId + strconv.Itoa(1)
 }
 
