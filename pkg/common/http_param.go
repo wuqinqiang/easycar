@@ -88,21 +88,11 @@ func (b *BranchData) GetBranId() {
 	b.branId = b.gId + strconv.Itoa(1)
 }
 
-type ReqCommitData struct {
+// ReportStateData report tm that transaction state
+type ReportStateData struct {
 	GId string
-	// todo add something such as tell server again or abort?
-	// .....
 }
 
-func (reqCommit *ReqCommitData) SetGId(gId string) {
-	reqCommit.GId = gId
-}
-
-type ReqFailData struct {
-	GId string
-	// todo add something
-}
-
-func (reqFail *ReqFailData) SetGId(gId string) {
-	reqFail.GId = gId
+func (b *ReportStateData) SetGId(gId string) {
+	b.GId = gId
 }

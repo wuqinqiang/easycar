@@ -1,23 +1,14 @@
 package entity
 
-type (
-	BranchType  uint8
-	BranchState string
-)
-
-const (
-	BranchReadyState    = "ready"
-	BranchSucceedState  = "succeed"
-	BranchFinishedState = "fail"
-)
+import "github.com/wuqinqiang/easycar/pkg/common"
 
 type Branch struct {
 	gId        string
 	url        string
 	reqData    string
 	branchId   string
-	branchType BranchType
-	state      BranchState
+	branchType common.BranchType
+	state      common.BranchState
 }
 
 func NewBranch(gId string) *Branch {
@@ -54,20 +45,20 @@ func (b *Branch) GetBranchId() string {
 	return b.branchId
 }
 
-func (b *Branch) SetBranchType(branchType BranchType) {
+func (b *Branch) SetBranchType(branchType common.BranchType) {
 	b.branchType = branchType
 }
-func (b *Branch) GetBranchType() BranchType {
+func (b *Branch) GetBranchType() common.BranchType {
 	return b.branchType
 }
 
-func (b *Branch) Setstate(state BranchState) {
+func (b *Branch) Setstate(state common.BranchState) {
 	b.state = state
 }
-func (b *Branch) GetBranchState() BranchState {
+func (b *Branch) GetBranchState() common.BranchState {
 	return b.state
 }
 
 func (b *Branch) CanHandle() bool {
-	return !(b.GetBranchState() == BranchSucceedState || b.GetBranchState() == BranchFinishedState)
+	return !(b.GetBranchState() == common.BranchSucceedState || b.GetBranchState() == common.BranchFinishedState)
 }

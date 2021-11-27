@@ -17,7 +17,7 @@ type TMInterface interface {
 type AddProcessorFunc func(global *entity2.Global) Processor
 
 type Processor interface {
-	HandleBranches(ctx context.Context, branchList []*entity2.Branch) error
+	ProcessBranchList(ctx context.Context, branchList []*entity2.Branch) error
 }
 
 type TM struct {
@@ -32,7 +32,9 @@ func NewTM(dao dao.TransactionDao) *TM {
 	tm.processorManager["tcc"] = func(global *entity2.Global) Processor {
 		return &TCC{global}
 	}
-
+	go func() {
+		// todo
+	}()
 	// todo saga and more
 	return tm
 }
@@ -61,7 +63,7 @@ func (tm *TM) Submit(ctx context.Context, gId string) (err error) {
 		}
 	}()
 
-	rowsAffected, err = tm.dao.UpdateGlobalStateByGid(ctx, gId, common.SucceedState)
+	rowsAffected, err = tm.dao.UpdateGlobalStateByGid(ctx, gId, common.Succeed)
 	if err != nil {
 		return err
 	}
@@ -96,7 +98,7 @@ func (tm *TM) Abort(ctx context.Context, gId string) error {
 	if len(list) == 0 {
 		return fmt.Errorf("branch  must not empty")
 	}
-	err = tm.GetProcessorByName(global.GetTransactionName(), global).HandleBranches(ctx, list)
+	err = tm.GetProcessorByName(global.GetTransactionName(), global).ProcessBranchList(ctx, list)
 	// todo if handle branch err, must update global state
 	if err != nil {
 		return err
