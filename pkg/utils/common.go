@@ -6,6 +6,13 @@ import (
 	"gorm.io/gorm"
 )
 
+func IF(bool2 bool, a interface{}, b interface{}) interface{} {
+	if bool2 {
+		return a
+	}
+	return b
+}
+
 func WrapDbErr(err error) error {
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {

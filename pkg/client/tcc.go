@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/wuqinqiang/easycar/pkg/common"
+	"github.com/wuqinqiang/easycar/pkg/utils"
 )
 
 var _ TransactionInterface = &TCC{}
@@ -44,30 +45,41 @@ func (tcc *TCC) WeGo(ctx context.Context, serverAddress string, rmFunc RMFunc) e
 		// todo log
 		return err
 	}
-	// step1:register branch
+	// step1:register all branch that
 	// step2: call branch try url
 	branchList, err := rmFunc(rm)
 	if err != nil {
 		// todo log
 		return err
 	}
-
-	// first register all branch
+	// register all branch that participated in this transaction
 	err = rm.RegisterBranch(ctx, branchList)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
+		action := utils.IF(err != nil, "/abort", "/commit").(string)
+		var (
+			reportReq  common.ReportStateData
+			reportResp common.RespBase
+		)
+		reportReq.SetGId(rm.gId)
+		err = common.RestyClient.PostJson(rm.serverAddress+action, reportReq, &reportResp)
 		if err != nil {
-			// to abort
+			// todo log....
+			return
 		}
-
-		// to commit
 	}()
-
-	// then call every branch try url,we should abort handler when any branch call err,
+	// then we should call every branch for prepare resource, then abort the transaction  when any branch response err,
 	// if err ==nil util last branch call over, it means that the transaction is success
+	return tcc.PrepareBranch(ctx, branchList)
+}
+
+func (tcc *TCC) PrepareBranch(ctx context.Context, branchList []common.BranchData) (err error) {
+	if len(branchList) == 0 {
+		return nil
+	}
 	for _, branch := range branchList {
 		var (
 			resp common.RespBase
@@ -78,7 +90,7 @@ func (tcc *TCC) WeGo(ctx context.Context, serverAddress string, rmFunc RMFunc) e
 			return err
 		}
 	}
-	return nil
+	return
 }
 
 // ask myself some questions
