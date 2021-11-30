@@ -8,5 +8,8 @@
     "maxLifetime": 100,
     "maxIdleNumber": 50,
     "maxOpenNumber": 50
+  },
+  "server": {
+    "addr": "0.0.0.0:9130"
   }
 }
