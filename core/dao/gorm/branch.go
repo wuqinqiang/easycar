@@ -5,6 +5,8 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/wuqinqiang/easycar/pkg/common"
+
 	entity2 "github.com/wuqinqiang/easycar/core/entity"
 
 	"github.com/wuqinqiang/easycar/core/dao"
@@ -33,7 +35,7 @@ func (g BranchImpl) CreateBatches(ctx context.Context, gId string, list []*entit
 			URL:        list[i].GetUrl(),
 			ReqData:    list[i].GetReqData(),
 			BranchID:   gId + strconv.Itoa(i),
-			BranchType: int32(list[i].GetBranchType()),
+			BranchType: string(list[i].GetBranchType()),
 			State:      string(list[i].GetBranchState()),
 			FinishTime: time.Now(),
 			CreateTime: time.Time{},
@@ -55,7 +57,7 @@ func (g BranchImpl) GetBranchList(ctx context.Context, gid string) ([]*entity2.B
 	return []*entity2.Branch{}, err
 }
 
-func (g BranchImpl) UpdateBranchStateByGid(ctx context.Context, gid string, state entity2.BranchState) (int64, error) {
+func (g BranchImpl) UpdateBranchStateByGid(ctx context.Context, gid string, state common.BranchState) (int64, error) {
 	branch := g.query.Branch
 	result, err := g.query.Branch.WithContext(ctx).
 		Where(branch.Gid.Eq(gid)).

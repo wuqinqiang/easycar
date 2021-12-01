@@ -1,5 +1,7 @@
 package encoding
 
+import "encoding/json"
+
 var _ Codec = (*jsonCodec)(nil)
 
 type jsonCodec struct {
@@ -10,11 +12,11 @@ func (j jsonCodec) Name() string {
 }
 
 func (j jsonCodec) Marshal(res interface{}) ([]byte, error) {
-	panic("implement me")
+	return json.Marshal(res)
 }
 
 func (j jsonCodec) UnMarshal(data []byte, src interface{}) error {
-	panic("implement me")
+	return json.Unmarshal(data, src)
 }
 
 func init() {
