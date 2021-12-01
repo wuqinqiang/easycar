@@ -29,7 +29,7 @@ func newBranch(db *gorm.DB) branch {
 	_branch.URL = field.NewString(tableName, "url")
 	_branch.ReqData = field.NewString(tableName, "req_data")
 	_branch.BranchID = field.NewString(tableName, "branch_id")
-	_branch.BranchType = field.NewInt32(tableName, "branch_type")
+	_branch.BranchType = field.NewString(tableName, "branch_type")
 	_branch.State = field.NewString(tableName, "state")
 	_branch.FinishTime = field.NewTime(tableName, "finish_time")
 	_branch.CreateTime = field.NewTime(tableName, "create_time")
@@ -59,7 +59,7 @@ type branch struct {
 	URL        field.String
 	ReqData    field.String
 	BranchID   field.String
-	BranchType field.Int32
+	BranchType field.String
 	State      field.String
 	FinishTime field.Time
 	CreateTime field.Time

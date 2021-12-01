@@ -11,12 +11,12 @@ const TableNameBranch = "branch"
 // Branch mapped from table <branch>
 type Branch struct {
 	ID         int32     `gorm:"column:id;type:int(11);primaryKey" json:"id"`
-	Gid        string    `gorm:"column:gid;type:varchar(128);not null" json:"gid"`               // 事务全局id
-	URL        string    `gorm:"column:url;type:varchar(128);not null" json:"url"`               // 请求资源地址
-	ReqData    string    `gorm:"column:req_data;type:varchar(2999)" json:"req_data"`             // 请求资源地址所需数据
-	BranchID   string    `gorm:"column:branch_id;type:varchar(128);not null" json:"branch_id"`   // 事务分支名称
-	BranchType int32     `gorm:"column:branch_type;type:tinyint(4);not null" json:"branch_type"` // 事务分支类型
-	State      string    `gorm:"column:state;type:varchar(45);not null" json:"state"`            // 步骤的状态 submitted | finished | rollbacked
+	Gid        string    `gorm:"column:gid;type:varchar(128);not null" json:"gid"`                // 事务全局id
+	URL        string    `gorm:"column:url;type:varchar(128);not null" json:"url"`                // 请求资源地址
+	ReqData    string    `gorm:"column:req_data;type:varchar(2999)" json:"req_data"`              // 请求资源地址所需数据
+	BranchID   string    `gorm:"column:branch_id;type:varchar(128);not null" json:"branch_id"`    // 事务分支名称
+	BranchType string    `gorm:"column:branch_type;type:varchar(50);not null" json:"branch_type"` // 事务分支类型
+	State      string    `gorm:"column:state;type:varchar(45);not null" json:"state"`             // 步骤的状态 submitted | finished | rollbacked
 	FinishTime time.Time `gorm:"column:finish_time;type:datetime" json:"finish_time"`
 	CreateTime time.Time `gorm:"column:create_time;type:datetime" json:"create_time"`
 	UpdateTime time.Time `gorm:"column:update_time;type:datetime" json:"update_time"`
