@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/wuqinqiang/easycar/conf"
 )
@@ -35,5 +36,21 @@ func (f *File) Load() (*conf.KeyValue, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &conf.KeyValue{Value: byteAll}, nil
+
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	return &conf.KeyValue{
+		Value:  byteAll,
+		Format: GetFormatByFileName(fileInfo.Name()),
+	}, nil
+}
+
+func GetFormatByFileName(fileName string) string {
+	spilt := strings.Split(fileName, ".")
+	if len(spilt) > 1 {
+		return spilt[len(spilt)-1]
+	}
+	return ""
 }

@@ -67,7 +67,7 @@ func (tm *TM) Submit(ctx context.Context, gId string) (err error) {
 	if err != nil {
 		return err
 	}
-	rowsAffectedBranch, err = tm.dao.UpdateBranchStateByGid(ctx, gId, entity2.BranchSucceedState)
+	rowsAffectedBranch, err = tm.dao.UpdateBranchStateByGid(ctx, gId, common.BranchSucceedState)
 	if err != nil {
 		return err
 	}

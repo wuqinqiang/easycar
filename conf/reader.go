@@ -5,29 +5,32 @@ import "sync"
 var _ Reader = (*reader)(nil)
 
 type Reader interface {
-	LoadValue(value KeyValue) error
+	LoadValue(value *KeyValue) error
 	GetValue(key string) (val interface{}, ok bool)
 }
 
 type reader struct {
-	opts   *options
+	opts   options
 	values map[string]interface{}
 	lock   sync.Mutex
 }
 
-func NewReader(opts *options) Reader {
+func NewReader(opts options) Reader {
 	return &reader{
 		opts:   opts,
 		values: make(map[string]interface{}),
 		lock:   sync.Mutex{},
 	}
 }
-func (r *reader) LoadValue(value KeyValue) error {
-	// todo un data to values by keyValue
+func (r *reader) LoadValue(value *KeyValue) error {
+	err := r.opts.decoder(value, r.values)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
 func (r *reader) GetValue(key string) (val interface{}, ok bool) {
-	// get value by key from values
-	return nil, false
+	val, ok = r.values[key]
+	return
 }

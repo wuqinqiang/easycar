@@ -1,7 +1,8 @@
 package conf
 
 type KeyValue struct {
-	Value []byte
+	Value  []byte
+	Format string
 }
 
 type Source interface {
