@@ -11,19 +11,8 @@ import (
 
 type App struct {
 	engine *gin.Engine
-	Cof    *Config
 	http   *core.EasyCarHttpHandler
 	// todo grpc handler
-}
-
-type Config struct {
-	Server Server `json:"server"`
-}
-
-// Server server config
-type Server struct {
-	url  string
-	port int64
 }
 
 func NewApp() *App {
