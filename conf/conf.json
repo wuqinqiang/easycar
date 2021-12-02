@@ -1,5 +1,5 @@
 {
-  "db": {
+  "mysql": {
     "url": "127.0.0.1",
     "dbName": "easycar",
     "port": 3306,
