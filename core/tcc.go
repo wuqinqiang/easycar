@@ -3,18 +3,18 @@ package core
 import (
 	"context"
 
+	"github.com/wuqinqiang/easycar/pkg/entity"
+
 	"github.com/wuqinqiang/easycar/pkg/utils"
 
 	"github.com/wuqinqiang/easycar/pkg/common"
-
-	entity2 "github.com/wuqinqiang/easycar/core/entity"
 )
 
 type TCC struct {
-	*entity2.Global
+	*entity.Global
 }
 
-func (t *TCC) ProcessBranchList(ctx context.Context, branchList []*entity2.Branch) error {
+func (t *TCC) ProcessBranchList(ctx context.Context, branchList []*entity.Branch) error {
 	if len(branchList) == 0 {
 		return nil
 	}

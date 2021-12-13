@@ -1,0 +1,86 @@
+syntax = "proto3";
+
+package apis;
+
+option go_package = "github.com/wuqinqiang/easycar/pkg/apis";
+
+service EasyCar {
+  rpc Begin(BeginReq)returns(BeginResp){}
+  rpc Commit(CommitReq)returns(CommitResp){}
+  rpc RollBack(RollBackReq) returns(RollBackReq){}
+}
+
+
+enum Code {
+  CODE_SUCCESS = 0;
+  CODE_FAILED = 1;
+}
+
+message BaseResp {
+  Code code = 1;
+  string msg = 2;
+}
+
+// todo more
+enum TransactionName {
+  DEFAULT = 0;
+  TCC = 1;
+  SAGA = 2;
+}
+
+
+//todo more
+enum GlobalState {
+  GLOBAL_DEFAULT = 0;
+  PREPARED = 1;
+  SUBMITTED = 2;
+  SUCCEED = 3;
+  FAILED = 4;
+  ABORT = 5;
+}
+
+
+//todo more
+enum BranchState {
+  BRANCH_DEFAULT = 0;
+  BRANCH_READY = 1;
+  BRANCH_SUCCEED = 2;
+  BRANCH_FAILED = 3;
+}
+
+
+
+message BeginReq {
+  TransactionName name = 1;
+}
+
+message BeginResp {
+  BaseResp common = 1;
+  message info{
+    string GId = 1;
+  }
+  info data = 3;
+}
+
+message CommitReq {
+  string GId = 1;
+}
+message CommitResp {
+  BaseResp common = 1;
+  message info{
+    GlobalState state = 1;
+  }
+  info data = 2;
+}
+
+message RollBackReq {
+  string GId = 1;
+}
+
+message RollBackResp{
+  BaseResp common = 1;
+  message info{
+    GlobalState state = 1;
+  }
+  info data = 2;
+}

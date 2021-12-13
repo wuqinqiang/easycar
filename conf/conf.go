@@ -24,6 +24,7 @@ func New(optFunS ...OptionFunc) Config {
 		decoder: DefaultDecoder,
 		source:  file.NewFile(""),
 	}
+
 	for _, optFunc := range optFunS {
 		optFunc(&opt)
 	}
