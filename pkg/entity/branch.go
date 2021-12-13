@@ -3,12 +3,13 @@ package entity
 import "github.com/wuqinqiang/easycar/pkg/common"
 
 type Branch struct {
-	gId        string
-	url        string
-	reqData    string
-	branchId   string
-	branchType common.BranchType
-	state      common.BranchState
+	gId             string
+	url             string
+	reqData         string
+	branchId        string
+	transactionName common.TransactionName
+	branchType      common.BranchType
+	state           common.BranchState
 }
 
 func NewBranch(gId string) *Branch {
@@ -50,6 +51,13 @@ func (b *Branch) SetBranchType(branchType common.BranchType) {
 }
 func (b *Branch) GetBranchType() common.BranchType {
 	return b.branchType
+}
+
+func (b *Branch) SetTransactionName(name common.TransactionName) {
+	b.transactionName = name
+}
+func (b *Branch) GetTransactionName() common.TransactionName {
+	return b.transactionName
 }
 
 func (b *Branch) Setstate(state common.BranchState) {

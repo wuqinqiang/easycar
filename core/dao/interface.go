@@ -3,9 +3,9 @@ package dao
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/pkg/common"
+	"github.com/wuqinqiang/easycar/pkg/entity"
 
-	entity2 "github.com/wuqinqiang/easycar/core/entity"
+	"github.com/wuqinqiang/easycar/pkg/common"
 )
 
 type TransactionDao interface {
@@ -14,15 +14,15 @@ type TransactionDao interface {
 }
 
 type BranchDao interface {
-	CreateBatches(ctx context.Context, gId string, branch []*entity2.Branch) error
-	GetBranchList(ctx context.Context, gid string) ([]*entity2.Branch, error)
+	CreateBatches(ctx context.Context, gId string, branch []*entity.Branch) error
+	GetBranchList(ctx context.Context, gid string) ([]*entity.Branch, error)
 	UpdateBranchStateByGid(ctx context.Context, gid string,
 		state common.BranchState) (int64, error)
 }
 
 type GlobalDao interface {
-	Create(ctx context.Context, global *entity2.Global) (int32, error)
-	First(ctx context.Context, gid string) (*entity2.Global, error)
+	Create(ctx context.Context, global *entity.Global) (int32, error)
+	First(ctx context.Context, gid string) (*entity.Global, error)
 	UpdateGlobalStateByGid(ctx context.Context, gid string,
 		state common.GlobalState) (int64, error)
 }

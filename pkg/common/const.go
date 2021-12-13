@@ -1,7 +1,5 @@
 package common
 
-const ()
-
 type (
 	GlobalState     string
 	TransactionName string

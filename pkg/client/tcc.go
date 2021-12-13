@@ -7,7 +7,7 @@ import (
 	"github.com/wuqinqiang/easycar/pkg/utils"
 )
 
-var _ TransactionInterface = &TCC{}
+var _ RMInterface = &TCC{}
 
 type TCCOption func(tcc *TCC)
 
@@ -15,10 +15,14 @@ var (
 	DefaultProtoCol = "http"
 )
 
-type RMFunc func(rmFunc *RM) ([]common.BranchData, error)
+type RMFunc func(rmFunc *TM) ([]common.BranchData, error)
 
 type TCC struct {
 	protoCol string
+}
+
+func (tcc *TCC) RegisterBranch(gId string) {
+	panic("implement me")
 }
 
 func NewTCC(options ...TCCOption) *TCC {
@@ -39,7 +43,7 @@ func (tcc *TCC) GetProtocol() string {
 
 // WeGo begin a transaction for tcc
 func (tcc *TCC) WeGo(ctx context.Context, serverAddress string, rmFunc RMFunc) error {
-	rm := NewRM(serverAddress)
+	rm := NewTM(serverAddress)
 	_, err := rm.Start(tcc)
 	if err != nil {
 		// todo log
@@ -93,6 +97,10 @@ func (tcc *TCC) PrepareBranch(ctx context.Context, branchList []common.BranchDat
 	return
 }
 
-// ask myself some questions
-// 1.how to easy to use?
-//
+func (tcc *TCC) BranchCommit() {
+	panic("implement me")
+}
+
+func (tcc *TCC) BranchRollBack() {
+	panic("implement me")
+}

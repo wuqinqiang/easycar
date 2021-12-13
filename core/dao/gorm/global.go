@@ -3,9 +3,9 @@ package gorm
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/pkg/common"
+	"github.com/wuqinqiang/easycar/pkg/entity"
 
-	entity2 "github.com/wuqinqiang/easycar/core/entity"
+	"github.com/wuqinqiang/easycar/pkg/common"
 
 	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
@@ -22,7 +22,7 @@ func NewGlobalImpl() dao.GlobalDao {
 	return GlobalImpl{query: query.Use(mysql.NewDb())}
 }
 
-func (g GlobalImpl) Create(ctx context.Context, globalEntity *entity2.Global) (int32, error) {
+func (g GlobalImpl) Create(ctx context.Context, globalEntity *entity.Global) (int32, error) {
 	var (
 		global model.Global
 	)
@@ -31,7 +31,7 @@ func (g GlobalImpl) Create(ctx context.Context, globalEntity *entity2.Global) (i
 	return global.ID, err
 }
 
-func (g GlobalImpl) First(ctx context.Context, gid string) (*entity2.Global, error) {
+func (g GlobalImpl) First(ctx context.Context, gid string) (*entity.Global, error) {
 	global := g.query.Global
 	first, err := g.query.Global.WithContext(ctx).
 		Where(global.Gid.Eq(gid)).
@@ -39,7 +39,7 @@ func (g GlobalImpl) First(ctx context.Context, gid string) (*entity2.Global, err
 	if err != nil {
 		return nil, utils.WrapDbErr(err)
 	}
-	globalEntity := new(entity2.Global)
+	globalEntity := new(entity.Global)
 	globalEntity.SetGId(first.Gid)
 	globalEntity.SetTransactionName(common.TransactionName(first.TransactionName))
 	globalEntity.SetProtocol(first.Protocol)

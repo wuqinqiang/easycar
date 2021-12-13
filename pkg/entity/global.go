@@ -54,3 +54,11 @@ func (g *Global) GetProtocol() string {
 func (g *Global) IsGrpc() bool {
 	return strings.HasSuffix(g.protocol, "grpc")
 }
+
+func (g *Global) CanSubmit() bool {
+	return g.state == common.Prepared
+}
+
+func (g *Global) CanRollBack() bool {
+	return g.state == common.Prepared
+}
