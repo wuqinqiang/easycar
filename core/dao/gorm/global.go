@@ -4,9 +4,6 @@ import (
 	"context"
 
 	"github.com/wuqinqiang/easycar/core/consts"
-
-	"github.com/wuqinqiang/easycar/pkg/entity"
-
 	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/query"
@@ -22,7 +19,7 @@ func NewGlobalImpl() dao.GlobalDao {
 	return GlobalImpl{query: query.Use(mysql.NewDb())}
 }
 
-func (g GlobalImpl) Create(ctx context.Context, globalEntity *entity.Global) (int32, error) {
+func (g GlobalImpl) Create(ctx context.Context, globalEntity *model.Global) (int32, error) {
 	var (
 		global model.Global
 	)
@@ -31,20 +28,8 @@ func (g GlobalImpl) Create(ctx context.Context, globalEntity *entity.Global) (in
 	return global.ID, err
 }
 
-func (g GlobalImpl) First(ctx context.Context, gid string) (*entity.Global, error) {
-	global := g.query.Global
-	first, err := g.query.Global.WithContext(ctx).
-		Where(global.Gid.Eq(gid)).
-		First()
-	if err != nil {
-		return nil, utils.WrapDbErr(err)
-	}
-	globalEntity := new(entity.Global)
-	globalEntity.SetGId(first.Gid)
-	globalEntity.SetTransactionName(consts.TransactionType(first.TransactionName))
-	globalEntity.SetProtocol(first.Protocol)
-	globalEntity.SetState(consts.GlobalState(first.State))
-	return globalEntity, err
+func (g GlobalImpl) First(ctx context.Context, gid string) (*model.Global, error) {
+	return nil, nil
 }
 
 func (g GlobalImpl) UpdateGlobalStateByGid(ctx context.Context, gid string,

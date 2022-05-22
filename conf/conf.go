@@ -2,8 +2,6 @@ package conf
 
 import (
 	"fmt"
-
-	"github.com/wuqinqiang/easycar/conf/file"
 )
 
 var _ Config = (*config)(nil)
@@ -22,7 +20,6 @@ func New(optFunS ...OptionFunc) Config {
 	// default options
 	opt := options{
 		decoder: DefaultDecoder,
-		source:  file.NewFile(""),
 	}
 
 	for _, optFunc := range optFunS {

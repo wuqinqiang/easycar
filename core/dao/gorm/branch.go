@@ -2,12 +2,8 @@ package gorm
 
 import (
 	"context"
-	"strconv"
-	"time"
 
 	"github.com/wuqinqiang/easycar/core/consts"
-
-	"github.com/wuqinqiang/easycar/pkg/entity"
 
 	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
@@ -24,37 +20,19 @@ func NewBranchImpl() dao.BranchDao {
 	return BranchImpl{query: query.Use(mysql.NewDb())}
 }
 
-func (g BranchImpl) CreateBatches(ctx context.Context, gId string, list []*entity.Branch) error {
-	var (
-		branchList []*model.Branch
-	)
-
-	for i := range list {
-		branchList = append(branchList, &model.Branch{
-			Gid:        gId,
-			URL:        list[i].GetUrl(),
-			ReqData:    list[i].GetReqData(),
-			BranchID:   gId + strconv.Itoa(i),
-			BranchType: string(list[i].GetBranchType()),
-			State:      string(list[i].GetBranchState()),
-			FinishTime: time.Now(),
-			CreateTime: time.Time{},
-			UpdateTime: time.Time{},
-		})
-	}
-
-	err := g.query.Branch.WithContext(ctx).CreateInBatches(branchList, len(branchList))
+func (g BranchImpl) CreateBatches(ctx context.Context, list []*model.Branch) error {
+	err := g.query.Branch.WithContext(ctx).CreateInBatches(list, len(list))
 	err = utils.WrapDbErr(err)
 	return err
 }
 
-func (g BranchImpl) GetBranchList(ctx context.Context, gid string) ([]*entity.Branch, error) {
+func (g BranchImpl) GetBranchList(ctx context.Context, gid string) ([]*model.Branch, error) {
 	branch := g.query.Branch
 	_, err := g.query.Branch.WithContext(ctx).
 		Where(branch.Gid.Eq(gid)).
 		Find()
 	err = utils.WrapDbErr(err)
-	return []*entity.Branch{}, err
+	return []*model.Branch{}, err
 }
 
 func (g BranchImpl) UpdateBranchStateByGid(ctx context.Context, gid string, state consts.BranchState) (int64, error) {

@@ -9,8 +9,6 @@ import (
 	"github.com/wuqinqiang/easycar/conf"
 )
 
-var _ conf.Source = &File{}
-
 type File struct {
 	path string
 }
