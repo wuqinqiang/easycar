@@ -3,9 +3,9 @@ package gorm
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/pkg/entity"
+	"github.com/wuqinqiang/easycar/core/consts"
 
-	"github.com/wuqinqiang/easycar/pkg/common"
+	"github.com/wuqinqiang/easycar/pkg/entity"
 
 	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
@@ -41,14 +41,14 @@ func (g GlobalImpl) First(ctx context.Context, gid string) (*entity.Global, erro
 	}
 	globalEntity := new(entity.Global)
 	globalEntity.SetGId(first.Gid)
-	globalEntity.SetTransactionName(common.TransactionName(first.TransactionName))
+	globalEntity.SetTransactionName(consts.TransactionType(first.TransactionName))
 	globalEntity.SetProtocol(first.Protocol)
-	globalEntity.SetState(common.GlobalState(first.State))
+	globalEntity.SetState(consts.GlobalState(first.State))
 	return globalEntity, err
 }
 
 func (g GlobalImpl) UpdateGlobalStateByGid(ctx context.Context, gid string,
-	state common.GlobalState) (int64, error) {
+	state consts.GlobalState) (int64, error) {
 	global := g.query.Global
 	result, err := g.query.Global.WithContext(ctx).
 		Where(global.Gid.Eq(gid)).Update(global.State, state)

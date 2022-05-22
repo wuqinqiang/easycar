@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/wuqinqiang/easycar/pkg/entity"
+	"github.com/wuqinqiang/easycar/core/consts"
 
-	"github.com/wuqinqiang/easycar/pkg/common"
+	"github.com/wuqinqiang/easycar/pkg/entity"
 
 	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
@@ -57,7 +57,7 @@ func (g BranchImpl) GetBranchList(ctx context.Context, gid string) ([]*entity.Br
 	return []*entity.Branch{}, err
 }
 
-func (g BranchImpl) UpdateBranchStateByGid(ctx context.Context, gid string, state common.BranchState) (int64, error) {
+func (g BranchImpl) UpdateBranchStateByGid(ctx context.Context, gid string, state consts.BranchState) (int64, error) {
 	branch := g.query.Branch
 	result, err := g.query.Branch.WithContext(ctx).
 		Where(branch.Gid.Eq(gid)).
