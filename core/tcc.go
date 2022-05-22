@@ -3,6 +3,8 @@ package core
 import (
 	"context"
 
+	"github.com/wuqinqiang/easycar/core/consts"
+
 	"github.com/wuqinqiang/easycar/pkg/entity"
 
 	"github.com/wuqinqiang/easycar/pkg/utils"
@@ -10,21 +12,21 @@ import (
 	"github.com/wuqinqiang/easycar/pkg/common"
 )
 
-type TCC struct {
+type TCCServer struct {
 	*entity.Global
 }
 
-func (t *TCC) ProcessBranchList(ctx context.Context, branchList []*entity.Branch) error {
+func (t *TCCServer) ProcessBranchList(ctx context.Context, branchList []*entity.Branch) error {
 	if len(branchList) == 0 {
 		return nil
 	}
 	globalState := t.GetState()
-	if globalState == common.Succeed || globalState == common.Failed {
+	if globalState == Succeed || globalState == Failed {
 		return nil
 	}
-	action := utils.IF(t.GetState() == common.Submitted, common.Confirm, common.Cancel).(string)
+	action := utils.IF(t.GetState() == consts.Submitted, consts.Confirm, consts.Cancel).(string)
 	for _, branch := range branchList {
-		if branch.GetBranchType() != common.BranchType(action) {
+		if branch.GetBranchType() != consts.BranchAction(action) {
 			continue
 		}
 
@@ -44,6 +46,5 @@ func (t *TCC) ProcessBranchList(ctx context.Context, branchList []*entity.Branch
 			return err
 		}
 	}
-
 	return nil
 }
