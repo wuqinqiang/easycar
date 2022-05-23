@@ -1,15 +1,13 @@
 package model
 
 import (
-	"strings"
-
 	"github.com/wuqinqiang/easycar/core/consts"
 )
 
 type Global struct {
-	gId      string
-	state    consts.GlobalState
-	protocol string
+	gId     string
+	state   consts.GlobalState
+	EndTime int64
 }
 
 func NewGlobal(gId string) *Global {
@@ -31,18 +29,6 @@ func (g *Global) SetState(state consts.GlobalState) {
 
 func (g *Global) GetState() consts.GlobalState {
 	return g.state
-}
-
-func (g *Global) SetProtocol(protocol string) {
-	g.protocol = protocol
-}
-
-func (g *Global) GetProtocol() string {
-	return g.protocol
-}
-
-func (g *Global) IsGrpc() bool {
-	return strings.HasSuffix(g.protocol, "grpc")
 }
 
 func (g *Global) CanSubmit() bool {
