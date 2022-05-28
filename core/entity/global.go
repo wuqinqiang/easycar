@@ -1,4 +1,4 @@
-package model
+package entity
 
 import (
 	"github.com/wuqinqiang/easycar/core/consts"
@@ -7,7 +7,7 @@ import (
 type Global struct {
 	gId     string
 	state   consts.GlobalState
-	EndTime int64
+	endTime int64
 }
 
 func NewGlobal(gId string) *Global {
@@ -33,4 +33,8 @@ func (g *Global) GetState() consts.GlobalState {
 
 func (g *Global) CanSubmit() bool {
 	return g.state == consts.Begin
+}
+
+func (g *Global) GetBranches() []string {
+	return []string{}
 }
