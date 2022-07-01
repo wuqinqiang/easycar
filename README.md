@@ -36,3 +36,9 @@ state    consts.GlobalState
 endTime int64
 }
 ```
+
+#### 架构
+
+#### 流转
+
+handler->Coordinator->tasks-work

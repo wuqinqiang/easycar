@@ -4,70 +4,47 @@ import (
 	"context"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/wuqinqiang/easycar/core"
 )
 
 var (
-	_        core.NetProtocol = (*client)(nil)
-	restyCli                  = resty.New()
+	_        NetProtocol = (*HttProtocol)(nil)
+	restyCli             = resty.New()
 )
 
 type (
-	Opt struct {
-		body []byte
-		head map[string]string
-	}
-
-	OptFn func(opt *Opt)
-
-	client struct {
-		*Opt
+	HttProtocol struct {
 		uri string
 	}
 )
 
-func (cli *client) GetType() core.NetType {
-	return core.Http
-}
-
-func (cli *client) Request(ctx context.Context, item interface{}) error {
-	//TODO implement me
-	panic("implement me")
-}
-
-func WithHead(header map[string]string) OptFn {
-	return func(opt *Opt) {
-		opt.head = header
-	}
-}
-
-func WithBody(body []byte) OptFn {
-	return func(opt *Opt) {
-		opt.body = body
-	}
-}
-
-func NewClient(uri string, opts ...OptFn) *client {
-	opt := new(Opt)
-	for _, optFn := range opts {
-		optFn(opt)
-	}
-	// todo check uri
-	return &client{
-		Opt: opt,
+func NewHttpProtocol(uri string) *HttProtocol {
+	return &HttProtocol{
 		uri: uri,
 	}
 }
 
-func (cli *client) Req() (Resp, error) {
+func (cli *HttProtocol) GetType() NetType {
+	return Http
+}
+
+func (cli *HttProtocol) Request(ctx context.Context, optFns ...OptsFn) (resp *Resp, err error) {
+	opts := new(Opts)
+	for _, optFn := range optFns {
+		optFn(opts)
+	}
+	resp, err = cli.req(ctx, opts.body, opts.headers)
+	return
+}
+
+func (cli *HttProtocol) req(ctx context.Context, body []byte, headers map[string]string) (*Resp, error) {
 	resp, err := restyCli.R().
-		SetHeaders(cli.head).
-		SetBody(cli.body).
+		SetHeaders(headers).
+		SetBody(body).
 		Post(cli.uri)
 	if err != nil {
-		return Resp{}, err
+		return nil, err
 	}
-	return Resp{
+	return &Resp{
 		Code: int64(resp.StatusCode()),
 		Body: resp.Body(),
 	}, nil
