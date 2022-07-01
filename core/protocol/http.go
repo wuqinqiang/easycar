@@ -1,11 +1,15 @@
 package protocol
 
 import (
+	"context"
+
 	"github.com/go-resty/resty/v2"
+	"github.com/wuqinqiang/easycar/core"
 )
 
 var (
-	restyCli = resty.New()
+	_        core.NetProtocol = (*client)(nil)
+	restyCli                  = resty.New()
 )
 
 type (
@@ -21,6 +25,15 @@ type (
 		uri string
 	}
 )
+
+func (cli *client) GetType() core.NetType {
+	return core.Http
+}
+
+func (cli *client) Request(ctx context.Context, item interface{}) error {
+	//TODO implement me
+	panic("implement me")
+}
 
 func WithHead(header map[string]string) OptFn {
 	return func(opt *Opt) {
