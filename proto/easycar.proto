@@ -1,19 +1,31 @@
 syntax = "proto3";
 
-package apis;
+package proto;
 
-option go_package = "github.com/wuqinqiang/easycar/pkg/apis";
+option go_package = "/proto";
+
+import "google/protobuf/empty.proto";
+
 
 service EasyCar {
-  rpc Begin(BeginReq)returns(BeginResp){}
+  rpc Begin(google.protobuf.Empty)returns(BeginResp){}
+  rpc Register(RegisterReq)returns(RegisterResp){}
   rpc Commit(CommitReq)returns(CommitResp){}
-  rpc RollBack(RollBackReq) returns(RollBackReq){}
+  rpc Abort(AbortReq) returns(AbortResp){}
+  rpc GetState(GetStateReq) returns(GetStateResp){}
 }
 
 
 enum Code {
   CODE_SUCCESS = 0;
   CODE_FAILED = 1;
+}
+
+message RegisterReq {
+
+}
+message RegisterResp {
+  BaseResp common = 1;
 }
 
 message BaseResp {
@@ -73,8 +85,13 @@ message CommitResp {
   info data = 2;
 }
 
-message RollBackReq {
+
+message AbortReq {
   string GId = 1;
+}
+
+message AbortResp {
+  BaseResp common = 1;
 }
 
 message RollBackResp{
@@ -83,4 +100,12 @@ message RollBackResp{
     GlobalState state = 1;
   }
   info data = 2;
+}
+
+message GetStateReq {
+  string GId = 1;
+}
+
+message GetStateResp {
+  BaseResp common = 1;
 }
