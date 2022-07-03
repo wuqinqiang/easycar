@@ -28,7 +28,7 @@ func newGlobal(db *gorm.DB) global {
 	_global.Gid = field.NewString(tableName, "gid")
 	_global.TransactionName = field.NewInt32(tableName, "transaction_name")
 	_global.State = field.NewString(tableName, "state")
-	_global.Protocol = field.NewString(tableName, "protocol")
+	_global.Protocol = field.NewString(tableName, "transport")
 	_global.CreateTime = field.NewTime(tableName, "create_time")
 	_global.UpdateTime = field.NewTime(tableName, "update_time")
 	_global.CommitTime = field.NewTime(tableName, "commit_time")
@@ -40,7 +40,7 @@ func newGlobal(db *gorm.DB) global {
 	_global.fieldMap["gid"] = _global.Gid
 	_global.fieldMap["transaction_name"] = _global.TransactionName
 	_global.fieldMap["state"] = _global.State
-	_global.fieldMap["protocol"] = _global.Protocol
+	_global.fieldMap["transport"] = _global.Protocol
 	_global.fieldMap["create_time"] = _global.CreateTime
 	_global.fieldMap["update_time"] = _global.UpdateTime
 	_global.fieldMap["commit_time"] = _global.CommitTime

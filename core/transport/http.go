@@ -1,4 +1,4 @@
-package protocol
+package transport
 
 import (
 	"context"
@@ -7,27 +7,27 @@ import (
 )
 
 var (
-	_        NetProtocol = (*HttProtocol)(nil)
-	restyCli             = resty.New()
+	_        NetTransport = (*HttpTransport)(nil)
+	restyCli              = resty.New()
 )
 
 type (
-	HttProtocol struct {
+	HttpTransport struct {
 		uri string
 	}
 )
 
-func NewHttpProtocol(uri string) *HttProtocol {
-	return &HttProtocol{
+func NewHttpTransport(uri string) *HttpTransport {
+	return &HttpTransport{
 		uri: uri,
 	}
 }
 
-func (cli *HttProtocol) GetType() NetType {
+func (cli *HttpTransport) GetType() NetType {
 	return Http
 }
 
-func (cli *HttProtocol) Request(ctx context.Context, optFns ...OptsFn) (resp *Resp, err error) {
+func (cli *HttpTransport) Request(ctx context.Context, optFns ...OptsFn) (resp *Resp, err error) {
 	opts := new(Opts)
 	for _, optFn := range optFns {
 		optFn(opts)
@@ -36,7 +36,7 @@ func (cli *HttProtocol) Request(ctx context.Context, optFns ...OptsFn) (resp *Re
 	return
 }
 
-func (cli *HttProtocol) req(ctx context.Context, body []byte, headers map[string]string) (*Resp, error) {
+func (cli *HttpTransport) req(ctx context.Context, body []byte, headers map[string]string) (*Resp, error) {
 	resp, err := restyCli.R().
 		SetHeaders(headers).
 		SetBody(body).

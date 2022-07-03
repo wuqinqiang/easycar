@@ -1,4 +1,4 @@
-package protocol
+package transport
 
 type Resp struct {
 	Code int64  //http code

@@ -1,4 +1,4 @@
-package protocol
+package transport
 
 type (
 	Opts struct {

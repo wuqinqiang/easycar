@@ -8,6 +8,7 @@ package proto
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -19,7 +20,7 @@ import (
 // Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
-// EasyCarClient is the client API for EasyCar service.
+// EasyCarClient is the client API for EasyCar services.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EasyCarClient interface {
@@ -83,7 +84,7 @@ func (c *easyCarClient) GetState(ctx context.Context, in *GetStateReq, opts ...g
 	return out, nil
 }
 
-// EasyCarServer is the server API for EasyCar service.
+// EasyCarServer is the server API for EasyCar services.
 // All implementations must embed UnimplementedEasyCarServer
 // for forward compatibility
 type EasyCarServer interface {
@@ -116,7 +117,7 @@ func (UnimplementedEasyCarServer) GetState(context.Context, *GetStateReq) (*GetS
 }
 func (UnimplementedEasyCarServer) mustEmbedUnimplementedEasyCarServer() {}
 
-// UnsafeEasyCarServer may be embedded to opt out of forward compatibility for this service.
+// UnsafeEasyCarServer may be embedded to opt out of forward compatibility for this services.
 // Use of this interface is not recommended, as added methods to EasyCarServer will
 // result in compilation errors.
 type UnsafeEasyCarServer interface {
@@ -217,7 +218,7 @@ func _EasyCar_GetState_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-// EasyCar_ServiceDesc is the grpc.ServiceDesc for EasyCar service.
+// EasyCar_ServiceDesc is the grpc.ServiceDesc for EasyCar services.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var EasyCar_ServiceDesc = grpc.ServiceDesc{
