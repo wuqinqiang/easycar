@@ -1,24 +1,38 @@
 package main
 
 import (
-	"net"
+	"context"
+	"log"
+	"os"
 
-	grpc2 "github.com/wuqinqiang/easycar/services/grpc"
+	"github.com/wuqinqiang/easycar/services/coordinator"
 
-	"github.com/wuqinqiang/easycar/proto"
-	"google.golang.org/grpc"
+	"github.com/urfave/cli"
 )
 
 func main() {
-	server := grpc.NewServer()
-	proto.RegisterEasyCarServer(server, &grpc2.EasyCarSrv{})
+	app := &cli.App{
+		Commands: []cli.Command{
+			EasyCarCommand,
+		},
+	}
 
-	lis, err := net.Listen("tcp", ":8080")
-	if err != nil {
-		panic(err)
+	if err := app.Run(os.Args); err != nil {
+		log.Fatal(err)
 	}
-	err = server.Serve(lis)
-	if err != nil {
-		panic(err)
-	}
+}
+
+var EasyCarCommand = cli.Command{
+	// todo add args
+	Name: "easycar",
+	Action: func(ctx *cli.Context) error {
+		service, err := coordinator.New(coordinator.WithPort(8089))
+		if err != nil {
+			panic(err)
+		}
+		if err = service.Start(context.Background()); err != nil {
+			panic(err)
+		}
+		return nil
+	},
 }

@@ -25,7 +25,7 @@ respData string //分支事务执行结果，子事务依赖父级事务的结�
 }
 transactionAction consts.BranchAction
 state             consts.BranchState
-protocol string //http or grpc
+protocol string //http or coordinator
 endTime  int64
 }
 

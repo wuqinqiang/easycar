@@ -22,4 +22,4 @@ proto:
 
 .PHONY: run
 run:
-	cd cmd && go run main.go
+	cd cmd && go run main.go easycar
