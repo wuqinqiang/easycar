@@ -2,6 +2,7 @@ package coordinator
 
 import (
 	"context"
+	"errors"
 
 	"github.com/wuqinqiang/easycar/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -28,8 +29,16 @@ func (e EasyCarSrv) Register(ctx context.Context, req *proto.RegisterReq) (*prot
 }
 
 func (e EasyCarSrv) Commit(ctx context.Context, req *proto.CommitReq) (*proto.CommitResp, error) {
-	//TODO implement me
-	panic("implement me")
+	if req.GId == "111" {
+		return nil, errors.New("gid is error")
+	}
+
+	resp := new(proto.CommitResp)
+	resp.Data = new(proto.CommitRespInfo)
+	resp.Common = new(proto.BaseResp)
+	resp.Data.State = proto.GlobalState_SUCCEED
+	resp.Common.Code = proto.Code_CODE_SUCCESS
+	return resp, nil
 }
 
 func (e EasyCarSrv) Abort(ctx context.Context, req *proto.AbortReq) (*proto.AbortResp, error) {

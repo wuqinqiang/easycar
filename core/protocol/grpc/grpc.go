@@ -47,16 +47,13 @@ func (g *Protocol) Request(ctx context.Context, optFns ...common.OptsFn) (*commo
 	if err = conn.Invoke(ctx, method, opts.Body, &respM); err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("响应数据:%+v\n", respM)
-
+	fmt.Println("数据:", string(respM))
 	return nil, nil
 }
 
 func (g *Protocol) getConn(uri string) (*grpc.ClientConn, error) {
-	codecOpt := grpc.ForceCodec(&rawCodec{})
+	codecOpt := grpc.ForceCodec(rawCodec{})
 	opts := grpc.WithDefaultCallOptions(codecOpt)
-
 	// todo add more options
 	return grpc.Dial(uri, grpc.WithTransportCredentials(insecure.NewCredentials()), opts)
 }
@@ -73,8 +70,6 @@ func (cb rawCodec) Marshal(v interface{}) ([]byte, error) {
 
 func (cb rawCodec) Unmarshal(data []byte, v interface{}) error {
 	ba, ok := v.(*[]byte)
-	fmt.Println("data:", string(data))
-	fmt.Println("v:", v)
 	if !ok {
 		return fmt.Errorf("please pass in *[]byte")
 	}
@@ -82,4 +77,5 @@ func (cb rawCodec) Unmarshal(data []byte, v interface{}) error {
 
 	return nil
 }
+
 func (cb rawCodec) Name() string { return "dtm_raw" }
