@@ -67,7 +67,8 @@ message BeginReq {
 }
 
 message BeginResp {
-  BaseResp common = 1;
+  Code code = 1;
+  string msg = 2;
   message info{
     string GId = 1;
   }
@@ -78,11 +79,12 @@ message CommitReq {
   string GId = 1;
 }
 message CommitResp {
-  BaseResp common = 1;
+  Code code = 1;
+  string msg = 2;
   message info{
     GlobalState state = 1;
   }
-  info data = 2;
+  info data = 3;
 }
 
 
@@ -91,15 +93,17 @@ message AbortReq {
 }
 
 message AbortResp {
-  BaseResp common = 1;
+  Code code = 1;
+  string msg = 2;
 }
 
 message RollBackResp{
-  BaseResp common = 1;
+  Code code = 1;
+  string msg = 2;
   message info{
     GlobalState state = 1;
   }
-  info data = 2;
+  info data = 3;
 }
 
 message GetStateReq {
@@ -107,5 +111,10 @@ message GetStateReq {
 }
 
 message GetStateResp {
-  BaseResp common = 1;
+  Code code = 1;
+  string msg = 2;
+  message info {
+
+  }
+  info data = 3;
 }

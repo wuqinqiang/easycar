@@ -17,9 +17,8 @@ type EasyCarSrv struct {
 func (e EasyCarSrv) Begin(ctx context.Context, empty *emptypb.Empty) (*proto.BeginResp, error) {
 	resp := new(proto.BeginResp)
 	resp.Data = new(proto.BeginRespInfo)
-	resp.Common = new(proto.BaseResp)
-	resp.Common.Code = 0
-	resp.Common.Msg = "success"
+	resp.Code = 0
+	resp.Msg = "success"
 	return resp, nil
 }
 
@@ -35,9 +34,8 @@ func (e EasyCarSrv) Commit(ctx context.Context, req *proto.CommitReq) (*proto.Co
 
 	resp := new(proto.CommitResp)
 	resp.Data = new(proto.CommitRespInfo)
-	resp.Common = new(proto.BaseResp)
 	resp.Data.State = proto.GlobalState_SUCCEED
-	resp.Common.Code = proto.Code_CODE_SUCCESS
+	resp.Code = proto.Code_CODE_SUCCESS
 	return resp, nil
 }
 

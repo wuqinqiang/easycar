@@ -1,11 +1,19 @@
 package consts
 
 type (
+	// TransactionType 	is a type of transaction
+	TransactionType string
 	// BranchAction branch action,such as tcc (try、confirm、cancel)
 	BranchAction string
+
+	// Level branch level,	0 is first level,same level can executed concurrently
+	Level uint8
 )
 
 const (
+	TCC  TransactionType = "tcc"
+	SAGA TransactionType = "saga"
+
 	// Try Try、Confirm and Cancel branch type for TCC
 	Try     BranchAction = "try"
 	Confirm BranchAction = "confirm"

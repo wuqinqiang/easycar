@@ -5,15 +5,20 @@ import (
 )
 
 type Global struct {
-	gId     string
-	state   consts.GlobalState
-	endTime int64
+	gId          string             // global id
+	state        consts.GlobalState // global state
+	endTime      int64              // end time for the transaction
+	NextCronTime int64              // next cron time
 }
 
 func NewGlobal(gId string) *Global {
 	return &Global{
 		gId: gId,
 	}
+}
+
+func (g *Global) IsEmpty() bool {
+	return g.gId == ""
 }
 
 func (g *Global) SetGId(gId string) {
@@ -29,6 +34,10 @@ func (g *Global) SetState(state consts.GlobalState) {
 
 func (g *Global) GetState() consts.GlobalState {
 	return g.state
+}
+
+func (g *Global) GetEndTime() int64 {
+	return g.endTime
 }
 
 func (g *Global) CanSubmit() bool {

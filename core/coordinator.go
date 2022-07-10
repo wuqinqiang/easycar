@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"errors"
 
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/mode"
@@ -11,25 +12,42 @@ import (
 	"github.com/wuqinqiang/easycar/core/dao"
 )
 
+var (
+	ErrGlobalNotExist = errors.New("global not exist")
+)
+
 type Coordinator struct {
 	// resty timeout
 	restyTimeout int64 //second
 	dao          dao.TransactionDao
 }
 
-func NewCoordinator() *Coordinator {
-	return &Coordinator{
+func NewCoordinator(dao dao.TransactionDao) *Coordinator {
+	c := &Coordinator{
 		restyTimeout: 60,
-		// todo more
+		dao:          dao,
 	}
+	return c
 }
 
-func (c *Coordinator) Begin(ctx context.Context) (entity.Global, error) {
-	return entity.Global{}, nil
+func (c *Coordinator) Begin(ctx context.Context) (string, error) {
+	gid := GetGid()
+
+	g := entity.NewGlobal(gid)
+	g.SetState(consts.Begin)
+	err := c.dao.CreateGlobal(ctx, g)
+	return gid, err
 }
 
-func (c *Coordinator) Register(ctx context.Context, gId string, branches []*entity.Branch) error {
-	return nil
+func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.BranchList) error {
+	global, err := c.dao.GetGlobal(ctx, gId)
+	if err != nil {
+		return err
+	}
+	if global.IsEmpty() {
+		return ErrGlobalNotExist
+	}
+	return c.dao.CreateBatches(ctx, branches)
 }
 
 func (c *Coordinator) Commit(ctx context.Context, global entity.Global) error {

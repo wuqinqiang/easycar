@@ -3,6 +3,8 @@ package gorm
 import (
 	"context"
 
+	"github.com/wuqinqiang/easycar/core/entity"
+
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
@@ -19,16 +21,16 @@ func NewGlobalImpl() dao.GlobalDao {
 	return GlobalImpl{query: query.Use(mysql.NewDb())}
 }
 
-func (g GlobalImpl) Create(ctx context.Context, globalEntity *model.Global) (int32, error) {
+func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) error {
 	var (
-		global model.Global
+		m model.Global
 	)
-	err := g.query.Global.WithContext(ctx).Create(&global)
-	err = utils.WrapDbErr(err)
-	return global.ID, err
+	m.Gid = global.GetGId()
+	err := g.query.Global.WithContext(ctx).Create(&m)
+	return utils.WrapDbErr(err)
 }
 
-func (g GlobalImpl) First(ctx context.Context, gid string) (*model.Global, error) {
+func (g GlobalImpl) GetGlobal(ctx context.Context, gid string) (*entity.Global, error) {
 	return nil, nil
 }
 

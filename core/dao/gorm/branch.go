@@ -3,6 +3,8 @@ package gorm
 import (
 	"context"
 
+	"github.com/wuqinqiang/easycar/core/entity"
+
 	"github.com/wuqinqiang/easycar/core/consts"
 
 	"github.com/wuqinqiang/easycar/core/dao"
@@ -20,8 +22,9 @@ func NewBranchImpl() dao.BranchDao {
 	return BranchImpl{query: query.Use(mysql.NewDb())}
 }
 
-func (g BranchImpl) CreateBatches(ctx context.Context, list []*model.Branch) error {
-	err := g.query.Branch.WithContext(ctx).CreateInBatches(list, len(list))
+func (g BranchImpl) CreateBatches(ctx context.Context, list entity.BranchList) error {
+	mList := list.Convert()
+	err := g.query.Branch.WithContext(ctx).CreateInBatches(mList, len(mList))
 	err = utils.WrapDbErr(err)
 	return err
 }
