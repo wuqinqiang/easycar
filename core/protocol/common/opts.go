@@ -1,30 +1,31 @@
 package common
 
+import "time"
+
+var DefaultOps = Opts{timeOut: 5 * time.Second}
+
 type (
-	Opts struct {
+	Req struct {
 		Body    []byte
 		Headers map[string]string
+		Opts    *Opts
 	}
 
+	Opts struct {
+		timeOut time.Duration
+	}
 	OptsFn func(*Opts)
 )
 
-func WithBody(b []byte) OptsFn {
-	return func(netOpts *Opts) {
-		netOpts.Body = b
+func NewReq(body []byte, headers map[string]string) *Req {
+	return &Req{
+		Body:    body,
+		Headers: headers,
 	}
 }
 
-func WithHeaders(heads map[string]string) OptsFn {
+func WithTimeOut(t time.Duration) OptsFn {
 	return func(netOpts *Opts) {
-		netOpts.Headers = heads
-	}
-}
-
-func AppendHeaders(headers map[string]string) OptsFn {
-	return func(opts *Opts) {
-		for k, v := range headers {
-			opts.Headers[k] = v
-		}
+		netOpts.timeOut = t
 	}
 }

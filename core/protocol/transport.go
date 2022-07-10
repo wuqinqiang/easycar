@@ -16,7 +16,7 @@ var NotFoundTransport = errors.New("not found protocol")
 type NetTransport interface {
 	// GetType returns the type of the net protocol
 	GetType() common.NetType
-	Request(ctx context.Context, optFns ...common.OptsFn) (*common.Resp, error)
+	Request(ctx context.Context, req *common.Req, optFns ...common.OptsFn) (*common.Resp, error)
 }
 
 func GetTransport(net common.NetType, service string) (NetTransport, error) {

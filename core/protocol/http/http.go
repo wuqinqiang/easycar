@@ -28,12 +28,12 @@ func (cli *Transport) GetType() common.NetType {
 	return common.Http
 }
 
-func (cli *Transport) Request(ctx context.Context, optFns ...common.OptsFn) (resp *common.Resp, err error) {
+func (cli *Transport) Request(ctx context.Context, req *common.Req, optFns ...common.OptsFn) (resp *common.Resp, err error) {
 	opts := new(common.Opts)
 	for _, optFn := range optFns {
 		optFn(opts)
 	}
-	resp, err = cli.req(ctx, opts.Body, opts.Headers)
+	resp, err = cli.req(ctx, req.Body, req.Headers)
 	return
 }
 

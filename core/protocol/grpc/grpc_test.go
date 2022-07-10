@@ -4,7 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"github.com/golang/protobuf/proto"
+	"google.golang.org/protobuf/proto"
+
 	"github.com/wuqinqiang/easycar/core/protocol/common"
 
 	proto2 "github.com/wuqinqiang/easycar/proto"
@@ -12,11 +13,11 @@ import (
 
 func TestProtocol_Request(t *testing.T) {
 	s := NewProtocol("127.0.0.1:8089/proto.EasyCar/Begin")
-	_, err := s.Request(context.Background())
+	a := common.NewReq(nil, nil)
+	_, err := s.Request(context.Background(), a)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
-
 }
 
 func TestProtocol_Request2(t *testing.T) {
@@ -25,11 +26,12 @@ func TestProtocol_Request2(t *testing.T) {
 	req := proto2.CommitReq{GId: "11"}
 	reqByte, err := proto.Marshal(&req)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
-	_, err = s.Request(context.Background(), common.WithBody(reqByte))
+	a := common.NewReq(reqByte, nil)
+	_, err = s.Request(context.Background(), a)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
 	}
 
 }

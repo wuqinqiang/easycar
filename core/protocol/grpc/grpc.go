@@ -23,10 +23,10 @@ func (g *Protocol) GetType() common.NetType {
 	return common.Grpc
 }
 
-func (g *Protocol) Request(ctx context.Context, optFns ...common.OptsFn) (*common.Resp, error) {
-	opts := new(common.Opts)
+func (g *Protocol) Request(ctx context.Context, req *common.Req, optFns ...common.OptsFn) (*common.Resp, error) {
+	opts := common.DefaultOps
 	for _, optFn := range optFns {
-		optFn(opts)
+		optFn(&opts)
 	}
 	parse, err := g.getParse(g.uri)
 	if err != nil {
@@ -36,26 +36,21 @@ func (g *Protocol) Request(ctx context.Context, optFns ...common.OptsFn) (*commo
 	if err != nil {
 		return nil, err
 	}
-	conn, err := g.getConn(server)
+	conn, err := g.getConn(ctx, server)
 	if err != nil {
 		return nil, err
 	}
-
 	var (
 		respM []byte
 	)
-	if err = conn.Invoke(ctx, method, opts.Body, &respM); err != nil {
-		return nil, err
-	}
-	fmt.Println("数据:", string(respM))
-	return nil, nil
+	err = conn.Invoke(ctx, method, req.Body, &respM)
+	return nil, err
 }
 
-func (g *Protocol) getConn(uri string) (*grpc.ClientConn, error) {
+func (g *Protocol) getConn(ctx context.Context, uri string) (*grpc.ClientConn, error) {
 	codecOpt := grpc.ForceCodec(rawCodec{})
 	opts := grpc.WithDefaultCallOptions(codecOpt)
-	// todo add more options
-	return grpc.Dial(uri, grpc.WithTransportCredentials(insecure.NewCredentials()), opts)
+	return grpc.DialContext(ctx, uri, grpc.WithTransportCredentials(insecure.NewCredentials()), opts)
 }
 
 func (g *Protocol) getParse(server string) (Parser, error) {
@@ -78,4 +73,4 @@ func (cb rawCodec) Unmarshal(data []byte, v interface{}) error {
 	return nil
 }
 
-func (cb rawCodec) Name() string { return "dtm_raw" }
+func (cb rawCodec) Name() string { return "easycar" }
