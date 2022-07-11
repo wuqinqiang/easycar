@@ -8,7 +8,6 @@ import (
 	"github.com/wuqinqiang/easycar/core/consts"
 
 	"github.com/wuqinqiang/easycar/core/dao"
-	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/query"
 	"github.com/wuqinqiang/easycar/pkg/mysql"
 	"github.com/wuqinqiang/easycar/pkg/utils"
@@ -29,13 +28,16 @@ func (g BranchImpl) CreateBatches(ctx context.Context, list entity.BranchList) e
 	return err
 }
 
-func (g BranchImpl) GetBranchList(ctx context.Context, gid string) ([]*model.Branch, error) {
-	branch := g.query.Branch
-	_, err := g.query.Branch.WithContext(ctx).
-		Where(branch.Gid.Eq(gid)).
+func (g BranchImpl) GetBranchList(ctx context.Context, gid string) (list entity.BranchList, err error) {
+	q := g.query.Branch
+	branches, err := g.query.Branch.WithContext(ctx).
+		Where(q.Gid.Eq(gid)).
 		Find()
-	err = utils.WrapDbErr(err)
-	return []*model.Branch{}, err
+	if err = utils.WrapDbErr(err); err != nil {
+		return
+	}
+	list = list.Assign(branches)
+	return
 }
 
 func (g BranchImpl) UpdateBranchStateByGid(ctx context.Context, gid string, state consts.BranchState) (int64, error) {

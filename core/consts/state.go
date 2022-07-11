@@ -23,7 +23,7 @@ const (
 	UNKNOWN GlobalState = "unknown"
 	// end global state
 
-	BranchReadyState    BranchState = "ready"
-	BranchSucceedState  BranchState = "succeed"
-	BranchFinishedState BranchState = "fail"
+	BranchReadyState   BranchState = "ready"
+	BranchSucceedState BranchState = "succeed"
+	BranchFailState    BranchState = "fail"
 )

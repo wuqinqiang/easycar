@@ -24,8 +24,16 @@ type (
 	BranchList []*Branch
 )
 
+func (b *Branch) IsSucceed() bool {
+	return b.State == consts.BranchSucceedState
+}
+
 func (b *Branch) Convert() *model.Branch {
 	return &model.Branch{}
+}
+
+func (b *Branch) Assign(m *model.Branch) *Branch {
+	return b
 }
 
 func (list BranchList) Convert() []*model.Branch {
@@ -34,4 +42,11 @@ func (list BranchList) Convert() []*model.Branch {
 		branches = append(branches, b.Convert())
 	}
 	return branches
+}
+
+func (list BranchList) Assign(mList []*model.Branch) BranchList {
+	for _, b := range list {
+		b.Assign(mList[0])
+	}
+	return list
 }

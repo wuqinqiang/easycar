@@ -5,8 +5,6 @@ import (
 
 	"github.com/wuqinqiang/easycar/core/entity"
 
-	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
-
 	"github.com/wuqinqiang/easycar/core/consts"
 )
 
@@ -17,7 +15,7 @@ type TransactionDao interface {
 
 type BranchDao interface {
 	CreateBatches(ctx context.Context, list entity.BranchList) error
-	GetBranchList(ctx context.Context, gid string) ([]*model.Branch, error)
+	GetBranchList(ctx context.Context, gid string) (entity.BranchList, error)
 	UpdateBranchStateByGid(ctx context.Context, gid string,
 		state consts.BranchState) (int64, error)
 }

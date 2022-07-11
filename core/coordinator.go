@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 
+	"github.com/wuqinqiang/easycar/core/protocol"
+	"github.com/wuqinqiang/easycar/core/protocol/common"
+
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/mode"
 
@@ -50,8 +53,47 @@ func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.
 	return c.dao.CreateBatches(ctx, branches)
 }
 
-func (c *Coordinator) Commit(ctx context.Context, global entity.Global) error {
+func (c *Coordinator) handler(ctx context.Context, gid string,
+	fn func(b *entity.Branch) error) error {
+	global, err := c.dao.GetGlobal(ctx, gid)
+	if err != nil {
+		return err
+	}
+	if global.IsEmpty() {
+		return ErrGlobalNotExist
+	}
+	if global.IsCommitted() || global.IsCommitting() {
+		return nil
+	}
+	branches, err := c.dao.GetBranchList(ctx, gid)
+	if err != nil {
+		return err
+	}
+	for i := range branches {
+		//todo warp err
+		err = fn(branches[i])
+		continue
+		// 处理分支
+	}
 	return nil
+}
+
+func (c *Coordinator) Commit(ctx context.Context, gid string) error {
+	return c.handler(ctx, gid, func(b *entity.Branch) error {
+		if b.IsSucceed() {
+			return nil
+		}
+		transport, err := protocol.GetTransport(common.NetType(b.Protocol), b.Url)
+		if err != nil {
+			return err
+		}
+		// todo replace []byte(b.ReqData)
+		req := common.NewReq([]byte(b.ReqData), nil)
+		if _, err = transport.Request(ctx, req); err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 func (c *Coordinator) Rollback(ctx context.Context, global entity.Global) error {

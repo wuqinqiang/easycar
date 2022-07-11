@@ -21,6 +21,14 @@ func (g *Global) IsEmpty() bool {
 	return g.gId == ""
 }
 
+func (g *Global) IsCommitted() bool {
+	return g.state == consts.Submitted
+}
+
+func (g *Global) IsCommitting() bool {
+	return g.state == consts.Submitting
+}
+
 func (g *Global) SetGId(gId string) {
 	g.gId = gId
 }
