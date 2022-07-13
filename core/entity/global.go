@@ -17,16 +17,32 @@ func NewGlobal(gId string) *Global {
 	}
 }
 
+func (g *Global) CanCommit() bool {
+	return g.IsBegin() || g.IsRetrying()
+}
+
+func (g *Global) CanRollback() bool {
+	return g.IsCommitFailed() || g.IsRollBackRetrying()
+}
+
+func (g *Global) IsCommitFailed() bool {
+	return g.state == consts.GlobalCommitFailed
+}
+
+func (g *Global) IsRollBackRetrying() bool {
+	return g.state == consts.GlobalRollBackRetrying
+}
+
+func (g *Global) IsBegin() bool {
+	return g.state == consts.Begin
+}
+
+func (g *Global) IsRetrying() bool {
+	return g.state == consts.GlobalCommitRetrying
+}
+
 func (g *Global) IsEmpty() bool {
 	return g.gId == ""
-}
-
-func (g *Global) IsCommitted() bool {
-	return g.state == consts.Submitted
-}
-
-func (g *Global) IsCommitting() bool {
-	return g.state == consts.Submitting
 }
 
 func (g *Global) SetGId(gId string) {

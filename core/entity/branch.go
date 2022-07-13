@@ -25,7 +25,10 @@ type (
 )
 
 func (b *Branch) IsSucceed() bool {
-	return b.State == consts.BranchSucceedState
+	return b.State == consts.BranchSucceed
+}
+func (b *Branch) IsBranchFailState() {
+
 }
 
 func (b *Branch) Convert() *model.Branch {

@@ -47,7 +47,6 @@ func (cli *Transport) req(ctx context.Context, body []byte, headers map[string]s
 		return nil, err
 	}
 	return &common.Resp{
-		Code: int64(resp.StatusCode()),
 		Body: resp.Body(),
 	}, nil
 }

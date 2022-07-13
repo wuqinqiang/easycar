@@ -10,20 +10,22 @@ const (
 	// Begin global state
 	Begin GlobalState = "begin"
 
-	Submitting    GlobalState = "submitting"
-	Submitted     GlobalState = "submitted"
-	SubmitFailed  GlobalState = "commitFailed"
-	TimeOutSubmit GlobalState = "timeOutSubmit"
+	//************global state***************
 
-	RollBacking       GlobalState = "rollBacking"
-	RollBacked        GlobalState = "rollBacked"
-	RollBackFailed    GlobalState = "rollBackFailed"
-	TimeoutRollBacked GlobalState = "timeoutRollBacked"
+	GlobalCommitting     GlobalState = "committing"
+	GlobalCommitted      GlobalState = "committed"
+	GlobalCommitRetrying GlobalState = "commitRetrying"
+	GlobalCommitFailed   GlobalState = "commitFailed"
 
-	UNKNOWN GlobalState = "unknown"
-	// end global state
+	GlobalRollBacking      GlobalState = "rollBacking"
+	GlobalRollBacked       GlobalState = "rollBacked"
+	GlobalRollBackRetrying GlobalState = "rollBackRetrying"
+	GlobalRollBackFailed   GlobalState = "rollBackFailed"
 
-	BranchReadyState   BranchState = "ready"
-	BranchSucceedState BranchState = "succeed"
-	BranchFailState    BranchState = "fail"
+	//************branch state***************
+
+	BranchReady     BranchState = "branchReady"
+	BranchRetrying  BranchState = "branchRetrying"
+	BranchSucceed   BranchState = "succeed"
+	BranchFailState BranchState = "failed"
 )

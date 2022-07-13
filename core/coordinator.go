@@ -55,16 +55,6 @@ func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.
 
 func (c *Coordinator) handler(ctx context.Context, gid string,
 	fn func(b *entity.Branch) error) error {
-	global, err := c.dao.GetGlobal(ctx, gid)
-	if err != nil {
-		return err
-	}
-	if global.IsEmpty() {
-		return ErrGlobalNotExist
-	}
-	if global.IsCommitted() || global.IsCommitting() {
-		return nil
-	}
 	branches, err := c.dao.GetBranchList(ctx, gid)
 	if err != nil {
 		return err
@@ -79,6 +69,18 @@ func (c *Coordinator) handler(ctx context.Context, gid string,
 }
 
 func (c *Coordinator) Commit(ctx context.Context, gid string) error {
+	global, err := c.dao.GetGlobal(ctx, gid)
+	if err != nil {
+		return err
+	}
+	if global.IsEmpty() {
+		return ErrGlobalNotExist
+	}
+
+	if !global.CanCommit() {
+		return errors.New("global state error")
+	}
+
 	return c.handler(ctx, gid, func(b *entity.Branch) error {
 		if b.IsSucceed() {
 			return nil
@@ -96,8 +98,22 @@ func (c *Coordinator) Commit(ctx context.Context, gid string) error {
 	})
 }
 
-func (c *Coordinator) Rollback(ctx context.Context, global entity.Global) error {
-	return nil
+func (c *Coordinator) Rollback(ctx context.Context, gid string) error {
+	global, err := c.dao.GetGlobal(ctx, gid)
+	if err != nil {
+		return err
+	}
+	if global.IsEmpty() {
+		return ErrGlobalNotExist
+	}
+	if !global.CanRollback() {
+		// todo error
+		return errors.New("global state error")
+	}
+
+	return c.handler(ctx, gid, func(b *entity.Branch) error {
+		return nil
+	})
 }
 
 func (c *Coordinator) GetMode(branch entity.Branch) Mode {
