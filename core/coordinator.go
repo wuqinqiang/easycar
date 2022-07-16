@@ -85,6 +85,16 @@ func (c *Coordinator) Commit(ctx context.Context, gid string) error {
 		if b.IsSucceed() {
 			return nil
 		}
+		//we should know for the transaction TranType,such as tcc or saga,
+		//if tcc ,such as try、confirm、cancel.or if saga ,such as normal、compensation
+		if b.TranType == consts.TCC && b.Action != consts.Try {
+			return nil
+		}
+
+		if b.TranType == consts.SAGA && b.Action != consts.Normal {
+			return nil
+		}
+
 		transport, err := protocol.GetTransport(common.NetType(b.Protocol), b.Url)
 		if err != nil {
 			return err
@@ -112,6 +122,22 @@ func (c *Coordinator) Rollback(ctx context.Context, gid string) error {
 	}
 
 	return c.handler(ctx, gid, func(b *entity.Branch) error {
+		if b.TranType == consts.TCC && b.Action != consts.Cancel {
+			return nil
+		}
+		if b.TranType == consts.SAGA && b.Action != consts.Compensation {
+			return nil
+		}
+
+		transport, err := protocol.GetTransport(common.NetType(b.Protocol), b.Url)
+		if err != nil {
+			return err
+		}
+		// todo replace []byte(b.ReqData)
+		req := common.NewReq([]byte(b.ReqData), nil)
+		if _, err = transport.Request(ctx, req); err != nil {
+			return err
+		}
 		return nil
 	})
 }
