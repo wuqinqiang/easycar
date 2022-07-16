@@ -60,10 +60,11 @@ func (c *Coordinator) handler(ctx context.Context, gid string,
 		return err
 	}
 	for i := range branches {
-		//todo warp err
-		err = fn(branches[i])
+		b := NewBackOff(1, 2, func() error {
+			return fn(branches[i])
+		})
+		err = b.Execution()
 		continue
-		// 处理分支
 	}
 	return nil
 }
