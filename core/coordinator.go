@@ -60,6 +60,7 @@ func (c *Coordinator) handler(ctx context.Context, gid string,
 		return err
 	}
 	for i := range branches {
+		// todo add option
 		b := NewBackOff(1, 2, func() error {
 			return fn(branches[i])
 		})
@@ -82,7 +83,7 @@ func (c *Coordinator) Commit(ctx context.Context, gid string) error {
 		return errors.New("global state error")
 	}
 
-	return c.handler(ctx, gid, func(b *entity.Branch) error {
+	err = c.handler(ctx, gid, func(b *entity.Branch) error {
 		if b.IsSucceed() {
 			return nil
 		}
@@ -107,6 +108,14 @@ func (c *Coordinator) Commit(ctx context.Context, gid string) error {
 		}
 		return nil
 	})
+	globalState := consts.GlobalCommitted
+	if err != nil {
+		globalState = consts.GlobalCommitFailed
+	}
+	// todo warp err
+	_, err = c.dao.UpdateGlobalStateByGid(ctx, gid, globalState)
+	return err
+
 }
 
 func (c *Coordinator) Rollback(ctx context.Context, gid string) error {
@@ -122,7 +131,7 @@ func (c *Coordinator) Rollback(ctx context.Context, gid string) error {
 		return errors.New("global state error")
 	}
 
-	return c.handler(ctx, gid, func(b *entity.Branch) error {
+	err = c.handler(ctx, gid, func(b *entity.Branch) error {
 		if b.TranType == consts.TCC && b.Action != consts.Cancel {
 			return nil
 		}
@@ -141,6 +150,17 @@ func (c *Coordinator) Rollback(ctx context.Context, gid string) error {
 		}
 		return nil
 	})
+	globalState := consts.GlobalRollBacked
+	if err != nil {
+		globalState = consts.GlobalRollBackFailed
+	}
+	// todo warp err
+	_, err = c.dao.UpdateGlobalStateByGid(ctx, gid, globalState)
+	return err
+}
+
+func (c *Coordinator) GetState(ctx context.Context, gid string) (*entity.Global, error) {
+	return c.dao.GetGlobal(ctx, gid)
 }
 
 func (c *Coordinator) GetMode(branch entity.Branch) Mode {

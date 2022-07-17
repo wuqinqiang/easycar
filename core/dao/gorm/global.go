@@ -6,7 +6,6 @@ import (
 	"github.com/wuqinqiang/easycar/core/entity"
 
 	"github.com/wuqinqiang/easycar/core/consts"
-	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/query"
 	"github.com/wuqinqiang/easycar/pkg/mysql"
@@ -17,7 +16,7 @@ type GlobalImpl struct {
 	query *query.Query
 }
 
-func NewGlobalImpl() dao.GlobalDao {
+func NewGlobalImpl() GlobalImpl {
 	return GlobalImpl{query: query.Use(mysql.NewDb())}
 }
 

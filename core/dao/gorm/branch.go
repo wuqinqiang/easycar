@@ -7,7 +7,6 @@ import (
 
 	"github.com/wuqinqiang/easycar/core/consts"
 
-	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/query"
 	"github.com/wuqinqiang/easycar/pkg/mysql"
 	"github.com/wuqinqiang/easycar/pkg/utils"
@@ -17,7 +16,7 @@ type BranchImpl struct {
 	query *query.Query
 }
 
-func NewBranchImpl() dao.BranchDao {
+func NewBranchImpl() BranchImpl {
 	return BranchImpl{query: query.Use(mysql.NewDb())}
 }
 

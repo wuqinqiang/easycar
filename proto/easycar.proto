@@ -11,80 +11,90 @@ service EasyCar {
   rpc Begin(google.protobuf.Empty)returns(BeginResp){}
   rpc Register(RegisterReq)returns(RegisterResp){}
   rpc Commit(CommitReq)returns(CommitResp){}
+  rpc RollBack(RollBackReq)returns(RollBackResp){}
   rpc Abort(AbortReq) returns(AbortResp){}
   rpc GetState(GetStateReq) returns(GetStateResp){}
 }
 
 
-enum Code {
+enum Err {
   CODE_SUCCESS = 0;
   CODE_FAILED = 1;
 }
 
-message RegisterReq {
+enum TranType {
+  UNKnow = 0;
+  TCC = 1;
+  SAGE = 2;
+}
+enum Action {
+  UnKnowTransactionType = 0;
+  Try = 1;
+  Confirm = 2;
+  Cancel = 3;
+  Normal = 4;
+  Compensation = 5;
+}
 
+enum BranchState {
+  UnknowState = 0;
+  Ready = 1;
+  Retrying = 2;
+  Success = 3;
+  FailState = 4;
+}
+
+
+
+message RegisterReq {
+  message Branch {
+    string BranchId = 1;
+    string Uri = 2;
+    string ReqData = 3;
+    TranType TranType = 4;
+    // todo remove pid?
+    string Pid = 5;
+    string Protocol = 6;
+    Action Action = 7;
+    BranchState State = 8;
+    // todo remove pid?
+    int32 Level = 9;
+  }
+  string GId = 1;
+  repeated Branch branches = 2;
 }
 message RegisterResp {
-  BaseResp common = 1;
-}
-
-message BaseResp {
-  Code code = 1;
-  string msg = 2;
-}
-
-// todo more
-enum TransactionName {
-  DEFAULT = 0;
-  TCC = 1;
-  SAGA = 2;
 }
 
 
-//todo more
 enum GlobalState {
   GLOBAL_DEFAULT = 0;
-  PREPARED = 1;
-  SUBMITTED = 2;
-  SUCCEED = 3;
-  FAILED = 4;
-  ABORT = 5;
-}
-
-
-//todo more
-enum BranchState {
-  BRANCH_DEFAULT = 0;
-  BRANCH_READY = 1;
-  BRANCH_SUCCEED = 2;
-  BRANCH_FAILED = 3;
+  Begin = 1;
+  GlobalCommitting = 2;
+  GlobalCommitted = 3;
+  GlobalCommitRetrying = 4;
+  GlobalCommitFailed = 5;
+  GlobalRollBacking = 6;
+  GlobalRollBacked = 7;
+  GlobalRollBackRetrying = 8;
+  GlobalRollBackFailed = 9;
 }
 
 
 
 message BeginReq {
-  TransactionName name = 1;
+  TranType TranType = 1;
 }
 
 message BeginResp {
-  Code code = 1;
-  string msg = 2;
-  message info{
-    string GId = 1;
-  }
-  info data = 3;
+  string GId = 1;
 }
 
 message CommitReq {
   string GId = 1;
 }
 message CommitResp {
-  Code code = 1;
-  string msg = 2;
-  message info{
-    GlobalState state = 1;
-  }
-  info data = 3;
+  GlobalState state = 1;
 }
 
 
@@ -93,17 +103,14 @@ message AbortReq {
 }
 
 message AbortResp {
-  Code code = 1;
-  string msg = 2;
+}
+
+message RollBackReq {
+  string GId = 1;
 }
 
 message RollBackResp{
-  Code code = 1;
-  string msg = 2;
-  message info{
-    GlobalState state = 1;
-  }
-  info data = 3;
+  GlobalState state = 1;
 }
 
 message GetStateReq {
@@ -111,10 +118,6 @@ message GetStateReq {
 }
 
 message GetStateResp {
-  Code code = 1;
-  string msg = 2;
-  message info {
-
-  }
-  info data = 3;
+  GlobalState state = 1;
+  // todo add branches state?
 }

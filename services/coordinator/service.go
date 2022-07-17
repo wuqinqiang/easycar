@@ -6,6 +6,10 @@ import (
 	"net"
 	"sync"
 
+	"github.com/wuqinqiang/easycar/core/dao"
+
+	"github.com/wuqinqiang/easycar/core"
+
 	"github.com/wuqinqiang/easycar/proto"
 
 	"google.golang.org/grpc"
@@ -32,7 +36,8 @@ func New(fns ...OptsFn) (s *Service, err error) {
 	}
 
 	s.Server = grpc.NewServer(opts.grpcOpts...)
-	proto.RegisterEasyCarServer(s.Server, EasyCarSrv{})
+	c := core.NewCoordinator(dao.GetTransaction())
+	proto.RegisterEasyCarServer(s.Server, NewCoordinator(c))
 	return
 }
 

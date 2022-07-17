@@ -3,6 +3,7 @@ package entity
 import (
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
+	"github.com/wuqinqiang/easycar/proto"
 )
 
 type (
@@ -35,7 +36,13 @@ func (b *Branch) Convert() *model.Branch {
 	return &model.Branch{}
 }
 
+// Assign todo
 func (b *Branch) Assign(m *model.Branch) *Branch {
+	return b
+}
+
+// Assign2 todo
+func (b *Branch) Assign2(m *proto.RegisterReq_Branch) *Branch {
 	return b
 }
 
@@ -50,6 +57,12 @@ func (list BranchList) Convert() []*model.Branch {
 func (list BranchList) Assign(mList []*model.Branch) BranchList {
 	for _, b := range list {
 		b.Assign(mList[0])
+	}
+	return list
+}
+func (list BranchList) Assign2(mList []*proto.RegisterReq_Branch) BranchList {
+	for _, b := range list {
+		b.Assign2(mList[0])
 	}
 	return list
 }

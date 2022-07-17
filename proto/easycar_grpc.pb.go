@@ -26,6 +26,7 @@ type EasyCarClient interface {
 	Begin(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BeginResp, error)
 	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
 	Commit(ctx context.Context, in *CommitReq, opts ...grpc.CallOption) (*CommitResp, error)
+	RollBack(ctx context.Context, in *RollBackReq, opts ...grpc.CallOption) (*RollBackResp, error)
 	Abort(ctx context.Context, in *AbortReq, opts ...grpc.CallOption) (*AbortResp, error)
 	GetState(ctx context.Context, in *GetStateReq, opts ...grpc.CallOption) (*GetStateResp, error)
 }
@@ -65,6 +66,15 @@ func (c *easyCarClient) Commit(ctx context.Context, in *CommitReq, opts ...grpc.
 	return out, nil
 }
 
+func (c *easyCarClient) RollBack(ctx context.Context, in *RollBackReq, opts ...grpc.CallOption) (*RollBackResp, error) {
+	out := new(RollBackResp)
+	err := c.cc.Invoke(ctx, "/proto.EasyCar/RollBack", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *easyCarClient) Abort(ctx context.Context, in *AbortReq, opts ...grpc.CallOption) (*AbortResp, error) {
 	out := new(AbortResp)
 	err := c.cc.Invoke(ctx, "/proto.EasyCar/Abort", in, out, opts...)
@@ -90,6 +100,7 @@ type EasyCarServer interface {
 	Begin(context.Context, *emptypb.Empty) (*BeginResp, error)
 	Register(context.Context, *RegisterReq) (*RegisterResp, error)
 	Commit(context.Context, *CommitReq) (*CommitResp, error)
+	RollBack(context.Context, *RollBackReq) (*RollBackResp, error)
 	Abort(context.Context, *AbortReq) (*AbortResp, error)
 	GetState(context.Context, *GetStateReq) (*GetStateResp, error)
 	mustEmbedUnimplementedEasyCarServer()
@@ -107,6 +118,9 @@ func (UnimplementedEasyCarServer) Register(context.Context, *RegisterReq) (*Regi
 }
 func (UnimplementedEasyCarServer) Commit(context.Context, *CommitReq) (*CommitResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Commit not implemented")
+}
+func (UnimplementedEasyCarServer) RollBack(context.Context, *RollBackReq) (*RollBackResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RollBack not implemented")
 }
 func (UnimplementedEasyCarServer) Abort(context.Context, *AbortReq) (*AbortResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Abort not implemented")
@@ -181,6 +195,24 @@ func _EasyCar_Commit_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EasyCar_RollBack_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RollBackReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EasyCarServer).RollBack(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.EasyCar/RollBack",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EasyCarServer).RollBack(ctx, req.(*RollBackReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _EasyCar_Abort_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AbortReq)
 	if err := dec(in); err != nil {
@@ -235,6 +267,10 @@ var EasyCar_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Commit",
 			Handler:    _EasyCar_Commit_Handler,
+		},
+		{
+			MethodName: "RollBack",
+			Handler:    _EasyCar_RollBack_Handler,
 		},
 		{
 			MethodName: "Abort",
