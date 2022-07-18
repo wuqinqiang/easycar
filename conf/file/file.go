@@ -1,23 +1,24 @@
 package file
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strings"
 
 	"github.com/wuqinqiang/easycar/conf"
 )
 
 type File struct {
 	path string
+	conf.EasyCar
 }
 
 func NewFile(path string) *File {
 	return &File{path: path}
 }
 
-func (f *File) Load() (*conf.KeyValue, error) {
+func (f *File) Load() (conf.Loader, error) {
 	fi, err := os.Stat(f.path)
 	if err != nil {
 		return nil, err
@@ -29,26 +30,11 @@ func (f *File) Load() (*conf.KeyValue, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer file.Close() //nolint:errcheck
 	byteAll, err := ioutil.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
-
-	fileInfo, err := file.Stat()
-	if err != nil {
-		return nil, err
-	}
-	return &conf.KeyValue{
-		Value:  byteAll,
-		Format: GetFormatByFileName(fileInfo.Name()),
-	}, nil
-}
-
-func GetFormatByFileName(fileName string) string {
-	spilt := strings.Split(fileName, ".")
-	if len(spilt) > 1 {
-		return spilt[len(spilt)-1]
-	}
-	return ""
+	err = json.Unmarshal(byteAll, &f.EasyCar)
+	return f, err
 }

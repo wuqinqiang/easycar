@@ -1,48 +1,61 @@
 package conf
 
-import (
-	"fmt"
-)
+import "fmt"
 
-var _ Config = (*config)(nil)
-
-type Config interface {
-	Load() error
-	GetValueByKey(key string) (interface{}, bool)
+type EasyCar struct {
+	*Server
+	*Mysql
 }
 
-type config struct {
-	opts   options
-	reader Reader
+func (conf *EasyCar) GetServer() (*Server, error) {
+	if conf.Server == nil {
+		return nil, fmt.Errorf("server is nil")
+	}
+	if conf.Server.Addr == "" {
+		conf.Server.Addr = "8089"
+	}
+	return conf.Server, nil
 }
 
-func New(optFunS ...OptionFunc) Config {
-	// default options
-	opt := options{
-		decoder: DefaultDecoder,
+func (conf *EasyCar) GetMysql() (*Mysql, error) {
+	if conf.Mysql == nil {
+		return nil, fmt.Errorf("mysql is nil")
+	}
+	if conf.Mysql.DbURL == "" {
+		return nil, fmt.Errorf("mysql.dburl is nil")
+	}
+	if conf.MaxLifetime == 0 {
+		conf.MaxLifetime = 3600
+	}
+	if conf.Mysql.MaxIdleConns == 0 {
+		conf.Mysql.MaxIdleConns = 20
 	}
 
-	for _, optFunc := range optFunS {
-		optFunc(&opt)
+	if conf.Mysql.MaxOpenConns == 0 {
+		conf.Mysql.MaxOpenConns = 10
 	}
-	return &config{opts: opt, reader: NewReader(opt)}
+	return conf.Mysql, nil
 }
 
-func (c *config) Load() error {
-	if c.opts.source == nil {
-		return fmt.Errorf("must be set source")
-	}
-	value, err := c.opts.source.Load()
-	if err != nil {
-		return err
-	}
-	err = c.reader.LoadValue(value)
-	if err != nil {
-		return err
-	}
-	return nil
+// Server conf
+type Server struct {
+	Addr string `json:"addr" yaml:"addr"`
 }
 
-func (c *config) GetValueByKey(key string) (interface{}, bool) {
-	return c.reader.GetValue(key)
+// Mysql conf
+type Mysql struct {
+	DbURL        string `json:"dbURL" yaml:"dbURL"`
+	MaxLifetime  int64  `json:"maxLifetime" yaml:"maxLifetime"`
+	MaxIdleConns int64  `json:"maxIdleConns" yaml:"maxIdleConns"`
+	MaxOpenConns int64  `json:"maxOpenConns" yaml:"maxOpenConns"`
+}
+
+type Conf interface {
+	Load() (Loader, error)
+}
+
+type Loader interface {
+	GetServer() (*Server, error)
+	//Mysql  todo replace,more db type
+	GetMysql() (*Mysql, error)
 }

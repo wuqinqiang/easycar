@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 
 	"fmt"
+	"os"
+	"sync"
+
 	"github.com/wuqinqiang/easycar/pkg/utils"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"os"
-	"sync"
 )
 
 type Config struct {
@@ -36,7 +37,7 @@ func init() {
 	if err != nil {
 		utils.ErrToPanic(err)
 	}
-	bytes, err := os.ReadFile(wd + "/conf/conf.json")
+	bytes, err := os.ReadFile(wd + "/conf/conf.yml")
 	if err != nil {
 		utils.ErrToPanic(err)
 	}

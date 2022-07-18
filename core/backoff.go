@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	// DefaultAttempt everything only three times when you on china
-	DefaultAttempt uint32 = 3
+	// DefaultRetries everything only three times when you on china
+	DefaultRetries uint32 = 3
 	DefaultFactor  uint32 = 2
 	// MaxWaitBackOff 10 minutes
 	MaxWaitBackOff = time.Second * 10 * 60
@@ -29,15 +29,15 @@ type (
 	Fn func() error
 )
 
-func NewBackOff(allowAttempt uint32, factor uint32, fn Fn) *BackOff {
-	if allowAttempt == 0 {
-		allowAttempt = DefaultAttempt
+func NewBackOff(allowRetries uint32, factor uint32, fn Fn) *BackOff {
+	if allowRetries == 0 {
+		allowRetries = DefaultRetries
 	}
 	if factor == 0 {
 		factor = DefaultFactor
 	}
 	b := &BackOff{
-		currentAttempt: allowAttempt,
+		currentAttempt: allowRetries,
 		factor:         factor,
 		fn:             fn,
 		timer:          time.NewTimer(0),

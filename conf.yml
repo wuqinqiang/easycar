@@ -1,0 +1,22 @@
+## conf
+
+dirver: mysql
+db:
+  Mysql:
+    dbURL: mysql://root:root@localhost/test?charset=utf8&parseTime=True&loc=Local
+    maxLifetime: 7200
+    maxIdleConns: 20
+    maxOpenConns: 10
+
+  ## todo add more store drivers
+
+server:
+  ## easycar coordinator server port
+  port: 8089
+  ## backOff for retry
+  backOff:
+    ##  max delay time for retry,unit senconds
+    maxDelay: 120
+    ## max retry times when rm is not available
+    maxRetries: 3
+    factor: 2

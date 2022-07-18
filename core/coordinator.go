@@ -21,14 +21,12 @@ var (
 
 type Coordinator struct {
 	// resty timeout
-	restyTimeout int64 //second
-	dao          dao.TransactionDao
+	dao dao.TransactionDao
 }
 
 func NewCoordinator(dao dao.TransactionDao) *Coordinator {
 	c := &Coordinator{
-		restyTimeout: 60,
-		dao:          dao,
+		dao: dao,
 	}
 	return c
 }
