@@ -5,34 +5,23 @@ import (
 	"log"
 	"os"
 
-	"github.com/wuqinqiang/easycar/services/coordinator"
+	"github.com/wuqinqiang/easycar/conf"
 
-	"github.com/urfave/cli"
+	"github.com/wuqinqiang/easycar/services/coordinator"
 )
 
 func main() {
-	app := &cli.App{
-		Commands: []cli.Command{
-			EasyCarCommand,
-		},
-	}
-
-	if err := app.Run(os.Args); err != nil {
+	c, err := conf.NewConf(os.Getenv("conf_mode"))
+	if err != nil {
 		log.Fatal(err)
 	}
-}
+	// init conf
 
-var EasyCarCommand = cli.Command{
-	// todo add args
-	Name: "easycar",
-	Action: func(ctx *cli.Context) error {
-		service, err := coordinator.New(coordinator.WithPort(8089))
-		if err != nil {
-			panic(err)
-		}
-		if err = service.Start(context.Background()); err != nil {
-			panic(err)
-		}
-		return nil
-	},
+	service, err := coordinator.New(c, coordinator.WithPort(8089))
+	if err != nil {
+		panic(err)
+	}
+	if err = service.Start(context.Background()); err != nil {
+		log.Fatal(err)
+	}
 }

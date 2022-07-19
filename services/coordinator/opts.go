@@ -6,11 +6,13 @@ import (
 	"google.golang.org/grpc"
 )
 
-type OptsFn func(opts *opts)
-
 var defaultOpts = opts{
 	timeout: 3 * time.Second,
 }
+
+type (
+	OptsFn func(opts *opts)
+)
 
 type opts struct {
 	port     int

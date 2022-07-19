@@ -3,13 +3,14 @@ package gorm
 import (
 	"context"
 
+	"github.com/wuqinqiang/easycar/conf"
+	"github.com/wuqinqiang/easycar/tools"
+
 	"github.com/wuqinqiang/easycar/core/entity"
 
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/query"
-	"github.com/wuqinqiang/easycar/pkg/mysql"
-	"github.com/wuqinqiang/easycar/pkg/utils"
 )
 
 type GlobalImpl struct {
@@ -17,7 +18,7 @@ type GlobalImpl struct {
 }
 
 func NewGlobalImpl() GlobalImpl {
-	return GlobalImpl{query: query.Use(mysql.NewDb())}
+	return GlobalImpl{query: query.Use(conf.GetDb())}
 }
 
 func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) error {
@@ -26,7 +27,7 @@ func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) err
 	)
 	m.Gid = global.GetGId()
 	err := g.query.Global.WithContext(ctx).Create(&m)
-	return utils.WrapDbErr(err)
+	return tools.WrapDbErr(err)
 }
 
 func (g GlobalImpl) GetGlobal(ctx context.Context, gid string) (*entity.Global, error) {
@@ -38,6 +39,6 @@ func (g GlobalImpl) UpdateGlobalStateByGid(ctx context.Context, gid string,
 	global := g.query.Global
 	result, err := g.query.Global.WithContext(ctx).
 		Where(global.Gid.Eq(gid)).Update(global.State, state)
-	err = utils.WrapDbErr(err)
+	err = tools.WrapDbErr(err)
 	return result.RowsAffected, err
 }

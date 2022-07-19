@@ -6,6 +6,8 @@ import (
 	"net"
 	"sync"
 
+	"github.com/wuqinqiang/easycar/conf"
+
 	"github.com/wuqinqiang/easycar/core/dao"
 
 	"github.com/wuqinqiang/easycar/core"
@@ -16,18 +18,20 @@ import (
 )
 
 type Service struct {
+	conf conf.Conf
 	*grpc.Server
 	opts opts
 	lis  net.Listener
 	once sync.Once
 }
 
-func New(fns ...OptsFn) (s *Service, err error) {
+func New(conf conf.Conf, fns ...OptsFn) (s *Service, err error) {
 	opts := defaultOpts
 	for _, fn := range fns {
 		fn(&opts)
 	}
 	s = &Service{
+		conf: conf,
 		opts: opts,
 		once: sync.Once{},
 	}

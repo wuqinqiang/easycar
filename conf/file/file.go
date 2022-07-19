@@ -6,19 +6,19 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/wuqinqiang/easycar/conf"
+	"github.com/wuqinqiang/easycar/conf/common"
 )
 
 type File struct {
 	path string
-	conf.EasyCar
+	*common.EasyCar
 }
 
 func NewFile(path string) *File {
 	return &File{path: path}
 }
 
-func (f *File) Load() (conf.Loader, error) {
+func (f *File) Load() (*common.EasyCar, error) {
 	fi, err := os.Stat(f.path)
 	if err != nil {
 		return nil, err
@@ -36,5 +36,5 @@ func (f *File) Load() (conf.Loader, error) {
 		return nil, err
 	}
 	err = json.Unmarshal(byteAll, &f.EasyCar)
-	return f, err
+	return f.EasyCar, err
 }
