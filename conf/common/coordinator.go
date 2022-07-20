@@ -2,9 +2,13 @@ package common
 
 import "fmt"
 
+type Db struct {
+	Mysql *Mysql `json:"mysql"`
+}
+
 type EasyCar struct {
+	Db     *Db `json:"db"`
 	Server *Server
-	Mysql  *Mysql
 }
 
 // Server conf
@@ -23,21 +27,21 @@ func (conf *EasyCar) GetServer() (*Server, error) {
 }
 
 func (conf *EasyCar) GetMysql() (*Mysql, error) {
-	if conf.Mysql == nil {
+	if conf.Db.Mysql == nil {
 		return nil, fmt.Errorf("Mysql is nil")
 	}
-	if conf.Mysql.DbURL == "" {
+	if conf.Db.Mysql.DbURL == "" {
 		return nil, fmt.Errorf("Mysql.dburl is nil")
 	}
-	if conf.Mysql.MaxLifetime == 0 {
-		conf.Mysql.MaxLifetime = 3600
+	if conf.Db.Mysql.MaxLifetime == 0 {
+		conf.Db.Mysql.MaxLifetime = 3600
 	}
-	if conf.Mysql.MaxIdleConns == 0 {
-		conf.Mysql.MaxIdleConns = 20
+	if conf.Db.Mysql.MaxIdleConns == 0 {
+		conf.Db.Mysql.MaxIdleConns = 20
 	}
 
-	if conf.Mysql.MaxOpenConns == 0 {
-		conf.Mysql.MaxOpenConns = 10
+	if conf.Db.Mysql.MaxOpenConns == 0 {
+		conf.Db.Mysql.MaxOpenConns = 10
 	}
-	return conf.Mysql, nil
+	return conf.Db.Mysql, nil
 }

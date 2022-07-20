@@ -1,9 +1,14 @@
 package dao
 
-import "github.com/wuqinqiang/easycar/core/dao/gorm"
+import (
+	"sync"
+
+	"github.com/wuqinqiang/easycar/core/dao/gorm"
+)
 
 var (
-	dao Dao
+	dao  Dao
+	once sync.Once
 )
 
 type Dao struct {
@@ -11,14 +16,13 @@ type Dao struct {
 	GlobalDao
 }
 
-func init() {
-	dao = Dao{
-		BranchDao: gorm.NewBranchImpl(),
-		GlobalDao: gorm.NewGlobalImpl(),
-	}
-}
-
 func GetTransaction() TransactionDao {
+	once.Do(func() {
+		dao = Dao{
+			BranchDao: gorm.NewBranchImpl(),
+			GlobalDao: gorm.NewGlobalImpl(),
+		}
+	})
 	return dao
 }
 

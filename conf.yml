@@ -12,7 +12,7 @@ db:
 
 server:
   ## easycar coordinator server port
-  port: 8089
+  Addr: 8089
   ## backOff for retry
   backOff:
     ##  max delay time for retry,unit senconds

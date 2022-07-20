@@ -2,7 +2,6 @@ package file
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"os"
 
@@ -19,14 +18,11 @@ func NewFile(path string) *File {
 }
 
 func (f *File) Load() (*common.EasyCar, error) {
-	fi, err := os.Stat(f.path)
+	dir, err := os.Getwd()
 	if err != nil {
 		return nil, err
 	}
-	if fi.IsDir() {
-		return nil, fmt.Errorf("the path must be a file,it's a dir now")
-	}
-	file, err := os.Open(f.path)
+	file, err := os.Open(dir + f.path)
 	if err != nil {
 		return nil, err
 	}

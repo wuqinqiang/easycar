@@ -16,7 +16,11 @@ func main() {
 		log.Fatal(err)
 	}
 	// init conf
-
+	easycar, err := c.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
+	easycar.Db.Mysql.Init()
 	service, err := coordinator.New(c, coordinator.WithPort(8089))
 	if err != nil {
 		panic(err)
