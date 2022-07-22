@@ -3,7 +3,7 @@
 dirver: mysql
 db:
   mysql:
-    dbURL: mysql://root:root@localhost/test?charset=utf8&parseTime=True&loc=Local
+    dbURL: mysql://root:root@127.0.0.1/test?charset=utf8&parseTime=True&loc=Local
     maxLifetime: 7200
     maxIdleConns: 20
     maxOpenConns: 10

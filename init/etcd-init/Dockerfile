@@ -1,0 +1,2 @@
+ARG ETCD_VERSION
+FROM quay.io/coreos/etcd:${ETCD_VERSION}

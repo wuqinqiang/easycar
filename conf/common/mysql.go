@@ -28,8 +28,10 @@ func (m *Mysql) Init() *gorm.DB {
 		DSN:               m.DbURL,
 		DefaultStringSize: 256,
 	}), &gorm.Config{SkipDefaultTransaction: true})
-	if m.MaxLifetime > 0 {
+	if err != nil {
+		panic(err)
 	}
+
 	d, err := db.DB()
 	if err != nil {
 		panic(err)

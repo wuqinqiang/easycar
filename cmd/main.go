@@ -20,7 +20,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	easycar.Db.Mysql.Init()
+	easycar.DB.Mysql.Init()
 	service, err := coordinator.New(c, coordinator.WithPort(8089))
 	if err != nil {
 		panic(err)

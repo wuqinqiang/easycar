@@ -1,9 +1,10 @@
 package file
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"os"
+
+	"gopkg.in/yaml.v2"
 
 	"github.com/wuqinqiang/easycar/conf/common"
 )
@@ -31,6 +32,6 @@ func (f *File) Load() (*common.EasyCar, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = json.Unmarshal(byteAll, &f.EasyCar)
+	err = yaml.Unmarshal(byteAll, &f.EasyCar)
 	return f.EasyCar, err
 }
