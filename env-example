@@ -26,18 +26,16 @@ ETCD_PORT=2379
 # ETCDKeeper
 ETCD_KEEPER_PORT=11004
 
-NUWAS_PATH=~/work/company/nuwas
-
 ### MYSQL #################################################
 
 # mysql版本
-MYSQL_VERSION=oracle
+MYSQL_VERSION=8.0.29
 
 MYSQL_DATABASE=easycar
 
 # mysql 用户信息
 MYSQL_USER=easycar
-MYSQL_PASSWORD=root
+MYSQL_PASSWORD=easycar
 
 # mysql 映射到宿主机端口
 MYSQL_PORT=3306
