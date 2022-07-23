@@ -3,7 +3,7 @@
 dirver: mysql
 db:
   mysql:
-    dbURL: mysql://root:root@127.0.0.1/test?charset=utf8&parseTime=True&loc=Local
+    dbURL: easycar:easycar@tcp(127.0.0.1:3306)/easycar?charset=utf8&parseTime=True&loc=Local
     maxLifetime: 7200
     maxIdleConns: 20
     maxOpenConns: 10
