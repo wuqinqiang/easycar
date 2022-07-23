@@ -5,10 +5,6 @@ import (
 	"github.com/wuqinqiang/easycar/conf/file"
 )
 
-type Conf interface {
-	Load() (*common.EasyCar, error)
-}
-
 type (
 	Mode string
 )
@@ -19,6 +15,10 @@ const (
 	Env  Mode = "env"
 	//Add more conf schema here
 )
+
+type Conf interface {
+	Load() (*common.EasyCar, error)
+}
 
 func NewConf(mode string) (Conf, error) {
 	m := Mode(mode)

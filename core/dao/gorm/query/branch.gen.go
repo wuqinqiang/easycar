@@ -25,27 +25,31 @@ func newBranch(db *gorm.DB) branch {
 	tableName := _branch.branchDo.TableName()
 	_branch.ALL = field.NewField(tableName, "*")
 	_branch.ID = field.NewInt32(tableName, "id")
-	_branch.Gid = field.NewString(tableName, "gid")
+	_branch.GID = field.NewString(tableName, "g_id")
+	_branch.BranchID = field.NewString(tableName, "branch_id")
 	_branch.URL = field.NewString(tableName, "url")
 	_branch.ReqData = field.NewString(tableName, "req_data")
-	_branch.BranchID = field.NewString(tableName, "branch_id")
-	_branch.BranchType = field.NewString(tableName, "branch_type")
+	_branch.TranType = field.NewString(tableName, "tran_type")
+	_branch.PID = field.NewString(tableName, "p_id")
+	_branch.Protocol = field.NewString(tableName, "protocol")
+	_branch.Action = field.NewString(tableName, "action")
 	_branch.State = field.NewString(tableName, "state")
-	_branch.FinishTime = field.NewTime(tableName, "finish_time")
-	_branch.CreateTime = field.NewTime(tableName, "create_time")
-	_branch.UpdateTime = field.NewTime(tableName, "update_time")
+	_branch.EndTime = field.NewInt32(tableName, "end_time")
+	_branch.Level = field.NewInt32(tableName, "level")
 
-	_branch.fieldMap = make(map[string]field.Expr, 10)
+	_branch.fieldMap = make(map[string]field.Expr, 12)
 	_branch.fieldMap["id"] = _branch.ID
-	_branch.fieldMap["gid"] = _branch.Gid
+	_branch.fieldMap["g_id"] = _branch.GID
+	_branch.fieldMap["branch_id"] = _branch.BranchID
 	_branch.fieldMap["url"] = _branch.URL
 	_branch.fieldMap["req_data"] = _branch.ReqData
-	_branch.fieldMap["branch_id"] = _branch.BranchID
-	_branch.fieldMap["branch_type"] = _branch.BranchType
+	_branch.fieldMap["tran_type"] = _branch.TranType
+	_branch.fieldMap["p_id"] = _branch.PID
+	_branch.fieldMap["protocol"] = _branch.Protocol
+	_branch.fieldMap["action"] = _branch.Action
 	_branch.fieldMap["state"] = _branch.State
-	_branch.fieldMap["finish_time"] = _branch.FinishTime
-	_branch.fieldMap["create_time"] = _branch.CreateTime
-	_branch.fieldMap["update_time"] = _branch.UpdateTime
+	_branch.fieldMap["end_time"] = _branch.EndTime
+	_branch.fieldMap["level"] = _branch.Level
 
 	return _branch
 }
@@ -53,17 +57,19 @@ func newBranch(db *gorm.DB) branch {
 type branch struct {
 	branchDo branchDo
 
-	ALL        field.Field
-	ID         field.Int32
-	Gid        field.String
-	URL        field.String
-	ReqData    field.String
-	BranchID   field.String
-	BranchType field.String
-	State      field.String
-	FinishTime field.Time
-	CreateTime field.Time
-	UpdateTime field.Time
+	ALL      field.Field
+	ID       field.Int32
+	GID      field.String
+	BranchID field.String
+	URL      field.String
+	ReqData  field.String
+	TranType field.String
+	PID      field.String
+	Protocol field.String
+	Action   field.String
+	State    field.String
+	EndTime  field.Int32
+	Level    field.Int32
 
 	fieldMap map[string]field.Expr
 }
@@ -172,7 +178,7 @@ func (b branchDo) CreateInBatches(values []*model.Branch, batchSize int) error {
 }
 
 // Save : !!! underlying implementation is different with GORM
-// The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).CreateGlobal(values)
+// The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
 func (b branchDo) Save(values ...*model.Branch) error {
 	if len(values) == 0 {
 		return nil

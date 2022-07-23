@@ -4,22 +4,15 @@
 
 package model
 
-import "time"
-
 const TableNameGlobal = "global"
 
 // Global mapped from table <global>
 type Global struct {
-	ID              int32     `gorm:"column:id;type:int(11);primaryKey" json:"id"`
-	Gid             string    `gorm:"column:gid;type:varchar(128);not null" json:"gid"`                         // 事务全局id
-	TransactionName int32     `gorm:"column:transaction_name;type:tinyint(4);not null" json:"transaction_name"` // 事务分类
-	State           string    `gorm:"column:state;type:varchar(12);not null" json:"state"`                      // 全局事务的状态 prepared | submitted | aborting | finished | rollbacked
-	Protocol        string    `gorm:"column:transport;type:varchar(45);not null" json:"transport"`              // 通信协议 http | grpc
-	CreateTime      time.Time `gorm:"column:create_time;type:datetime" json:"create_time"`
-	UpdateTime      time.Time `gorm:"column:update_time;type:datetime" json:"update_time"`
-	CommitTime      time.Time `gorm:"column:commit_time;type:datetime" json:"commit_time"`
-	FinishTime      time.Time `gorm:"column:finish_time;type:datetime" json:"finish_time"`
-	RollbackTime    time.Time `gorm:"column:rollback_time;type:datetime" json:"rollback_time"`
+	ID           int32  `gorm:"column:id;type:int;primaryKey" json:"id"`
+	GID          string `gorm:"column:g_id;type:varchar(255);not null" json:"g_id"`
+	State        string `gorm:"column:state;type:varchar(255);not null" json:"state"`
+	EndTime      string `gorm:"column:end_time;type:varchar(255);not null" json:"end_time"`
+	NextCronTime int32  `gorm:"column:next_cron_time;type:int;not null;default:0" json:"next_cron_time"`
 }
 
 // TableName Global's table name
