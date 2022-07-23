@@ -33,16 +33,48 @@ func (b *Branch) IsBranchFailState() {
 }
 
 func (b *Branch) Convert() *model.Branch {
-	return &model.Branch{}
+	return &model.Branch{
+		GID:      b.GId,
+		BranchID: b.BranchId,
+		URL:      b.Url,
+		ReqData:  b.ReqData,
+		TranType: string(b.TranType),
+		PID:      b.PId,
+		Protocol: b.Protocol,
+		Action:   string(b.Action),
+		State:    string(b.State),
+		EndTime:  int32(b.EndTime),
+		Level:    int32(b.Level),
+	}
 }
 
-// Assign todo
-func (b *Branch) Assign(m *model.Branch) *Branch {
+// AssignmentByModel todo
+func (b *Branch) AssignmentByModel(m *model.Branch) *Branch {
+	b.GId = m.GID
+	b.BranchId = m.BranchID
+	b.Url = m.URL
+	b.ReqData = m.ReqData
+	b.TranType = consts.TransactionType(m.TranType)
+	b.PId = m.PID
+	b.Protocol = m.Protocol
+	b.Action = consts.BranchAction(m.Action)
+	b.State = consts.BranchState(m.State)
+	b.EndTime = int64(m.EndTime)
+	b.Level = consts.Level(m.Level)
 	return b
 }
 
-// Assign2 todo
-func (b *Branch) Assign2(m *proto.RegisterReq_Branch) *Branch {
+// AssignmentByPb todo
+func (b *Branch) AssignmentByPb(m *proto.RegisterReq_Branch) *Branch {
+	b.BranchId = m.GetBranchId()
+	b.Url = m.GetUri()
+	b.ReqData = m.GetReqData()
+	b.TranType = consts.TransactionType(m.GetTranType())
+	b.PId = m.GetPid()
+	b.Protocol = m.GetProtocol()
+	b.Action = consts.BranchAction(m.GetAction())
+	b.State = consts.BranchState(m.GetState())
+	b.Level = consts.Level(m.GetLevel())
 	return b
 }
 
@@ -54,15 +86,21 @@ func (list BranchList) Convert() []*model.Branch {
 	return branches
 }
 
-func (list BranchList) Assign(mList []*model.Branch) BranchList {
-	for _, b := range list {
-		b.Assign(mList[0])
+func (list BranchList) AssignmentByModel(mList []*model.Branch) BranchList {
+	for i := range mList {
+		var (
+			b Branch
+		)
+		list = append(list, b.AssignmentByModel(mList[i]))
 	}
 	return list
 }
-func (list BranchList) Assign2(mList []*proto.RegisterReq_Branch) BranchList {
-	for _, b := range list {
-		b.Assign2(mList[0])
+func (list BranchList) AssignmentByGrpc(mList []*proto.RegisterReq_Branch) BranchList {
+	for i := range mList {
+		var (
+			b Branch
+		)
+		list = append(list, b.AssignmentByPb(mList[i]))
 	}
 	return list
 }

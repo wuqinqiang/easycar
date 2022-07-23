@@ -45,7 +45,7 @@ func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.
 	if err != nil {
 		return err
 	}
-	if global.IsEmpty() {
+	if global == nil || global.IsEmpty() {
 		return ErrGlobalNotExist
 	}
 	return c.dao.CreateBatches(ctx, branches)

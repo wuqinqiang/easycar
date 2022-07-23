@@ -40,7 +40,7 @@ func (e EasyCarSrv) Register(ctx context.Context, req *proto.RegisterReq) (*prot
 	var (
 		list entity.BranchList
 	)
-	list = list.Assign2(req.Branches)
+	list = list.AssignmentByGrpc(req.Branches)
 	if err := e.core.Register(ctx, req.GetGId(), list); err != nil {
 		return nil, err
 	}

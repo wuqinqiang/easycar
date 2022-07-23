@@ -2,6 +2,7 @@ package entity
 
 import (
 	"github.com/wuqinqiang/easycar/core/consts"
+	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
 )
 
 type Global struct {
@@ -70,4 +71,11 @@ func (g *Global) CanSubmit() bool {
 
 func (g *Global) GetBranches() []string {
 	return []string{}
+}
+
+func (g *Global) Assignment(m *model.Global) {
+	g.gId = m.GID
+	g.state = consts.GlobalState(m.State)
+	g.endTime = int64(m.EndTime)
+	g.NextCronTime = int64(m.NextCronTime)
 }

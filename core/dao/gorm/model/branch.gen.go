@@ -15,9 +15,9 @@ type Branch struct {
 	ReqData  string `gorm:"column:req_data;type:varchar(255);not null" json:"req_data"`
 	TranType string `gorm:"column:tran_type;type:varchar(255);not null" json:"tran_type"`
 	PID      string `gorm:"column:p_id;type:varchar(255);not null" json:"p_id"`
-	Protocol string `gorm:"column:protocol;type:varchar(255);not null" json:"protocol"`
+	Protocol string `gorm:"column:protocol;type:varchar(255);not null;default:http" json:"protocol"`
 	Action   string `gorm:"column:action;type:varchar(255);not null" json:"action"`
-	State    string `gorm:"column:state;type:varchar(255);not null" json:"state"`
+	State    string `gorm:"column:state;type:varchar(255);not null;default:branchReady" json:"state"`
 	EndTime  int32  `gorm:"column:end_time;type:int;not null;default:0" json:"end_time"`
 	Level    int32  `gorm:"column:level;type:int;not null;default:1" json:"level"`
 }

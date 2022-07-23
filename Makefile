@@ -22,4 +22,4 @@ proto:
 
 .PHONY: run
 run:
-	cd cmd && go run main.go
+	go run cmd/main.go

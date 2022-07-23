@@ -32,19 +32,19 @@ func (g BranchImpl) CreateBatches(ctx context.Context, list entity.BranchList) e
 func (g BranchImpl) GetBranchList(ctx context.Context, gid string) (list entity.BranchList, err error) {
 	q := g.query.Branch
 	branches, err := g.query.Branch.WithContext(ctx).
-		Where(q.Gid.Eq(gid)).
+		Where(q.GID.Eq(gid)).
 		Find()
 	if err = tools.WrapDbErr(err); err != nil {
 		return
 	}
-	list = list.Assign(branches)
+	list = list.AssignmentByModel(branches)
 	return
 }
 
 func (g BranchImpl) UpdateBranchStateByGid(ctx context.Context, gid string, state consts.BranchState) (int64, error) {
 	branch := g.query.Branch
 	result, err := g.query.Branch.WithContext(ctx).
-		Where(branch.Gid.Eq(gid)).
+		Where(branch.GID.Eq(gid)).
 		Update(branch.State, state)
 	err = tools.WrapDbErr(err)
 	return result.RowsAffected, err

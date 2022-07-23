@@ -48,19 +48,19 @@ enum BranchState {
 
 message RegisterReq {
   message Branch {
-    string BranchId = 1;
-    string Uri = 2;
-    string ReqData = 3;
-    TranType TranType = 4;
+    string branchId = 1;
+    string uri = 2;
+    string reqData = 3;
+    TranType tranType = 4;
     // todo remove pid?
-    string Pid = 5;
-    string Protocol = 6;
-    Action Action = 7;
-    BranchState State = 8;
+    string pid = 5;
+    string protocol = 6;
+    Action action = 7;
+    BranchState state = 8;
     // todo remove pid?
-    int32 Level = 9;
+    int32 level = 9;
   }
-  string GId = 1;
+  string gId = 1;
   repeated Branch branches = 2;
 }
 message RegisterResp {
@@ -83,15 +83,15 @@ enum GlobalState {
 
 
 message BeginReq {
-  TranType TranType = 1;
+  TranType tranType = 1;
 }
 
 message BeginResp {
-  string GId = 1;
+  string gId = 1;
 }
 
 message CommitReq {
-  string GId = 1;
+  string gId = 1;
 }
 message CommitResp {
   GlobalState state = 1;
@@ -99,14 +99,14 @@ message CommitResp {
 
 
 message AbortReq {
-  string GId = 1;
+  string gId = 1;
 }
 
 message AbortResp {
 }
 
 message RollBackReq {
-  string GId = 1;
+  string gId = 1;
 }
 
 message RollBackResp{
@@ -114,7 +114,7 @@ message RollBackResp{
 }
 
 message GetStateReq {
-  string GId = 1;
+  string gId = 1;
 }
 
 message GetStateResp {

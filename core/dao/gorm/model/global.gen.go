@@ -10,8 +10,8 @@ const TableNameGlobal = "global"
 type Global struct {
 	ID           int32  `gorm:"column:id;type:int;primaryKey" json:"id"`
 	GID          string `gorm:"column:g_id;type:varchar(255);not null" json:"g_id"`
-	State        string `gorm:"column:state;type:varchar(255);not null" json:"state"`
-	EndTime      string `gorm:"column:end_time;type:varchar(255);not null" json:"end_time"`
+	State        string `gorm:"column:state;type:varchar(255);not null;default:begin" json:"state"`
+	EndTime      int32  `gorm:"column:end_time;type:int;not null;default:0" json:"end_time"`
 	NextCronTime int32  `gorm:"column:next_cron_time;type:int;not null;default:0" json:"next_cron_time"`
 }
 
