@@ -2,7 +2,6 @@ package gorm
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/wuqinqiang/easycar/conf/common"
 
@@ -32,23 +31,18 @@ func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) err
 	return tools.WrapDbErr(err)
 }
 
-func (g GlobalImpl) GetGlobal(ctx context.Context, gid string) (*entity.Global, error) {
+func (g GlobalImpl) GetGlobal(ctx context.Context, gid string) (e entity.Global, err error) {
 	global := g.query.Global
 	m, err := g.query.Global.WithContext(ctx).Where(global.GID.Eq(gid)).First()
 	err = tools.WrapDbErr(err)
 	if err != nil {
-		return nil, err
+		return entity.Global{}, err
 	}
 	if m == nil || m.GID == "" {
-		return nil, nil
+		return entity.Global{}, nil
 	}
-
-	fmt.Printf("mode:%+v", m)
-	var (
-		e entity.Global
-	)
 	e.Assignment(m)
-	return &e, nil
+	return e, nil
 }
 
 func (g GlobalImpl) UpdateGlobalStateByGid(ctx context.Context, gid string,

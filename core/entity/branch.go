@@ -69,13 +69,28 @@ func (b *Branch) AssignmentByPb(m *proto.RegisterReq_Branch) *Branch {
 	b.BranchId = m.GetBranchId()
 	b.Url = m.GetUri()
 	b.ReqData = m.GetReqData()
-	b.TranType = consts.TransactionType(m.GetTranType())
+	b.TranType = consts.TransactionType(m.GetTranType().String())
 	b.PId = m.GetPid()
 	b.Protocol = m.GetProtocol()
-	b.Action = consts.BranchAction(m.GetAction())
-	b.State = consts.BranchState(m.GetState())
+	b.Action = consts.BranchAction(m.GetAction().String())
+	b.State = consts.BranchState(m.GetState().String())
 	b.Level = consts.Level(m.GetLevel())
 	return b
+}
+
+func (b *Branch) IsTcc() bool {
+	return b.TranType == consts.TCC
+}
+func (b *Branch) IsTccTry() bool {
+	return b.Action == consts.Try && b.IsTcc()
+}
+
+func (b *Branch) IsSAGA() bool {
+	return b.TranType == consts.SAGA
+}
+
+func (b *Branch) IsSAGANormal() bool {
+	return b.Action == consts.Normal && b.IsSAGA()
 }
 
 func (list BranchList) Convert() []*model.Branch {
@@ -95,11 +110,12 @@ func (list BranchList) AssignmentByModel(mList []*model.Branch) BranchList {
 	}
 	return list
 }
-func (list BranchList) AssignmentByGrpc(mList []*proto.RegisterReq_Branch) BranchList {
+func (list BranchList) AssignmentByGrpc(gid string, mList []*proto.RegisterReq_Branch) BranchList {
 	for i := range mList {
 		var (
 			b Branch
 		)
+		b.GId = gid
 		list = append(list, b.AssignmentByPb(mList[i]))
 	}
 	return list

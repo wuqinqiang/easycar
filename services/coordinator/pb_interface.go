@@ -2,6 +2,8 @@ package coordinator
 
 import (
 	"context"
+	"errors"
+	"fmt"
 
 	"github.com/wuqinqiang/easycar/core/consts"
 
@@ -11,6 +13,10 @@ import (
 
 	"github.com/wuqinqiang/easycar/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
+)
+
+var (
+	ErrGlobalNotExist = errors.New("global not exist")
 )
 
 var _ proto.EasyCarServer = (*EasyCarSrv)(nil)
@@ -24,6 +30,21 @@ func NewCoordinator(core *core.Coordinator) *EasyCarSrv {
 	return &EasyCarSrv{
 		core: core,
 	}
+}
+
+func (e EasyCarSrv) check(ctx context.Context, gid string, fn func(g *entity.Global) error) (g entity.Global, err error) {
+	g, err = e.core.GetGlobal(ctx, gid)
+	if err != nil {
+		return
+	}
+	if g.IsEmpty() {
+		err = ErrGlobalNotExist
+		return
+	}
+	if fn != nil {
+		err = fn(&g)
+	}
+	return
 }
 
 func (e EasyCarSrv) Begin(ctx context.Context, empty *emptypb.Empty) (*proto.BeginResp, error) {
@@ -40,7 +61,7 @@ func (e EasyCarSrv) Register(ctx context.Context, req *proto.RegisterReq) (*prot
 	var (
 		list entity.BranchList
 	)
-	list = list.AssignmentByGrpc(req.Branches)
+	list = list.AssignmentByGrpc(req.GetGId(), req.Branches)
 	if err := e.core.Register(ctx, req.GetGId(), list); err != nil {
 		return nil, err
 	}
@@ -49,7 +70,16 @@ func (e EasyCarSrv) Register(ctx context.Context, req *proto.RegisterReq) (*prot
 }
 
 func (e EasyCarSrv) Commit(ctx context.Context, req *proto.CommitReq) (*proto.CommitResp, error) {
-	if err := e.core.Commit(ctx, req.GetGId()); err != nil {
+	global, err := e.check(ctx, req.GetGId(), func(g *entity.Global) error {
+		if !g.CanCommit() {
+			return fmt.Errorf("global state:%v can not commit", g.GetState())
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if err := e.core.Commit(ctx, global); err != nil {
 		return nil, err
 	}
 	resp := new(proto.CommitResp)
@@ -57,20 +87,30 @@ func (e EasyCarSrv) Commit(ctx context.Context, req *proto.CommitReq) (*proto.Co
 }
 
 func (e EasyCarSrv) RollBack(ctx context.Context, req *proto.RollBackReq) (*proto.RollBackResp, error) {
-	if err := e.core.Rollback(ctx, req.GetGId()); err != nil {
+	global, err := e.check(ctx, req.GetGId(), func(g *entity.Global) error {
+		if !g.CanRollback() {
+			return fmt.Errorf("global state:%v can not rollback", g.GetState())
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if err := e.core.Rollback(ctx, global); err != nil {
 		return nil, err
 	}
 	resp := new(proto.RollBackResp)
 	return resp, nil
 }
 
+//todo remove
 func (e EasyCarSrv) Abort(ctx context.Context, req *proto.AbortReq) (*proto.AbortResp, error) {
 	return nil, nil
-
 }
 
 func (e EasyCarSrv) GetState(ctx context.Context, req *proto.GetStateReq) (*proto.GetStateResp, error) {
-	global, err := e.core.GetState(ctx, req.GetGId())
+	global, err := e.core.GetGlobal(ctx, req.GetGId())
 	if err != nil {
 		return nil, err
 	}

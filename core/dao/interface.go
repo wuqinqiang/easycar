@@ -22,7 +22,7 @@ type BranchDao interface {
 
 type GlobalDao interface {
 	CreateGlobal(ctx context.Context, global *entity.Global) error
-	GetGlobal(ctx context.Context, gid string) (*entity.Global, error)
+	GetGlobal(ctx context.Context, gid string) (entity.Global, error)
 	UpdateGlobalStateByGid(ctx context.Context, gid string,
 		state consts.GlobalState) (int64, error)
 }

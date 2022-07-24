@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/wuqinqiang/easycar/core/protocol"
 	"github.com/wuqinqiang/easycar/core/protocol/common"
@@ -45,7 +46,7 @@ func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.
 	if err != nil {
 		return err
 	}
-	if global == nil || global.IsEmpty() {
+	if global.IsEmpty() {
 		return ErrGlobalNotExist
 	}
 	return c.dao.CreateBatches(ctx, branches)
@@ -58,30 +59,23 @@ func (c *Coordinator) handler(ctx context.Context, gid string,
 		return err
 	}
 	for i := range branches {
+		err = fn(branches[i])
+		if err != nil {
+			fmt.Printf("[Coordinator] err:%v\n", err)
+		}
 		// todo add option
-		b := NewBackOff(1, 2, func() error {
-			return fn(branches[i])
-		})
-		err = b.Execution()
+		//b := NewBackOff(1, 2, func() error {
+		//	return fn(branches[i])
+		//})
+		//err = b.Execution()
 		continue
 	}
 	return nil
 }
 
-func (c *Coordinator) Commit(ctx context.Context, gid string) error {
-	global, err := c.dao.GetGlobal(ctx, gid)
-	if err != nil {
-		return err
-	}
-	if global.IsEmpty() {
-		return ErrGlobalNotExist
-	}
-
-	if !global.CanCommit() {
-		return errors.New("global state error")
-	}
-
-	err = c.handler(ctx, gid, func(b *entity.Branch) error {
+func (c *Coordinator) Commit(ctx context.Context, global entity.Global) error {
+	globalState := consts.GlobalCommitted
+	if err := c.handler(ctx, global.GetGId(), func(b *entity.Branch) error {
 		if b.IsSucceed() {
 			return nil
 		}
@@ -105,31 +99,16 @@ func (c *Coordinator) Commit(ctx context.Context, gid string) error {
 			return err
 		}
 		return nil
-	})
-	globalState := consts.GlobalCommitted
-	if err != nil {
+	}); err != nil {
 		globalState = consts.GlobalCommitFailed
-	}
-	// todo warp err
-	_, err = c.dao.UpdateGlobalStateByGid(ctx, gid, globalState)
+	} // todo warp err
+	_, err := c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(), globalState)
 	return err
-
 }
 
-func (c *Coordinator) Rollback(ctx context.Context, gid string) error {
-	global, err := c.dao.GetGlobal(ctx, gid)
-	if err != nil {
-		return err
-	}
-	if global.IsEmpty() {
-		return ErrGlobalNotExist
-	}
-	if !global.CanRollback() {
-		// todo error
-		return errors.New("global state error")
-	}
-
-	err = c.handler(ctx, gid, func(b *entity.Branch) error {
+func (c *Coordinator) Rollback(ctx context.Context, global entity.Global) error {
+	globalState := consts.GlobalRollBacked
+	if err := c.handler(ctx, global.GetGId(), func(b *entity.Branch) error {
 		if b.TranType == consts.TCC && b.Action != consts.Cancel {
 			return nil
 		}
@@ -147,18 +126,20 @@ func (c *Coordinator) Rollback(ctx context.Context, gid string) error {
 			return err
 		}
 		return nil
-	})
-	globalState := consts.GlobalRollBacked
-	if err != nil {
+	}); err != nil {
 		globalState = consts.GlobalRollBackFailed
 	}
 	// todo warp err
-	_, err = c.dao.UpdateGlobalStateByGid(ctx, gid, globalState)
+	_, err := c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(), globalState)
 	return err
 }
 
-func (c *Coordinator) GetState(ctx context.Context, gid string) (*entity.Global, error) {
+func (c *Coordinator) GetGlobal(ctx context.Context, gid string) (entity.Global, error) {
 	return c.dao.GetGlobal(ctx, gid)
+}
+
+func (c *Coordinator) GetBranchList(ctx context.Context, gid string) (list []*entity.Branch, err error) {
+	return c.dao.GetBranchList(ctx, gid)
 }
 
 func (c *Coordinator) GetMode(branch entity.Branch) Mode {

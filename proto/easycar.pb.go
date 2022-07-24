@@ -7,11 +7,12 @@
 package proto
 
 import (
+	reflect "reflect"
+	sync "sync"
+
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	reflect "reflect"
-	sync "sync"
 )
 
 const (
@@ -1126,13 +1127,13 @@ var file_proto_easycar_proto_depIdxs = []int32{
 	9,  // 10: proto.EasyCar.Commit:input_type -> proto.CommitReq
 	13, // 11: proto.EasyCar.RollBack:input_type -> proto.RollBackReq
 	11, // 12: proto.EasyCar.Abort:input_type -> proto.AbortReq
-	15, // 13: proto.EasyCar.GetState:input_type -> proto.GetStateReq
+	15, // 13: proto.EasyCar.GetGlobal:input_type -> proto.GetStateReq
 	8,  // 14: proto.EasyCar.Begin:output_type -> proto.BeginResp
 	6,  // 15: proto.EasyCar.Register:output_type -> proto.RegisterResp
 	10, // 16: proto.EasyCar.Commit:output_type -> proto.CommitResp
 	14, // 17: proto.EasyCar.RollBack:output_type -> proto.RollBackResp
 	12, // 18: proto.EasyCar.Abort:output_type -> proto.AbortResp
-	16, // 19: proto.EasyCar.GetState:output_type -> proto.GetStateResp
+	16, // 19: proto.EasyCar.GetGlobal:output_type -> proto.GetStateResp
 	14, // [14:20] is the sub-list for method output_type
 	8,  // [8:14] is the sub-list for method input_type
 	8,  // [8:8] is the sub-list for extension type_name

@@ -29,3 +29,16 @@ func ErrToPanic(err error) {
 		panic(err)
 	}
 }
+
+func GoSafe(fn func()) {
+	go runSafe(fn)
+}
+
+func runSafe(fn func()) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("[runSafe] err:%v\n", err)
+		}
+	}()
+	fn()
+}

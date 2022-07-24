@@ -8,6 +8,7 @@ package proto
 
 import (
 	context "context"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -86,7 +87,7 @@ func (c *easyCarClient) Abort(ctx context.Context, in *AbortReq, opts ...grpc.Ca
 
 func (c *easyCarClient) GetState(ctx context.Context, in *GetStateReq, opts ...grpc.CallOption) (*GetStateResp, error) {
 	out := new(GetStateResp)
-	err := c.cc.Invoke(ctx, "/proto.EasyCar/GetState", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.EasyCar/GetGlobal", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +127,7 @@ func (UnimplementedEasyCarServer) Abort(context.Context, *AbortReq) (*AbortResp,
 	return nil, status.Errorf(codes.Unimplemented, "method Abort not implemented")
 }
 func (UnimplementedEasyCarServer) GetState(context.Context, *GetStateReq) (*GetStateResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetState not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method GetGlobal not implemented")
 }
 func (UnimplementedEasyCarServer) mustEmbedUnimplementedEasyCarServer() {}
 
@@ -241,7 +242,7 @@ func _EasyCar_GetState_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.EasyCar/GetState",
+		FullMethod: "/proto.EasyCar/GetGlobal",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EasyCarServer).GetState(ctx, req.(*GetStateReq))
@@ -277,7 +278,7 @@ var EasyCar_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EasyCar_Abort_Handler,
 		},
 		{
-			MethodName: "GetState",
+			MethodName: "GetGlobal",
 			Handler:    _EasyCar_GetState_Handler,
 		},
 	},
