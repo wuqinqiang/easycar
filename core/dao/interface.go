@@ -2,6 +2,9 @@ package dao
 
 import (
 	"context"
+	"sync"
+
+	"github.com/wuqinqiang/easycar/core/dao/gorm"
 
 	"github.com/wuqinqiang/easycar/core/entity"
 
@@ -25,4 +28,32 @@ type GlobalDao interface {
 	GetGlobal(ctx context.Context, gid string) (entity.Global, error)
 	UpdateGlobalStateByGid(ctx context.Context, gid string,
 		state consts.GlobalState) (int64, error)
+}
+
+var (
+	dao  Dao
+	once sync.Once
+)
+
+type Dao struct {
+	BranchDao
+	GlobalDao
+}
+
+func GetTransaction() TransactionDao {
+	once.Do(func() {
+		dao = Dao{
+			BranchDao: gorm.NewBranchImpl(),
+			GlobalDao: gorm.NewGlobalImpl(),
+		}
+	})
+	return dao
+}
+
+func ReplaceGlobalDao(globalDao GlobalDao) {
+	dao.GlobalDao = globalDao
+}
+
+func ReplaceBranchDao(branchDao BranchDao) {
+	dao.BranchDao = branchDao
 }
