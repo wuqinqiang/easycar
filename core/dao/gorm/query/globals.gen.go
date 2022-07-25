@@ -7,7 +7,7 @@ package query
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
+	"github.com/wuqinqiang/easycar/core/entity"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -20,20 +20,18 @@ func newGlobal(db *gorm.DB) global {
 	_global := global{}
 
 	_global.globalDo.UseDB(db)
-	_global.globalDo.UseModel(&model.Global{})
+	_global.globalDo.UseModel(&entity.Global{})
 
 	tableName := _global.globalDo.TableName()
 	_global.ALL = field.NewField(tableName, "*")
-	_global.ID = field.NewInt32(tableName, "id")
 	_global.GID = field.NewString(tableName, "g_id")
-	_global.State = field.NewString(tableName, "state")
-	_global.EndTime = field.NewInt32(tableName, "end_time")
-	_global.NextCronTime = field.NewInt32(tableName, "next_cron_time")
+	_global.State = field.NewString(tableName, "State")
+	_global.EndTime = field.NewInt64(tableName, "end_time")
+	_global.NextCronTime = field.NewInt64(tableName, "next_cron_time")
 
-	_global.fieldMap = make(map[string]field.Expr, 5)
-	_global.fieldMap["id"] = _global.ID
+	_global.fieldMap = make(map[string]field.Expr, 4)
 	_global.fieldMap["g_id"] = _global.GID
-	_global.fieldMap["state"] = _global.State
+	_global.fieldMap["State"] = _global.State
 	_global.fieldMap["end_time"] = _global.EndTime
 	_global.fieldMap["next_cron_time"] = _global.NextCronTime
 
@@ -44,11 +42,10 @@ type global struct {
 	globalDo globalDo
 
 	ALL          field.Field
-	ID           field.Int32
 	GID          field.String
 	State        field.String
-	EndTime      field.Int32
-	NextCronTime field.Int32
+	EndTime      field.Int64
+	NextCronTime field.Int64
 
 	fieldMap map[string]field.Expr
 }
@@ -145,61 +142,61 @@ func (g globalDo) Unscoped() *globalDo {
 	return g.withDO(g.DO.Unscoped())
 }
 
-func (g globalDo) Create(values ...*model.Global) error {
+func (g globalDo) Create(values ...*entity.Global) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return g.DO.Create(values)
 }
 
-func (g globalDo) CreateInBatches(values []*model.Global, batchSize int) error {
+func (g globalDo) CreateInBatches(values []*entity.Global, batchSize int) error {
 	return g.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (g globalDo) Save(values ...*model.Global) error {
+func (g globalDo) Save(values ...*entity.Global) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return g.DO.Save(values)
 }
 
-func (g globalDo) First() (*model.Global, error) {
+func (g globalDo) First() (*entity.Global, error) {
 	if result, err := g.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Global), nil
+		return result.(*entity.Global), nil
 	}
 }
 
-func (g globalDo) Take() (*model.Global, error) {
+func (g globalDo) Take() (*entity.Global, error) {
 	if result, err := g.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Global), nil
+		return result.(*entity.Global), nil
 	}
 }
 
-func (g globalDo) Last() (*model.Global, error) {
+func (g globalDo) Last() (*entity.Global, error) {
 	if result, err := g.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Global), nil
+		return result.(*entity.Global), nil
 	}
 }
 
-func (g globalDo) Find() ([]*model.Global, error) {
+func (g globalDo) Find() ([]*entity.Global, error) {
 	result, err := g.DO.Find()
-	return result.([]*model.Global), err
+	return result.([]*entity.Global), err
 }
 
-func (g globalDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) ([]*model.Global, error) {
+func (g globalDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) ([]*entity.Global, error) {
 	result, err := g.DO.FindInBatch(batchSize, fc)
-	return result.([]*model.Global), err
+	return result.([]*entity.Global), err
 }
 
-func (g globalDo) FindInBatches(result []*model.Global, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (g globalDo) FindInBatches(result []*entity.Global, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return g.DO.FindInBatches(&result, batchSize, fc)
 }
 
@@ -219,23 +216,23 @@ func (g globalDo) Preload(field field.RelationField) *globalDo {
 	return g.withDO(g.DO.Preload(field))
 }
 
-func (g globalDo) FirstOrInit() (*model.Global, error) {
+func (g globalDo) FirstOrInit() (*entity.Global, error) {
 	if result, err := g.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Global), nil
+		return result.(*entity.Global), nil
 	}
 }
 
-func (g globalDo) FirstOrCreate() (*model.Global, error) {
+func (g globalDo) FirstOrCreate() (*entity.Global, error) {
 	if result, err := g.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Global), nil
+		return result.(*entity.Global), nil
 	}
 }
 
-func (g globalDo) FindByPage(offset int, limit int) (result []*model.Global, count int64, err error) {
+func (g globalDo) FindByPage(offset int, limit int) (result []*entity.Global, count int64, err error) {
 	count, err = g.Count()
 	if err != nil {
 		return

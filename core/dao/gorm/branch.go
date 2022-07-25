@@ -23,21 +23,19 @@ func NewBranchImpl() BranchImpl {
 }
 
 func (g BranchImpl) CreateBatches(ctx context.Context, list entity.BranchList) error {
-	mList := list.Convert()
-	err := g.query.Branch.WithContext(ctx).CreateInBatches(mList, len(mList))
+	err := g.query.Branch.WithContext(ctx).CreateInBatches(list, len(list))
 	err = tools.WrapDbErr(err)
 	return err
 }
 
 func (g BranchImpl) GetBranchList(ctx context.Context, gid string) (list entity.BranchList, err error) {
 	q := g.query.Branch
-	branches, err := g.query.Branch.WithContext(ctx).
+	list, err = g.query.Branch.WithContext(ctx).
 		Where(q.GID.Eq(gid)).
 		Find()
 	if err = tools.WrapDbErr(err); err != nil {
 		return
 	}
-	list = list.AssignmentByModel(branches)
 	return
 }
 

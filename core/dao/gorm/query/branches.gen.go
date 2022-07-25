@@ -7,7 +7,7 @@ package query
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
+	"github.com/wuqinqiang/easycar/core/entity"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
@@ -20,34 +20,32 @@ func newBranch(db *gorm.DB) branch {
 	_branch := branch{}
 
 	_branch.branchDo.UseDB(db)
-	_branch.branchDo.UseModel(&model.Branch{})
+	_branch.branchDo.UseModel(&entity.Branch{})
 
 	tableName := _branch.branchDo.TableName()
 	_branch.ALL = field.NewField(tableName, "*")
-	_branch.ID = field.NewInt32(tableName, "id")
 	_branch.GID = field.NewString(tableName, "g_id")
-	_branch.BranchID = field.NewString(tableName, "branch_id")
-	_branch.URL = field.NewString(tableName, "url")
+	_branch.BranchId = field.NewString(tableName, "branch_id")
+	_branch.Url = field.NewString(tableName, "url")
 	_branch.ReqData = field.NewString(tableName, "req_data")
 	_branch.TranType = field.NewString(tableName, "tran_type")
-	_branch.PID = field.NewString(tableName, "p_id")
+	_branch.PId = field.NewString(tableName, "p_id")
 	_branch.Protocol = field.NewString(tableName, "protocol")
 	_branch.Action = field.NewString(tableName, "action")
-	_branch.State = field.NewString(tableName, "state")
-	_branch.EndTime = field.NewInt32(tableName, "end_time")
-	_branch.Level = field.NewInt32(tableName, "level")
+	_branch.State = field.NewString(tableName, "State")
+	_branch.EndTime = field.NewInt64(tableName, "end_time")
+	_branch.Level = field.NewUint8(tableName, "level")
 
-	_branch.fieldMap = make(map[string]field.Expr, 12)
-	_branch.fieldMap["id"] = _branch.ID
+	_branch.fieldMap = make(map[string]field.Expr, 11)
 	_branch.fieldMap["g_id"] = _branch.GID
-	_branch.fieldMap["branch_id"] = _branch.BranchID
-	_branch.fieldMap["url"] = _branch.URL
+	_branch.fieldMap["branch_id"] = _branch.BranchId
+	_branch.fieldMap["url"] = _branch.Url
 	_branch.fieldMap["req_data"] = _branch.ReqData
 	_branch.fieldMap["tran_type"] = _branch.TranType
-	_branch.fieldMap["p_id"] = _branch.PID
+	_branch.fieldMap["p_id"] = _branch.PId
 	_branch.fieldMap["protocol"] = _branch.Protocol
 	_branch.fieldMap["action"] = _branch.Action
-	_branch.fieldMap["state"] = _branch.State
+	_branch.fieldMap["State"] = _branch.State
 	_branch.fieldMap["end_time"] = _branch.EndTime
 	_branch.fieldMap["level"] = _branch.Level
 
@@ -58,18 +56,17 @@ type branch struct {
 	branchDo branchDo
 
 	ALL      field.Field
-	ID       field.Int32
 	GID      field.String
-	BranchID field.String
-	URL      field.String
+	BranchId field.String
+	Url      field.String
 	ReqData  field.String
 	TranType field.String
-	PID      field.String
+	PId      field.String
 	Protocol field.String
 	Action   field.String
 	State    field.String
-	EndTime  field.Int32
-	Level    field.Int32
+	EndTime  field.Int64
+	Level    field.Uint8
 
 	fieldMap map[string]field.Expr
 }
@@ -166,61 +163,61 @@ func (b branchDo) Unscoped() *branchDo {
 	return b.withDO(b.DO.Unscoped())
 }
 
-func (b branchDo) Create(values ...*model.Branch) error {
+func (b branchDo) Create(values ...*entity.Branch) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return b.DO.Create(values)
 }
 
-func (b branchDo) CreateInBatches(values []*model.Branch, batchSize int) error {
+func (b branchDo) CreateInBatches(values []*entity.Branch, batchSize int) error {
 	return b.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (b branchDo) Save(values ...*model.Branch) error {
+func (b branchDo) Save(values ...*entity.Branch) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return b.DO.Save(values)
 }
 
-func (b branchDo) First() (*model.Branch, error) {
+func (b branchDo) First() (*entity.Branch, error) {
 	if result, err := b.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Branch), nil
+		return result.(*entity.Branch), nil
 	}
 }
 
-func (b branchDo) Take() (*model.Branch, error) {
+func (b branchDo) Take() (*entity.Branch, error) {
 	if result, err := b.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Branch), nil
+		return result.(*entity.Branch), nil
 	}
 }
 
-func (b branchDo) Last() (*model.Branch, error) {
+func (b branchDo) Last() (*entity.Branch, error) {
 	if result, err := b.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Branch), nil
+		return result.(*entity.Branch), nil
 	}
 }
 
-func (b branchDo) Find() ([]*model.Branch, error) {
+func (b branchDo) Find() ([]*entity.Branch, error) {
 	result, err := b.DO.Find()
-	return result.([]*model.Branch), err
+	return result.([]*entity.Branch), err
 }
 
-func (b branchDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) ([]*model.Branch, error) {
+func (b branchDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) ([]*entity.Branch, error) {
 	result, err := b.DO.FindInBatch(batchSize, fc)
-	return result.([]*model.Branch), err
+	return result.([]*entity.Branch), err
 }
 
-func (b branchDo) FindInBatches(result []*model.Branch, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (b branchDo) FindInBatches(result []*entity.Branch, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return b.DO.FindInBatches(&result, batchSize, fc)
 }
 
@@ -240,23 +237,23 @@ func (b branchDo) Preload(field field.RelationField) *branchDo {
 	return b.withDO(b.DO.Preload(field))
 }
 
-func (b branchDo) FirstOrInit() (*model.Branch, error) {
+func (b branchDo) FirstOrInit() (*entity.Branch, error) {
 	if result, err := b.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Branch), nil
+		return result.(*entity.Branch), nil
 	}
 }
 
-func (b branchDo) FirstOrCreate() (*model.Branch, error) {
+func (b branchDo) FirstOrCreate() (*entity.Branch, error) {
 	if result, err := b.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Branch), nil
+		return result.(*entity.Branch), nil
 	}
 }
 
-func (b branchDo) FindByPage(offset int, limit int) (result []*model.Branch, count int64, err error) {
+func (b branchDo) FindByPage(offset int, limit int) (result []*entity.Branch, count int64, err error) {
 	count, err = b.Count()
 	if err != nil {
 		return

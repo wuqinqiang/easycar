@@ -10,7 +10,6 @@ import (
 	"github.com/wuqinqiang/easycar/core/entity"
 
 	"github.com/wuqinqiang/easycar/core/consts"
-	"github.com/wuqinqiang/easycar/core/dao/gorm/model"
 	"github.com/wuqinqiang/easycar/core/dao/gorm/query"
 )
 
@@ -24,25 +23,21 @@ func NewGlobalImpl() GlobalImpl {
 
 func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) error {
 	var (
-		m model.Global
+		m entity.Global
 	)
 	m.GID = global.GetGId()
 	err := g.query.Global.WithContext(ctx).Create(&m)
 	return tools.WrapDbErr(err)
 }
 
-func (g GlobalImpl) GetGlobal(ctx context.Context, gid string) (e entity.Global, err error) {
+func (g GlobalImpl) GetGlobal(ctx context.Context, gid string) (entity.Global, error) {
 	global := g.query.Global
 	m, err := g.query.Global.WithContext(ctx).Where(global.GID.Eq(gid)).First()
 	err = tools.WrapDbErr(err)
 	if err != nil {
 		return entity.Global{}, err
 	}
-	if m == nil || m.GID == "" {
-		return entity.Global{}, nil
-	}
-	e.Assignment(m)
-	return e, nil
+	return *m, nil
 }
 
 func (g GlobalImpl) UpdateGlobalStateByGid(ctx context.Context, gid string,

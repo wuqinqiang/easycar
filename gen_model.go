@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/wuqinqiang/easycar/core/entity"
 	"gorm.io/driver/mysql"
 	"gorm.io/gen"
 	"gorm.io/gorm"
@@ -31,9 +32,11 @@ func main() {
 	}
 	g.UseDB(db)
 
-	g.ApplyBasic(
-		g.GenerateModelAs("branch", "Branch"),
-		g.GenerateModelAs("global", "Global"),
-	)
+	g.ApplyBasic(entity.Global{}, entity.Branch{})
+
+	//g.ApplyBasic(
+	//	g.GenerateModelAs("branch", "Branch"),
+	//	g.GenerateModelAs("global", "Global"),
+	//)
 	g.Execute()
 }
