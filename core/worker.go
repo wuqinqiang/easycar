@@ -20,14 +20,14 @@ import (
 	"github.com/wuqinqiang/easycar/core/entity"
 )
 
-type Worker struct {
-	Gid           string
+type Executor struct {
+	GID           string
 	PhaseBranches []entity.BranchList
 }
 
-func NewWorker(gid string, branches entity.BranchList) *Worker {
-	w := &Worker{
-		Gid:           gid,
+func NewWorker(gid string, branches entity.BranchList) *Executor {
+	w := &Executor{
+		GID:           gid,
 		PhaseBranches: make([]entity.BranchList, len(branches)),
 	}
 
@@ -53,7 +53,7 @@ func NewWorker(gid string, branches entity.BranchList) *Worker {
 	return w
 }
 
-func (w *Worker) Commit(ctx context.Context) error {
+func (w *Executor) Commit(ctx context.Context) error {
 	if len(w.PhaseBranches) == 0 {
 		return nil
 	}
