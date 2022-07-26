@@ -1,4 +1,4 @@
-package core
+package executor
 
 import (
 	"context"
@@ -20,27 +20,53 @@ import (
 	"github.com/wuqinqiang/easycar/core/entity"
 )
 
-type Executor struct {
-	GID           string
-	PhaseBranches []entity.BranchList
+type (
+	// FilterFn is a function that filters branches
+	FilterFn func(branch *entity.Branch) bool
+
+	Executor interface {
+		Execute(ctx context.Context) error
+	}
+)
+
+type executor struct {
+	// MustInitExecutor todo add  config
 }
 
-func NewExecutor(gid string, branches entity.BranchList) *Executor {
-	w := &Executor{
-		GID:           gid,
-		PhaseBranches: make([]entity.BranchList, len(branches)),
+var (
+	e *executor
+)
+
+func init() {
+	e = &executor{}
+}
+
+func GetExecutor() *executor {
+	return e
+}
+
+func (e *executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
+	if len(branches) == 0 {
+		return nil
 	}
 
+	phaseList := make([]entity.BranchList, len(branches))
+
+	// sort branches by level
 	sort.Slice(branches, func(i, j int) bool {
 		return branches[i].Level < branches[j].Level
 	})
-	var previousLevel consts.Level = 1
-	bucketIndex := 0
+
+	var (
+		previousLevel consts.Level = 1 // first level default 1
+		bucketIndex                = 0 // first level bucket index default 0
+	)
+
 	for i, branch := range branches {
-		// todo 修改成二阶段需要
-		if !branch.IsSAGANormal() && !branch.IsTccTry() {
+		if !filterFn(branch) {
 			continue
 		}
+
 		if i == 0 {
 			previousLevel = branch.Level
 		}
@@ -48,19 +74,14 @@ func NewExecutor(gid string, branches entity.BranchList) *Executor {
 			bucketIndex += 1
 			previousLevel = branch.Level
 		}
-		w.PhaseBranches[bucketIndex] = append(w.PhaseBranches[bucketIndex], branch)
+		phaseList[bucketIndex] = append(phaseList[bucketIndex], branch)
 	}
-	return w
-}
 
-func (w *Executor) Commit(ctx context.Context) error {
-	if len(w.PhaseBranches) == 0 {
-		return nil
-	}
 	var (
 		wg sync.WaitGroup
 	)
-	for _, list := range w.PhaseBranches {
+
+	for _, list := range phaseList {
 		var (
 			err error
 		)

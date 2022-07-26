@@ -1,4 +1,4 @@
-package core
+package retry
 
 import (
 	"fmt"
@@ -18,25 +18,26 @@ var (
 )
 
 type (
-	BackOff struct {
+	Fn    func() error
+	Retry struct {
 		min, max       time.Duration
 		factor         uint32
 		allowAttempt   uint32
 		currentAttempt uint32
 		timer          *time.Timer
 		fn             Fn
+		AfterFn        func() // AfterFn is called after the last attempt
 	}
-	Fn func() error
 )
 
-func NewBackOff(allowRetries uint32, factor uint32, fn Fn) *BackOff {
+func NewRetry(allowRetries uint32, factor uint32, fn Fn) *Retry {
 	if allowRetries == 0 {
 		allowRetries = DefaultRetries
 	}
 	if factor == 0 {
 		factor = DefaultFactor
 	}
-	b := &BackOff{
+	b := &Retry{
 		currentAttempt: allowRetries,
 		factor:         factor,
 		fn:             fn,
@@ -44,7 +45,7 @@ func NewBackOff(allowRetries uint32, factor uint32, fn Fn) *BackOff {
 	}
 	return b
 }
-func (b *BackOff) Duration() time.Duration {
+func (b *Retry) Duration() time.Duration {
 	backDuration := time.Duration(math.Pow(float64(b.factor),
 		float64(b.currentAttempt))) * time.Second
 	if backDuration > MaxWaitBackOff {
@@ -53,7 +54,7 @@ func (b *BackOff) Duration() time.Duration {
 	return backDuration
 }
 
-func (b *BackOff) Execution() error {
+func (b *Retry) Execution() error {
 	atomic.AddUint32(&b.currentAttempt, 1)
 	if b.currentAttempt > b.allowAttempt {
 		return ErrMaxAttempt

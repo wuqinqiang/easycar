@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/wuqinqiang/easycar/core/executor"
+
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/mode"
 
@@ -53,10 +55,7 @@ func (c *Coordinator) Commit(ctx context.Context, global entity.Global) error {
 	if err != nil {
 		return err
 	}
-	executor := NewExecutor(global.GID, branches)
-	if err = executor.Commit(ctx); err != nil {
-		return err
-	}
+	err = executor.NewCommitExecutor(branches).Execute(ctx)
 	return err
 }
 
@@ -65,9 +64,7 @@ func (c *Coordinator) Rollback(ctx context.Context, global entity.Global) error 
 	if err != nil {
 		return err
 	}
-
-	executor := NewExecutor(global.GID, branches)
-	if err = executor.Commit(ctx); err != nil {
+	if err = executor.NewRollbackExecutor(branches).Execute(ctx); err != nil {
 		return err
 	}
 	return err
