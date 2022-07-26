@@ -3,10 +3,6 @@ package core
 import (
 	"context"
 	"errors"
-	"fmt"
-
-	"github.com/wuqinqiang/easycar/core/protocol"
-	"github.com/wuqinqiang/easycar/core/protocol/common"
 
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/mode"
@@ -52,85 +48,28 @@ func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.
 	return c.dao.CreateBatches(ctx, branches)
 }
 
-func (c *Coordinator) handler(ctx context.Context, gid string,
-	fn func(b *entity.Branch) error) error {
-	branches, err := c.dao.GetBranchList(ctx, gid)
+func (c *Coordinator) Commit(ctx context.Context, global entity.Global) error {
+	branches, err := c.dao.GetBranchList(ctx, global.GetGId())
 	if err != nil {
 		return err
 	}
-	for i := range branches {
-		err = fn(branches[i])
-		if err != nil {
-			fmt.Printf("[Coordinator] err:%v\n", err)
-		}
-		// todo add option
-		//b := NewBackOff(1, 2, func() error {
-		//	return fn(branches[i])
-		//})
-		//err = b.Execution()
-		continue
+	executor := NewExecutor(global.GID, branches)
+	if err = executor.Commit(ctx); err != nil {
+		return err
 	}
-	return nil
-}
-
-func (c *Coordinator) Commit(ctx context.Context, global entity.Global) error {
-	globalState := consts.GlobalCommitted
-	if err := c.handler(ctx, global.GetGId(), func(b *entity.Branch) error {
-		if b.IsSucceed() {
-			return nil
-		}
-		//we should know for the transaction TranType,such as tcc or saga,
-		//if tcc ,such as try、confirm、cancel.or if saga ,such as normal、compensation
-		if b.TranType == consts.TCC && b.Action != consts.Try {
-			return nil
-		}
-
-		if b.TranType == consts.SAGA && b.Action != consts.Normal {
-			return nil
-		}
-
-		transport, err := protocol.GetTransport(common.NetType(b.Protocol), b.Url)
-		if err != nil {
-			return err
-		}
-		// todo replace []byte(b.ReqData)
-		req := common.NewReq([]byte(b.ReqData), nil)
-		if _, err = transport.Request(ctx, req); err != nil {
-			return err
-		}
-		return nil
-	}); err != nil {
-		globalState = consts.GlobalCommitFailed
-	} // todo warp err
-	_, err := c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(), globalState)
 	return err
 }
 
 func (c *Coordinator) Rollback(ctx context.Context, global entity.Global) error {
-	globalState := consts.GlobalRollBacked
-	if err := c.handler(ctx, global.GetGId(), func(b *entity.Branch) error {
-		if b.TranType == consts.TCC && b.Action != consts.Cancel {
-			return nil
-		}
-		if b.TranType == consts.SAGA && b.Action != consts.Compensation {
-			return nil
-		}
-
-		transport, err := protocol.GetTransport(common.NetType(b.Protocol), b.Url)
-		if err != nil {
-			return err
-		}
-		// todo replace []byte(b.ReqData)
-		req := common.NewReq([]byte(b.ReqData), nil)
-		if _, err = transport.Request(ctx, req); err != nil {
-			return err
-		}
-		return nil
-	}); err != nil {
-		globalState = consts.GlobalRollBackFailed
+	branches, err := c.dao.GetBranchList(ctx, global.GetGId())
+	if err != nil {
+		return err
 	}
-	// todo warp err
-	_, err := c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(), globalState)
+
+	executor := NewExecutor(global.GID, branches)
+	if err = executor.Commit(ctx); err != nil {
+		return err
+	}
 	return err
 }
 

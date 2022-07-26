@@ -83,6 +83,7 @@ func (e EasyCarSrv) Commit(ctx context.Context, req *proto.CommitReq) (*proto.Co
 		return nil, err
 	}
 	resp := new(proto.CommitResp)
+	resp.State = consts.ConvertStateToGrpc(consts.GlobalCommitted)
 	return resp, nil
 }
 

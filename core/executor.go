@@ -25,7 +25,7 @@ type Executor struct {
 	PhaseBranches []entity.BranchList
 }
 
-func NewWorker(gid string, branches entity.BranchList) *Executor {
+func NewExecutor(gid string, branches entity.BranchList) *Executor {
 	w := &Executor{
 		GID:           gid,
 		PhaseBranches: make([]entity.BranchList, len(branches)),
@@ -75,19 +75,19 @@ func (w *Executor) Commit(ctx context.Context) error {
 			}).Walk(func(item interface{}, pipe chan<- interface{}) {
 				b, ok := item.(*entity.Branch)
 				if !ok {
-					pipe <- fmt.Errorf("invalid branch:%+v", item)
+					pipe <- fmt.Errorf("[Executor]invalid branch:%+v", item)
 					return
 				}
 				transport, err := protocol.GetTransport(common.NetType(b.Protocol), b.Url)
 				if err != nil {
-					pipe <- fmt.Errorf("branchid:%vget transport error:%v", b.BranchId, err)
+					pipe <- fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
 					return
 				}
 				// todo replace []byte(b.ReqData)
 				req := common.NewReq([]byte(b.ReqData), nil)
 				if _, err = transport.Request(ctx, req); err != nil {
 					// todo update branch status
-					pipe <- fmt.Errorf("branch:%vrequest error:%v", b, err)
+					pipe <- fmt.Errorf("[Executor]branch:%vrequest error:%v", b, err)
 					return
 				}
 			}).ForEach(func(item interface{}) {

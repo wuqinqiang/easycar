@@ -11,13 +11,16 @@ type (
 )
 
 const (
-	TCC  TransactionType = "tcc"
-	SAGA TransactionType = "saga"
+	TransactionUnknown TransactionType = "unknown"
+	TCC                TransactionType = "tcc"
+	SAGA               TransactionType = "saga"
 
 	// Try Try、Confirm and Cancel branch type for TCC
-	Try     BranchAction = "try"
-	Confirm BranchAction = "confirm"
-	Cancel  BranchAction = "cancel"
+
+	ActionUnknown              = "unknown"
+	Try           BranchAction = "try"
+	Confirm       BranchAction = "confirm"
+	Cancel        BranchAction = "cancel"
 
 	// Normal and Compensation branch type for SAGA
 	Normal       BranchAction = "normal"

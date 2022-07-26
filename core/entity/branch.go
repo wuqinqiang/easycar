@@ -2,7 +2,6 @@ package entity
 
 import (
 	"github.com/wuqinqiang/easycar/core/consts"
-	"github.com/wuqinqiang/easycar/proto"
 )
 
 type (
@@ -15,7 +14,7 @@ type (
 		PId      string                 `gorm:"column:p_id;type:varchar(255);not null"`                      // parent branch id
 		Protocol string                 `gorm:"column:protocol;type:varchar(255);not null;default:http"`     //http,grpc
 		Action   consts.BranchAction    `gorm:"column:action;type:varchar(255);not null"`                    // action type of transaction
-		State    consts.BranchState     `gorm:"column:State;type:varchar(255);not null;default:branchReady"` // branch State
+		State    consts.BranchState     `gorm:"column:state;type:varchar(255);not null;default:branchReady"` // branch State
 		//ChildrenList      []*Branch               //	children branch list
 		EndTime int64 `gorm:"column:end_time;type:int;not null;default:0"`
 		// 07-10 add
@@ -24,25 +23,15 @@ type (
 	BranchList []*Branch
 )
 
+func (b Branch) TableName() string {
+	return "branch"
+}
+
 func (b *Branch) IsSucceed() bool {
 	return b.State == consts.BranchSucceed
 }
 func (b *Branch) IsBranchFailState() {
 
-}
-
-// AssignmentByPb todo
-func (b *Branch) AssignmentByPb(m *proto.RegisterReq_Branch) *Branch {
-	b.BranchId = m.GetBranchId()
-	b.Url = m.GetUri()
-	b.ReqData = m.GetReqData()
-	b.TranType = consts.TransactionType(m.GetTranType().String())
-	b.PId = m.GetPid()
-	b.Protocol = m.GetProtocol()
-	b.Action = consts.BranchAction(m.GetAction().String())
-	b.State = consts.BranchState(m.GetState().String())
-	b.Level = consts.Level(m.GetLevel())
-	return b
 }
 
 func (b *Branch) IsTcc() bool {
@@ -58,15 +47,4 @@ func (b *Branch) IsSAGA() bool {
 
 func (b *Branch) IsSAGANormal() bool {
 	return b.Action == consts.Normal && b.IsSAGA()
-}
-
-func (list BranchList) AssignmentByGrpc(gid string, mList []*proto.RegisterReq_Branch) BranchList {
-	for i := range mList {
-		var (
-			b Branch
-		)
-		b.GID = gid
-		list = append(list, b.AssignmentByPb(mList[i]))
-	}
-	return list
 }
