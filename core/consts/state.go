@@ -7,8 +7,8 @@ type ( // GlobalState is a global state of the application
 )
 
 const (
-	// Begin global state
-	Begin GlobalState = "begin"
+	// Ready global state
+	Ready GlobalState = "ready"
 
 	//************global state***************
 	Phase1Processing GlobalState = "phase1_processing"

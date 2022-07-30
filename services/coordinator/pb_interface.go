@@ -71,60 +71,30 @@ func (e EasyCarSrv) Register(ctx context.Context, req *proto.RegisterReq) (*prot
 
 func (e EasyCarSrv) Start(ctx context.Context, req *proto.StartReq) (*proto.StartResp, error) {
 	global, err := e.check(ctx, req.GetGId(), func(g *entity.Global) error {
-		if !g.CanCommit() {
-			return fmt.Errorf("global state:%v can not commit", g.GetState())
+		if !g.IsReady() {
+			return fmt.Errorf("global state:%v can not start", g.GetState())
 		}
 		return nil
 	})
 	if err != nil {
 		return nil, err
 	}
-	if !global.IsBegin() {
-		return nil, fmt.Errorf("global state:%v can not commit", global.GetState())
+
+	var (
+		branches entity.BranchList
+	)
+	if branches, err = e.core.GetBranchList(ctx, global.GetGId()); err != nil {
+		return nil, err
+	}
+	global.SetState(consts.Phase1Processing)
+	if err = e.core.UpdateGlobalState(ctx, global.GetGId(), global.State); err != nil {
+		return nil, err
 	}
 
-	if err := e.core.Commit(ctx, global); err != nil {
+	if err = e.core.Start(ctx, &global, branches); err != nil {
 		return nil, err
 	}
 	resp := new(proto.StartResp)
-	resp.State = consts.ConvertStateToGrpc(consts.Phase1Success)
-	return resp, nil
-}
-
-func (e EasyCarSrv) Commit(ctx context.Context, req *proto.CommitReq) (*proto.CommitResp, error) {
-	global, err := e.check(ctx, req.GetGId(), func(g *entity.Global) error {
-		if !g.CanCommit() {
-			return fmt.Errorf("global state:%v can not commit", g.GetState())
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	if err := e.core.Commit(ctx, global); err != nil {
-		return nil, err
-	}
-	resp := new(proto.CommitResp)
-	resp.State = consts.ConvertStateToGrpc(consts.Phase1Success)
-	return resp, nil
-}
-
-func (e EasyCarSrv) RollBack(ctx context.Context, req *proto.RollBackReq) (*proto.RollBackResp, error) {
-	global, err := e.check(ctx, req.GetGId(), func(g *entity.Global) error {
-		if !g.CanPhase2() {
-			return fmt.Errorf("global state:%v can not rollback", g.GetState())
-		}
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	if err := e.core.Rollback(ctx, global); err != nil {
-		return nil, err
-	}
-	resp := new(proto.RollBackResp)
-	resp.State = consts.ConvertStateToGrpc(consts.Phase2Success)
 	return resp, nil
 }
 

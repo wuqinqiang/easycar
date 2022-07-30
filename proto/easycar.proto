@@ -11,9 +11,6 @@ service EasyCar {
   rpc Begin(google.protobuf.Empty)returns(BeginResp){}
   rpc Register(RegisterReq)returns(RegisterResp){}
   rpc Start(StartReq)returns(StartResp){}
-
-  rpc Commit(CommitReq)returns(CommitResp){}
-  rpc RollBack(RollBackReq)returns(RollBackResp){}
   rpc Abort(AbortReq) returns(AbortResp){}
   rpc GetState(GetStateReq) returns(GetStateResp){}
 }
@@ -92,15 +89,6 @@ message BeginResp {
   string gId = 1;
 }
 
-message CommitReq {
-  string gId = 1;
-}
-message CommitResp {
-  GlobalState state = 1;
-}
-
-
-
 message StartReq {
   string gId = 1;
 }
@@ -114,14 +102,6 @@ message AbortReq {
 }
 
 message AbortResp {
-}
-
-message RollBackReq {
-  string gId = 1;
-}
-
-message RollBackResp{
-  GlobalState state = 1;
 }
 
 message GetStateReq {

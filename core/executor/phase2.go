@@ -3,16 +3,19 @@ package executor
 import (
 	"context"
 
+	"github.com/wuqinqiang/easycar/core/consts"
+
 	"github.com/wuqinqiang/easycar/core/entity"
 )
 
 type Phase2 struct {
-	list entity.BranchList
+	list   entity.BranchList
+	global *entity.Global
 	*executor
 }
 
-func NewPhase2Executor(branchList entity.BranchList) *Phase2 {
-	return &Phase2{list: branchList, executor: GetExecutor()}
+func NewPhase2Executor(global *entity.Global, branchList entity.BranchList) *Phase2 {
+	return &Phase2{list: branchList, global: global, executor: GetExecutor()}
 }
 
 func (e *Phase2) Execute(ctx context.Context) error {
@@ -20,6 +23,17 @@ func (e *Phase2) Execute(ctx context.Context) error {
 		return nil
 	}
 	return e.execute(ctx, e.list, func(branch *entity.Branch) bool {
-		return branch.IsTccTry()
+		if e.global.State == consts.Phase1Success {
+			if branch.IsSAGA() {
+				return false
+			}
+			return branch.IsTccConfirm()
+			// todo more
+		}
+		// other phase1 failed
+		if branch.IsSAGACompensation() || branch.IsTccTry() {
+			return true
+		}
+		return false
 	})
 }

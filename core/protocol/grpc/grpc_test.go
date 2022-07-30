@@ -21,9 +21,9 @@ func TestProtocol_Request(t *testing.T) {
 }
 
 func TestProtocol_Request2(t *testing.T) {
-	s := NewProtocol("127.0.0.1:8089/proto.EasyCar/Commit")
+	s := NewProtocol("127.0.0.1:8089/proto.EasyCar/Phase1")
 
-	req := proto2.CommitReq{GId: "11"}
+	req := proto2.StartReq{GId: "11"}
 	reqByte, err := proto.Marshal(&req)
 	if err != nil {
 		t.Fatal(err)

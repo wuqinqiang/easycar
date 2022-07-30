@@ -41,10 +41,22 @@ func (b *Branch) IsTccTry() bool {
 	return b.Action == consts.Try && b.IsTcc()
 }
 
+func (b *Branch) IsTccConfirm() bool {
+	return b.Action == consts.Confirm
+}
+
+func (b *Branch) CanDo() {
+
+}
+
 func (b *Branch) IsSAGA() bool {
 	return b.TranType == consts.SAGA
 }
 
 func (b *Branch) IsSAGANormal() bool {
 	return b.Action == consts.Normal && b.IsSAGA()
+}
+
+func (b *Branch) IsSAGACompensation() bool {
+	return b.Action == consts.Compensation && b.IsSAGA()
 }

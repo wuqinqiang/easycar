@@ -4,7 +4,7 @@ import "github.com/wuqinqiang/easycar/proto"
 
 func ConvertStateToGrpc(state GlobalState) proto.GlobalState {
 	switch state {
-	case Begin:
+	case Ready:
 		return proto.GlobalState_Begin
 	case Phase1Processing:
 		return proto.GlobalState_Phase1Processing

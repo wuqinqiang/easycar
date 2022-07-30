@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 
+	"github.com/wuqinqiang/easycar/tools"
+
 	"github.com/wuqinqiang/easycar/core/executor"
 
 	"github.com/wuqinqiang/easycar/core/consts"
@@ -32,7 +34,7 @@ func (c *Coordinator) Begin(ctx context.Context) (string, error) {
 	gid := GetGid()
 
 	g := entity.NewGlobal(gid)
-	g.SetState(consts.Begin)
+	g.SetState(consts.Ready)
 	err := c.dao.CreateGlobal(ctx, g)
 	return gid, err
 }
@@ -48,24 +50,31 @@ func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.
 	return c.dao.CreateBatches(ctx, branches)
 }
 
-func (c *Coordinator) Commit(ctx context.Context, global entity.Global) error {
-	branches, err := c.dao.GetBranchList(ctx, global.GetGId())
+func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
+	phase1State := consts.Phase1Success
+	err := c.Phase1(ctx, branches)
 	if err != nil {
+		phase1State = consts.Phase1Failed
+	}
+	global.State = phase1State
+	if err = c.UpdateGlobalState(ctx, global.GetGId(), phase1State); err != nil {
 		return err
 	}
-	err = executor.Phase1Executor(branches).Execute(ctx)
-	return err
+	tools.GoSafe(func() {
+		if err = c.Phase2(ctx, global, branches); err != nil {
+			return
+		}
+	})
+	global.State = phase1State
+	return nil
 }
 
-func (c *Coordinator) Rollback(ctx context.Context, global entity.Global) error {
-	branches, err := c.dao.GetBranchList(ctx, global.GetGId())
-	if err != nil {
-		return err
-	}
-	if err = executor.NewPhase2Executor(branches).Execute(ctx); err != nil {
-		return err
-	}
-	return err
+func (c *Coordinator) Phase1(ctx context.Context, branchList entity.BranchList) error {
+	return executor.Phase1Executor(branchList).Execute(ctx)
+}
+
+func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
+	return executor.NewPhase2Executor(global, branches).Execute(ctx)
 }
 
 func (c *Coordinator) GetGlobal(ctx context.Context, gid string) (entity.Global, error) {
@@ -74,4 +83,10 @@ func (c *Coordinator) GetGlobal(ctx context.Context, gid string) (entity.Global,
 
 func (c *Coordinator) GetBranchList(ctx context.Context, gid string) (list []*entity.Branch, err error) {
 	return c.dao.GetBranchList(ctx, gid)
+}
+
+func (c *Coordinator) UpdateGlobalState(ctx context.Context, gid string,
+	state consts.GlobalState) error {
+	_, err := c.dao.UpdateGlobalStateByGid(ctx, gid, state)
+	return err
 }

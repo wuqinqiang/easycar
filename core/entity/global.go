@@ -21,10 +21,6 @@ func NewGlobal(gId string) *Global {
 	}
 }
 
-func (g *Global) CanCommit() bool {
-	return g.IsBegin() || g.IsPhase1Retrying()
-}
-
 func (g *Global) CanPhase2() bool {
 	return g.IsPhase2Failed()
 }
@@ -40,8 +36,8 @@ func (g *Global) IsPhase1Retrying() bool {
 	return g.State == consts.Phase1Retrying
 }
 
-func (g *Global) IsBegin() bool {
-	return g.State == consts.Begin
+func (g *Global) IsReady() bool {
+	return g.State == consts.Ready
 }
 
 func (g *Global) IsEmpty() bool {
@@ -68,7 +64,7 @@ func (g *Global) GetEndTime() int64 {
 }
 
 func (g *Global) CanSubmit() bool {
-	return g.State == consts.Begin
+	return g.State == consts.Ready
 }
 
 func (g *Global) GetBranches() []string {
