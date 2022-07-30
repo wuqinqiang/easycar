@@ -82,7 +82,7 @@ func (c *Coordinator) GetGlobal(ctx context.Context, gid string) (entity.Global,
 }
 
 func (c *Coordinator) GetBranchList(ctx context.Context, gid string) (list []*entity.Branch, err error) {
-	return c.dao.GetBranchList(ctx, gid)
+	return c.dao.GetBranches(ctx, gid)
 }
 
 func (c *Coordinator) UpdateGlobalState(ctx context.Context, gid string,

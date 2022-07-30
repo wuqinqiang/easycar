@@ -28,7 +28,7 @@ func (g BranchImpl) CreateBatches(ctx context.Context, list entity.BranchList) e
 	return err
 }
 
-func (g BranchImpl) GetBranchList(ctx context.Context, gid string) (list entity.BranchList, err error) {
+func (g BranchImpl) GetBranches(ctx context.Context, gid string) (list entity.BranchList, err error) {
 	q := g.query.Branch
 	list, err = g.query.Branch.WithContext(ctx).
 		Where(q.GID.Eq(gid)).
