@@ -24,14 +24,13 @@ func (e *Phase2) Execute(ctx context.Context) error {
 	}
 	return e.execute(ctx, e.list, func(branch *entity.Branch) bool {
 		if e.global.State == consts.Phase1Success {
-			if branch.IsSAGA() {
-				return false
+			if branch.IsTccConfirm() {
+				return true
 			}
-			return branch.IsTccConfirm()
-			// todo more
+			return false
 		}
 		// other phase1 failed
-		if branch.IsSAGACompensation() || branch.IsTccTry() {
+		if branch.IsSAGACompensation() || branch.IsTccCancel() {
 			return true
 		}
 		return false

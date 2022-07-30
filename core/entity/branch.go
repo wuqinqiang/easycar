@@ -41,6 +41,10 @@ func (b *Branch) IsTccTry() bool {
 	return b.Action == consts.Try && b.IsTcc()
 }
 
+func (b *Branch) IsTccCancel() bool {
+	return b.Action == consts.Cancel && b.IsTcc()
+}
+
 func (b *Branch) IsTccConfirm() bool {
 	return b.Action == consts.Confirm
 }
