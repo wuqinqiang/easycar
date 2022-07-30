@@ -6,16 +6,16 @@ import (
 	"github.com/wuqinqiang/easycar/core/entity"
 )
 
-type CommitExecutor struct {
+type Phase1 struct {
 	list entity.BranchList
 	*executor
 }
 
-func NewCommitExecutor(branchList entity.BranchList) *CommitExecutor {
-	return &CommitExecutor{list: branchList, executor: GetExecutor()}
+func Phase1Executor(branchList entity.BranchList) *Phase1 {
+	return &Phase1{list: branchList, executor: GetExecutor()}
 }
 
-func (e *CommitExecutor) Execute(ctx context.Context) error {
+func (e *Phase1) Execute(ctx context.Context) error {
 	if len(e.list) == 0 {
 		return nil
 	}

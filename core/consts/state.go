@@ -11,16 +11,15 @@ const (
 	Begin GlobalState = "begin"
 
 	//************global state***************
+	Phase1Processing GlobalState = "phase1_processing"
+	Phase1Retrying   GlobalState = "phase1_retrying"
+	Phase1Failed     GlobalState = "phase1_failed"
+	Phase1Success    GlobalState = "phase1_success"
 
-	GlobalCommitting     GlobalState = "committing"
-	GlobalCommitted      GlobalState = "committed"
-	GlobalCommitRetrying GlobalState = "commitRetrying"
-	GlobalCommitFailed   GlobalState = "commitFailed"
-
-	GlobalRollBacking      GlobalState = "rollBacking"
-	GlobalRollBacked       GlobalState = "rollBacked"
-	GlobalRollBackRetrying GlobalState = "rollBackRetrying"
-	GlobalRollBackFailed   GlobalState = "rollBackFailed"
+	Phase2Processing GlobalState = "phase2_processing"
+	Phase2Retrying   GlobalState = "phase2_retrying"
+	Phase2Failed     GlobalState = "phase2_failed"
+	Phase2Success    GlobalState = "phase2_success"
 
 	//************branch state***************
 

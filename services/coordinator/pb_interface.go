@@ -69,6 +69,28 @@ func (e EasyCarSrv) Register(ctx context.Context, req *proto.RegisterReq) (*prot
 	return resp, nil
 }
 
+func (e EasyCarSrv) Start(ctx context.Context, req *proto.StartReq) (*proto.StartResp, error) {
+	global, err := e.check(ctx, req.GetGId(), func(g *entity.Global) error {
+		if !g.CanCommit() {
+			return fmt.Errorf("global state:%v can not commit", g.GetState())
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	if !global.IsBegin() {
+		return nil, fmt.Errorf("global state:%v can not commit", global.GetState())
+	}
+
+	if err := e.core.Commit(ctx, global); err != nil {
+		return nil, err
+	}
+	resp := new(proto.StartResp)
+	resp.State = consts.ConvertStateToGrpc(consts.Phase1Success)
+	return resp, nil
+}
+
 func (e EasyCarSrv) Commit(ctx context.Context, req *proto.CommitReq) (*proto.CommitResp, error) {
 	global, err := e.check(ctx, req.GetGId(), func(g *entity.Global) error {
 		if !g.CanCommit() {
@@ -83,13 +105,13 @@ func (e EasyCarSrv) Commit(ctx context.Context, req *proto.CommitReq) (*proto.Co
 		return nil, err
 	}
 	resp := new(proto.CommitResp)
-	resp.State = consts.ConvertStateToGrpc(consts.GlobalCommitted)
+	resp.State = consts.ConvertStateToGrpc(consts.Phase1Success)
 	return resp, nil
 }
 
 func (e EasyCarSrv) RollBack(ctx context.Context, req *proto.RollBackReq) (*proto.RollBackResp, error) {
 	global, err := e.check(ctx, req.GetGId(), func(g *entity.Global) error {
-		if !g.CanRollback() {
+		if !g.CanPhase2() {
 			return fmt.Errorf("global state:%v can not rollback", g.GetState())
 		}
 		return nil
@@ -102,6 +124,7 @@ func (e EasyCarSrv) RollBack(ctx context.Context, req *proto.RollBackReq) (*prot
 		return nil, err
 	}
 	resp := new(proto.RollBackResp)
+	resp.State = consts.ConvertStateToGrpc(consts.Phase2Success)
 	return resp, nil
 }
 

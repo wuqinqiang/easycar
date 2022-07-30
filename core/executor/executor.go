@@ -66,7 +66,6 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 		if !filterFn(branch) {
 			continue
 		}
-
 		if i == 0 {
 			previousLevel = branch.Level
 		}

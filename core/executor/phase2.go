@@ -6,16 +6,16 @@ import (
 	"github.com/wuqinqiang/easycar/core/entity"
 )
 
-type RollbackExecutor struct {
+type Phase2 struct {
 	list entity.BranchList
 	*executor
 }
 
-func NewRollbackExecutor(branchList entity.BranchList) *RollbackExecutor {
-	return &RollbackExecutor{list: branchList, executor: GetExecutor()}
+func NewPhase2Executor(branchList entity.BranchList) *Phase2 {
+	return &Phase2{list: branchList, executor: GetExecutor()}
 }
 
-func (e *RollbackExecutor) Execute(ctx context.Context) error {
+func (e *Phase2) Execute(ctx context.Context) error {
 	if len(e.list) == 0 {
 		return nil
 	}

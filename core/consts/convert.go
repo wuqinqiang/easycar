@@ -6,22 +6,22 @@ func ConvertStateToGrpc(state GlobalState) proto.GlobalState {
 	switch state {
 	case Begin:
 		return proto.GlobalState_Begin
-	case GlobalCommitting:
-		return proto.GlobalState_GlobalCommitting
-	case GlobalCommitted:
-		return proto.GlobalState_GlobalCommitted
-	case GlobalCommitRetrying:
-		return proto.GlobalState_GlobalCommitRetrying
-	case GlobalCommitFailed:
-		return proto.GlobalState_GlobalCommitFailed
-	case GlobalRollBacking:
-		return proto.GlobalState_GlobalRollBacking
-	case GlobalRollBacked:
-		return proto.GlobalState_GlobalRollBacked
-	case GlobalRollBackRetrying:
-		return proto.GlobalState_GlobalRollBackRetrying
-	case GlobalRollBackFailed:
-		return proto.GlobalState_GlobalRollBackFailed
+	case Phase1Processing:
+		return proto.GlobalState_Phase1Processing
+	case Phase1Success:
+		return proto.GlobalState_Phase1Success
+	case Phase1Retrying:
+		return proto.GlobalState_Phase1Retrying
+	case Phase1Failed:
+		return proto.GlobalState_Phase1Failed
+	case Phase2Processing:
+		return proto.GlobalState_Phase2Processing
+	case Phase2Retrying:
+		return proto.GlobalState_Phase2Retrying
+	case Phase2Success:
+		return proto.GlobalState_Phase2Success
+	case Phase2Failed:
+		return proto.GlobalState_Phase2Failed
 	default:
 	}
 	return proto.GlobalState_GLOBAL_DEFAULT

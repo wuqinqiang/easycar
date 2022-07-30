@@ -22,27 +22,26 @@ func NewGlobal(gId string) *Global {
 }
 
 func (g *Global) CanCommit() bool {
-	return g.IsBegin() || g.IsRetrying()
+	return g.IsBegin() || g.IsPhase1Retrying()
 }
 
-func (g *Global) CanRollback() bool {
-	return g.IsCommitFailed() || g.IsRollBackRetrying()
+func (g *Global) CanPhase2() bool {
+	return g.IsPhase2Failed()
 }
 
-func (g *Global) IsCommitFailed() bool {
-	return g.State == consts.GlobalCommitFailed
+func (g *Global) IsPhase2Failed() bool {
+	return g.State == consts.Phase1Failed
 }
 
-func (g *Global) IsRollBackRetrying() bool {
-	return g.State == consts.GlobalRollBackRetrying
+func (g *Global) IsPhase2Retrying() bool {
+	return g.State == consts.Phase1Retrying
+}
+func (g *Global) IsPhase1Retrying() bool {
+	return g.State == consts.Phase1Retrying
 }
 
 func (g *Global) IsBegin() bool {
 	return g.State == consts.Begin
-}
-
-func (g *Global) IsRetrying() bool {
-	return g.State == consts.GlobalCommitRetrying
 }
 
 func (g *Global) IsEmpty() bool {

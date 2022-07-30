@@ -8,7 +8,6 @@ package proto
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -26,6 +25,7 @@ const _ = grpc.SupportPackageIsVersion7
 type EasyCarClient interface {
 	Begin(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BeginResp, error)
 	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
+	Start(ctx context.Context, in *StartReq, opts ...grpc.CallOption) (*StartResp, error)
 	Commit(ctx context.Context, in *CommitReq, opts ...grpc.CallOption) (*CommitResp, error)
 	RollBack(ctx context.Context, in *RollBackReq, opts ...grpc.CallOption) (*RollBackResp, error)
 	Abort(ctx context.Context, in *AbortReq, opts ...grpc.CallOption) (*AbortResp, error)
@@ -52,6 +52,15 @@ func (c *easyCarClient) Begin(ctx context.Context, in *emptypb.Empty, opts ...gr
 func (c *easyCarClient) Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error) {
 	out := new(RegisterResp)
 	err := c.cc.Invoke(ctx, "/proto.EasyCar/Register", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *easyCarClient) Start(ctx context.Context, in *StartReq, opts ...grpc.CallOption) (*StartResp, error) {
+	out := new(StartResp)
+	err := c.cc.Invoke(ctx, "/proto.EasyCar/Start", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +96,7 @@ func (c *easyCarClient) Abort(ctx context.Context, in *AbortReq, opts ...grpc.Ca
 
 func (c *easyCarClient) GetState(ctx context.Context, in *GetStateReq, opts ...grpc.CallOption) (*GetStateResp, error) {
 	out := new(GetStateResp)
-	err := c.cc.Invoke(ctx, "/proto.EasyCar/GetGlobal", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/proto.EasyCar/GetState", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -100,6 +109,7 @@ func (c *easyCarClient) GetState(ctx context.Context, in *GetStateReq, opts ...g
 type EasyCarServer interface {
 	Begin(context.Context, *emptypb.Empty) (*BeginResp, error)
 	Register(context.Context, *RegisterReq) (*RegisterResp, error)
+	Start(context.Context, *StartReq) (*StartResp, error)
 	Commit(context.Context, *CommitReq) (*CommitResp, error)
 	RollBack(context.Context, *RollBackReq) (*RollBackResp, error)
 	Abort(context.Context, *AbortReq) (*AbortResp, error)
@@ -117,6 +127,9 @@ func (UnimplementedEasyCarServer) Begin(context.Context, *emptypb.Empty) (*Begin
 func (UnimplementedEasyCarServer) Register(context.Context, *RegisterReq) (*RegisterResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
+func (UnimplementedEasyCarServer) Start(context.Context, *StartReq) (*StartResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
+}
 func (UnimplementedEasyCarServer) Commit(context.Context, *CommitReq) (*CommitResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Commit not implemented")
 }
@@ -127,7 +140,7 @@ func (UnimplementedEasyCarServer) Abort(context.Context, *AbortReq) (*AbortResp,
 	return nil, status.Errorf(codes.Unimplemented, "method Abort not implemented")
 }
 func (UnimplementedEasyCarServer) GetState(context.Context, *GetStateReq) (*GetStateResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetGlobal not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method GetState not implemented")
 }
 func (UnimplementedEasyCarServer) mustEmbedUnimplementedEasyCarServer() {}
 
@@ -174,6 +187,24 @@ func _EasyCar_Register_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EasyCarServer).Register(ctx, req.(*RegisterReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EasyCar_Start_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EasyCarServer).Start(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.EasyCar/Start",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EasyCarServer).Start(ctx, req.(*StartReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -242,7 +273,7 @@ func _EasyCar_GetState_Handler(srv interface{}, ctx context.Context, dec func(in
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.EasyCar/GetGlobal",
+		FullMethod: "/proto.EasyCar/GetState",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(EasyCarServer).GetState(ctx, req.(*GetStateReq))
@@ -266,6 +297,10 @@ var EasyCar_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EasyCar_Register_Handler,
 		},
 		{
+			MethodName: "Start",
+			Handler:    _EasyCar_Start_Handler,
+		},
+		{
 			MethodName: "Commit",
 			Handler:    _EasyCar_Commit_Handler,
 		},
@@ -278,7 +313,7 @@ var EasyCar_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EasyCar_Abort_Handler,
 		},
 		{
-			MethodName: "GetGlobal",
+			MethodName: "GetState",
 			Handler:    _EasyCar_GetState_Handler,
 		},
 	},

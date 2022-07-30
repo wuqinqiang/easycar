@@ -7,8 +7,6 @@ import (
 	"github.com/wuqinqiang/easycar/core/executor"
 
 	"github.com/wuqinqiang/easycar/core/consts"
-	"github.com/wuqinqiang/easycar/core/mode"
-
 	"github.com/wuqinqiang/easycar/core/entity"
 
 	"github.com/wuqinqiang/easycar/core/dao"
@@ -55,7 +53,7 @@ func (c *Coordinator) Commit(ctx context.Context, global entity.Global) error {
 	if err != nil {
 		return err
 	}
-	err = executor.NewCommitExecutor(branches).Execute(ctx)
+	err = executor.Phase1Executor(branches).Execute(ctx)
 	return err
 }
 
@@ -64,7 +62,7 @@ func (c *Coordinator) Rollback(ctx context.Context, global entity.Global) error 
 	if err != nil {
 		return err
 	}
-	if err = executor.NewRollbackExecutor(branches).Execute(ctx); err != nil {
+	if err = executor.NewPhase2Executor(branches).Execute(ctx); err != nil {
 		return err
 	}
 	return err
@@ -76,14 +74,4 @@ func (c *Coordinator) GetGlobal(ctx context.Context, gid string) (entity.Global,
 
 func (c *Coordinator) GetBranchList(ctx context.Context, gid string) (list []*entity.Branch, err error) {
 	return c.dao.GetBranchList(ctx, gid)
-}
-
-func (c *Coordinator) GetMode(branch entity.Branch) Mode {
-	switch branch.TranType {
-	case consts.SAGA:
-		return mode.NewSaga()
-	case consts.TCC:
-		return mode.NewTcc()
-	}
-	panic("not support")
 }

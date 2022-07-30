@@ -10,6 +10,8 @@ import "google/protobuf/empty.proto";
 service EasyCar {
   rpc Begin(google.protobuf.Empty)returns(BeginResp){}
   rpc Register(RegisterReq)returns(RegisterResp){}
+  rpc Start(StartReq)returns(StartResp){}
+
   rpc Commit(CommitReq)returns(CommitResp){}
   rpc RollBack(RollBackReq)returns(RollBackResp){}
   rpc Abort(AbortReq) returns(AbortResp){}
@@ -70,14 +72,14 @@ message RegisterResp {
 enum GlobalState {
   GLOBAL_DEFAULT = 0;
   Begin = 1;
-  GlobalCommitting = 2;
-  GlobalCommitted = 3;
-  GlobalCommitRetrying = 4;
-  GlobalCommitFailed = 5;
-  GlobalRollBacking = 6;
-  GlobalRollBacked = 7;
-  GlobalRollBackRetrying = 8;
-  GlobalRollBackFailed = 9;
+  Phase1Processing = 2;
+  Phase1Retrying = 3;
+  Phase1Failed = 4;
+  Phase1Success = 5;
+  Phase2Processing = 6;
+  Phase2Retrying = 7;
+  Phase2Failed = 8;
+  Phase2Success = 9;
 }
 
 
@@ -94,6 +96,15 @@ message CommitReq {
   string gId = 1;
 }
 message CommitResp {
+  GlobalState state = 1;
+}
+
+
+
+message StartReq {
+  string gId = 1;
+}
+message StartResp {
   GlobalState state = 1;
 }
 
