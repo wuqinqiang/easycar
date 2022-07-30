@@ -20,7 +20,7 @@ var (
 type (
 	Fn    func() error
 	Retry struct {
-		min, max       time.Duration
+		//min, max       time.Duration
 		factor         uint32
 		allowAttempt   uint32
 		currentAttempt uint32
@@ -38,10 +38,10 @@ func NewRetry(allowRetries uint32, factor uint32, fn Fn) *Retry {
 		factor = DefaultFactor
 	}
 	b := &Retry{
-		currentAttempt: allowRetries,
-		factor:         factor,
-		fn:             fn,
-		timer:          time.NewTimer(0),
+		allowAttempt: allowRetries,
+		factor:       factor,
+		fn:           fn,
+		timer:        time.NewTimer(0),
 	}
 	return b
 }
@@ -54,7 +54,7 @@ func (b *Retry) Duration() time.Duration {
 	return backDuration
 }
 
-func (b *Retry) Execution() error {
+func (b *Retry) Run() error {
 	atomic.AddUint32(&b.currentAttempt, 1)
 	if b.currentAttempt > b.allowAttempt {
 		return ErrMaxAttempt
@@ -66,5 +66,9 @@ func (b *Retry) Execution() error {
 		return nil
 	}
 	b.timer.Reset(b.Duration())
-	return b.Execution()
+
+	if b.currentAttempt == b.allowAttempt {
+		return err
+	}
+	return b.Run()
 }

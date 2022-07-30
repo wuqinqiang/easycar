@@ -24,10 +24,7 @@ func (e *Phase2) Execute(ctx context.Context) error {
 	}
 	return e.execute(ctx, e.list, func(branch *entity.Branch) bool {
 		if e.global.State == consts.Phase1Success {
-			if branch.IsTccConfirm() {
-				return true
-			}
-			return false
+			return branch.IsTccConfirm()
 		}
 		// other phase1 failed
 		if branch.IsSAGACompensation() || branch.IsTccCancel() {

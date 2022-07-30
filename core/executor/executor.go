@@ -6,6 +6,8 @@ import (
 	"sort"
 	"sync"
 
+	"github.com/wuqinqiang/easycar/tools/retry"
+
 	"github.com/pkg/errors"
 
 	"github.com/wuqinqiang/easycar/core/protocol"
@@ -46,10 +48,6 @@ func GetExecutor() *executor {
 }
 
 func (e *executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
-	if len(branches) == 0 {
-		return nil
-	}
-
 	phaseList := make([]entity.BranchList, len(branches))
 
 	// sort branches by level
@@ -103,12 +101,13 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					pipe <- fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
 					return
 				}
-				// todo replace []byte(b.ReqData)
 				req := common.NewReq([]byte(b.ReqData), nil)
-				if _, err = transport.Request(ctx, req); err != nil {
-					// todo update branch status
+				r := retry.NewRetry(2, 2, func() error {
+					_, err = transport.Request(ctx, req)
+					return err
+				})
+				if err = r.Run(); err != nil {
 					pipe <- fmt.Errorf("[Executor]branch:%vrequest error:%v", b, err)
-					return
 				}
 			}).ForEach(func(item interface{}) {
 				erro, ok := item.(error)
