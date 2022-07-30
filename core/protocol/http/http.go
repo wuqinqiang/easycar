@@ -2,6 +2,8 @@ package http
 
 import (
 	"context"
+	"fmt"
+	"net/http"
 
 	"github.com/wuqinqiang/easycar/core/protocol/common"
 
@@ -45,6 +47,11 @@ func (cli *Transport) req(ctx context.Context, body []byte, headers map[string]s
 		Post(cli.uri)
 	if err != nil {
 		return nil, err
+	}
+
+	// todo more,such as validate data from response
+	if resp.StatusCode() != http.StatusOK {
+		return nil, fmt.Errorf("[http Transport]http status code: %d", resp.StatusCode())
 	}
 	return &common.Resp{
 		Body: resp.Body(),

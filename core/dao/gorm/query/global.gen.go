@@ -25,13 +25,13 @@ func newGlobal(db *gorm.DB) global {
 	tableName := _global.globalDo.TableName()
 	_global.ALL = field.NewField(tableName, "*")
 	_global.GID = field.NewString(tableName, "g_id")
-	_global.State = field.NewString(tableName, "State")
+	_global.State = field.NewString(tableName, "state")
 	_global.EndTime = field.NewInt64(tableName, "end_time")
 	_global.NextCronTime = field.NewInt64(tableName, "next_cron_time")
 
 	_global.fieldMap = make(map[string]field.Expr, 4)
 	_global.fieldMap["g_id"] = _global.GID
-	_global.fieldMap["State"] = _global.State
+	_global.fieldMap["state"] = _global.State
 	_global.fieldMap["end_time"] = _global.EndTime
 	_global.fieldMap["next_cron_time"] = _global.NextCronTime
 

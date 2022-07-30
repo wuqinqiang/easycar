@@ -80,7 +80,7 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 
 	for _, list := range phaseList {
 		var (
-			err error
+			err = errors.New("[execute]")
 		)
 		branches := list
 		wg.Add(1)
@@ -107,7 +107,8 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					return err
 				})
 				if err = r.Run(); err != nil {
-					pipe <- fmt.Errorf("[Executor]branch:%vrequest error:%v", b, err)
+					// todo update branch status
+					pipe <- fmt.Errorf("branch:%vrequest error:%v", b, err)
 				}
 			}).ForEach(func(item interface{}) {
 				erro, ok := item.(error)

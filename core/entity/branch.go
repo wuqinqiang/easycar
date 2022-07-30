@@ -19,6 +19,8 @@ type (
 		EndTime int64 `gorm:"column:end_time;type:int;not null;default:0"`
 		// 07-10 add
 		Level consts.Level `gorm:"column:level;type:int;not null;default:1"` // branch level in tree
+
+		LastErrMsg string `gorm:"column:last_err_msg;type:varchar(255);not null"`
 	}
 	BranchList []*Branch
 )

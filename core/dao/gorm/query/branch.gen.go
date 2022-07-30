@@ -32,11 +32,12 @@ func newBranch(db *gorm.DB) branch {
 	_branch.PId = field.NewString(tableName, "p_id")
 	_branch.Protocol = field.NewString(tableName, "protocol")
 	_branch.Action = field.NewString(tableName, "action")
-	_branch.State = field.NewString(tableName, "State")
+	_branch.State = field.NewString(tableName, "state")
 	_branch.EndTime = field.NewInt64(tableName, "end_time")
 	_branch.Level = field.NewUint8(tableName, "level")
+	_branch.LastErrMsg = field.NewString(tableName, "last_err_msg")
 
-	_branch.fieldMap = make(map[string]field.Expr, 11)
+	_branch.fieldMap = make(map[string]field.Expr, 12)
 	_branch.fieldMap["g_id"] = _branch.GID
 	_branch.fieldMap["branch_id"] = _branch.BranchId
 	_branch.fieldMap["url"] = _branch.Url
@@ -45,9 +46,10 @@ func newBranch(db *gorm.DB) branch {
 	_branch.fieldMap["p_id"] = _branch.PId
 	_branch.fieldMap["protocol"] = _branch.Protocol
 	_branch.fieldMap["action"] = _branch.Action
-	_branch.fieldMap["State"] = _branch.State
+	_branch.fieldMap["state"] = _branch.State
 	_branch.fieldMap["end_time"] = _branch.EndTime
 	_branch.fieldMap["level"] = _branch.Level
+	_branch.fieldMap["last_err_msg"] = _branch.LastErrMsg
 
 	return _branch
 }
@@ -55,18 +57,19 @@ func newBranch(db *gorm.DB) branch {
 type branch struct {
 	branchDo branchDo
 
-	ALL      field.Field
-	GID      field.String
-	BranchId field.String
-	Url      field.String
-	ReqData  field.String
-	TranType field.String
-	PId      field.String
-	Protocol field.String
-	Action   field.String
-	State    field.String
-	EndTime  field.Int64
-	Level    field.Uint8
+	ALL        field.Field
+	GID        field.String
+	BranchId   field.String
+	Url        field.String
+	ReqData    field.String
+	TranType   field.String
+	PId        field.String
+	Protocol   field.String
+	Action     field.String
+	State      field.String
+	EndTime    field.Int64
+	Level      field.Uint8
+	LastErrMsg field.String
 
 	fieldMap map[string]field.Expr
 }
