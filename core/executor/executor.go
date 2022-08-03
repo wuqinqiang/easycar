@@ -50,7 +50,6 @@ func GetExecutor() *executor {
 }
 
 func (e *executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
-	dao := dao.GetTransaction()
 	phaseList := make([]entity.BranchList, len(branches))
 
 	// sort branches by level
@@ -81,11 +80,14 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 		wg sync.WaitGroup
 	)
 
-	for _, list := range phaseList {
+	for _, tierList := range phaseList {
+		branches := tierList
+		if len(branches) == 0 {
+			continue
+		}
 		var (
 			err = errors.New("[execute]")
 		)
-		branches := list
 		wg.Add(1)
 		tools.GoSafe(func() {
 			defer wg.Done()
@@ -110,23 +112,24 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					return err
 				})
 
-				branchState := consts.BranchSucceed
-				errMsg := ""
-				err = r.Run()
-				if err != nil {
+				var (
+					branchState = consts.BranchSucceed
+					errMsg      = ""
+				)
+				if err = r.Run(); err != nil {
 					errMsg = err.Error()
 					branchState = consts.BranchFailState
-					// todo update branch status
 					pipe <- fmt.Errorf("branch:%vrequest error:%v", b, err)
 				}
-				b.State = branchState
-				if _, err = dao.UpdateBranchStateByGid(ctx, b.BranchId,
-					b.State, errMsg); err != nil {
+
+				// todo replace with dao
+				if _, err = dao.GetTransaction().UpdateBranchStateByGid(ctx, b.BranchId,
+					branchState, errMsg); err != nil {
 					pipe <- fmt.Errorf("[Executor]update branch state error:%v", err)
 				}
 			}).ForEach(func(item interface{}) {
 				erro, ok := item.(error)
-				fmt.Println("[execute]err:", erro)
+				// todo add err log
 				if !ok {
 					return
 				}
