@@ -19,8 +19,8 @@ type TransactionDao interface {
 type BranchDao interface {
 	CreateBatches(ctx context.Context, list entity.BranchList) error
 	GetBranches(ctx context.Context, gid string) (entity.BranchList, error)
-	UpdateBranchStateByGid(ctx context.Context, gid string,
-		state consts.BranchState) (int64, error)
+	UpdateBranchStateByGid(ctx context.Context, branchId string,
+		state consts.BranchState, errMsg string) (int64, error)
 }
 
 type GlobalDao interface {

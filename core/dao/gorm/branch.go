@@ -39,11 +39,11 @@ func (g BranchImpl) GetBranches(ctx context.Context, gid string) (list entity.Br
 	return
 }
 
-func (g BranchImpl) UpdateBranchStateByGid(ctx context.Context, gid string, state consts.BranchState) (int64, error) {
+func (g BranchImpl) UpdateBranchStateByGid(ctx context.Context, branchId string, state consts.BranchState, errmsg string) (int64, error) {
 	branch := g.query.Branch
 	result, err := g.query.Branch.WithContext(ctx).
-		Where(branch.GID.Eq(gid)).
-		Update(branch.State, state)
+		Where(branch.BranchId.Eq(branchId)).
+		UpdateSimple(branch.State.Value(string(state)), branch.LastErrMsg.Value(errmsg))
 	err = tools.WrapDbErr(err)
 	return result.RowsAffected, err
 }

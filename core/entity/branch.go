@@ -32,6 +32,7 @@ func (b Branch) TableName() string {
 func (b *Branch) IsSucceed() bool {
 	return b.State == consts.BranchSucceed
 }
+
 func (b *Branch) IsBranchFailState() {
 
 }

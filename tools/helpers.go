@@ -2,6 +2,7 @@ package tools
 
 import (
 	"fmt"
+	"runtime/debug"
 
 	"gorm.io/gorm"
 )
@@ -37,6 +38,7 @@ func GoSafe(fn func()) {
 func runSafe(fn func()) {
 	defer func() {
 		if err := recover(); err != nil {
+			debug.PrintStack()
 			fmt.Printf("[runSafe] err:%v\n", err)
 		}
 	}()

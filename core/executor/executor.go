@@ -6,6 +6,8 @@ import (
 	"sort"
 	"sync"
 
+	"github.com/wuqinqiang/easycar/core/dao"
+
 	"github.com/wuqinqiang/easycar/tools/retry"
 
 	"github.com/pkg/errors"
@@ -48,6 +50,7 @@ func GetExecutor() *executor {
 }
 
 func (e *executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
+	dao := dao.GetTransaction()
 	phaseList := make([]entity.BranchList, len(branches))
 
 	// sort branches by level
@@ -106,12 +109,24 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					_, err = transport.Request(ctx, req)
 					return err
 				})
-				if err = r.Run(); err != nil {
+
+				branchState := consts.BranchSucceed
+				errMsg := ""
+				err = r.Run()
+				if err != nil {
+					errMsg = err.Error()
+					branchState = consts.BranchFailState
 					// todo update branch status
 					pipe <- fmt.Errorf("branch:%vrequest error:%v", b, err)
 				}
+				b.State = branchState
+				if _, err = dao.UpdateBranchStateByGid(ctx, b.BranchId,
+					b.State, errMsg); err != nil {
+					pipe <- fmt.Errorf("[Executor]update branch state error:%v", err)
+				}
 			}).ForEach(func(item interface{}) {
 				erro, ok := item.(error)
+				fmt.Println("[execute]err:", erro)
 				if !ok {
 					return
 				}

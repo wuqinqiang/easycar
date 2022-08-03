@@ -60,8 +60,11 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 	if err = c.UpdateGlobalState(ctx, global.GetGId(), phase1State); err != nil {
 		return err
 	}
+
 	tools.GoSafe(func() {
-		if err = c.Phase2(ctx, global, branches); err != nil {
+		// todo replace ctx
+		ctx2 := context.Background()
+		if err = c.Phase2(ctx2, global, branches); err != nil {
 			return
 		}
 	})
