@@ -1,32 +1,25 @@
-package coordinator
+package core
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/wuqinqiang/easycar/core/consts"
 
 	"github.com/wuqinqiang/easycar/core/entity"
 
-	"github.com/wuqinqiang/easycar/core"
-
 	"github.com/wuqinqiang/easycar/proto"
 	"google.golang.org/protobuf/types/known/emptypb"
-)
-
-var (
-	ErrGlobalNotExist = errors.New("global not exist")
 )
 
 var _ proto.EasyCarServer = (*EasyCarSrv)(nil)
 
 type EasyCarSrv struct {
 	proto.UnimplementedEasyCarServer
-	core *core.Coordinator
+	core *Coordinator
 }
 
-func NewCoordinator(core *core.Coordinator) *EasyCarSrv {
+func NewEasyCarSrv(core *Coordinator) *EasyCarSrv {
 	return &EasyCarSrv{
 		core: core,
 	}

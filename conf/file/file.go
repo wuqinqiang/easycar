@@ -4,21 +4,21 @@ import (
 	"io/ioutil"
 	"os"
 
-	"gopkg.in/yaml.v2"
+	"github.com/wuqinqiang/easycar/conf"
 
-	"github.com/wuqinqiang/easycar/conf/common"
+	"gopkg.in/yaml.v2"
 )
 
 type File struct {
 	path string
-	*common.EasyCar
+	*conf.EasyCar
 }
 
 func NewFile(path string) *File {
 	return &File{path: path}
 }
 
-func (f *File) Load() (*common.EasyCar, error) {
+func (f *File) Load() (*conf.EasyCar, error) {
 	dir, err := os.Getwd()
 	if err != nil {
 		return nil, err

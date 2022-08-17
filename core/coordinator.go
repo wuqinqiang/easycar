@@ -2,7 +2,6 @@ package core
 
 import (
 	"context"
-	"errors"
 
 	"github.com/wuqinqiang/easycar/tools"
 
@@ -12,10 +11,6 @@ import (
 	"github.com/wuqinqiang/easycar/core/entity"
 
 	"github.com/wuqinqiang/easycar/core/dao"
-)
-
-var (
-	ErrGlobalNotExist = errors.New("global not exist")
 )
 
 type Coordinator struct {

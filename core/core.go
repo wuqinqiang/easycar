@@ -1,4 +1,4 @@
-package coordinator
+package core
 
 import (
 	"context"
@@ -9,8 +9,6 @@ import (
 	"github.com/wuqinqiang/easycar/conf"
 
 	"github.com/wuqinqiang/easycar/core/dao"
-
-	"github.com/wuqinqiang/easycar/core"
 
 	"github.com/wuqinqiang/easycar/proto"
 
@@ -40,8 +38,8 @@ func New(conf conf.Conf, fns ...OptsFn) (s *Service, err error) {
 	}
 
 	s.Server = grpc.NewServer(opts.grpcOpts...)
-	c := core.NewCoordinator(dao.GetTransaction())
-	proto.RegisterEasyCarServer(s.Server, NewCoordinator(c))
+	c := NewCoordinator(dao.GetTransaction())
+	proto.RegisterEasyCarServer(s.Server, NewEasyCarSrv(c))
 	return
 }
 

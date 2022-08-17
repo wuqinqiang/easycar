@@ -3,7 +3,7 @@ package gorm
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/conf/common"
+	"github.com/wuqinqiang/easycar/conf"
 
 	"github.com/wuqinqiang/easycar/tools"
 
@@ -18,7 +18,7 @@ type GlobalImpl struct {
 }
 
 func NewGlobalImpl() GlobalImpl {
-	return GlobalImpl{query: query.Use(common.GetDb())}
+	return GlobalImpl{query: query.Use(conf.GetDb())}
 }
 
 func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) error {
