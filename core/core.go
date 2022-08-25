@@ -25,7 +25,6 @@ var _ proto.EasyCarServer = (*Core)(nil)
 
 type Core struct {
 	proto.UnimplementedEasyCarServer
-	grpcOpts   []grpc.ServerOption
 	grpcServer *grpc.Server
 
 	opts        opts

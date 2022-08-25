@@ -3,6 +3,8 @@ package core
 import (
 	"time"
 
+	"google.golang.org/grpc"
+
 	"github.com/wuqinqiang/easycar/conf"
 )
 
@@ -20,11 +22,19 @@ type opts struct {
 	grpcTimeout time.Duration
 	timeout     time.Duration
 	conf        *conf.EasyCar
+
+	grpcOpts []grpc.ServerOption
 }
 
 func WithPort(port int) OptsFn {
 	return func(opts *opts) {
 		opts.port = port
+	}
+}
+
+func WithGrpcOpts(grpcOpts ...grpc.ServerOption) OptsFn {
+	return func(opts *opts) {
+		opts.grpcOpts = grpcOpts
 	}
 }
 
