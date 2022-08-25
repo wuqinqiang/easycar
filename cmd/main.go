@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"log"
 	"os"
@@ -21,13 +20,15 @@ func main() {
 		log.Fatal(err)
 	}
 	easyCarConf.DB.Mysql.Init()
-	service, err := core.New(f, core.WithPort(8089))
+	core, err := core.New(core.WithPort(8089), core.WithConf(easyCarConf))
 	if err != nil {
-		panic(err)
-	}
-	if err = service.Start(context.Background()); err != nil {
 		log.Fatal(err)
 	}
+	if err := core.Run(); err != nil {
+		log.Fatal(err)
+	}
+
+	// everything is over
 }
 
 func flagConf() conf.Conf {
@@ -37,8 +38,11 @@ func flagConf() conf.Conf {
 	confMod := flag.String("mod", os.Getenv("CONF_MOD"), "configuration module")
 	switch conf.Mode(*confMod) {
 	case conf.File:
-		filePath := flag.String("f", GetEnvOrDefault("FILE_PATH", "conf.yml"), "configuration file")
+		filePath := flag.String("f", GetEnvOrDefault("FILE_PATH", "/conf.yml"), "configuration file")
 		c = file.NewFile(*filePath)
+	case conf.Etcd:
+	case conf.Env:
+
 	}
 	flag.Parse()
 	return c
