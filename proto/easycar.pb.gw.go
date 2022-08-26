@@ -216,7 +216,7 @@ func RegisterEasyCarHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.EasyCar/Begin", runtime.WithHTTPPathPattern("/v1/begin"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.EasyCar/Begin", runtime.WithHTTPPathPattern("/easycar/begin"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -241,7 +241,7 @@ func RegisterEasyCarHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.EasyCar/Register", runtime.WithHTTPPathPattern("/v1/register"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.EasyCar/Register", runtime.WithHTTPPathPattern("/easycar/register"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -266,7 +266,7 @@ func RegisterEasyCarHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.EasyCar/Start", runtime.WithHTTPPathPattern("/proto.EasyCar/Start"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.EasyCar/Start", runtime.WithHTTPPathPattern("/easycar/start"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -291,7 +291,7 @@ func RegisterEasyCarHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.EasyCar/Abort", runtime.WithHTTPPathPattern("/proto.EasyCar/Abort"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.EasyCar/Abort", runtime.WithHTTPPathPattern("/easycar/abort"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -316,7 +316,7 @@ func RegisterEasyCarHandlerServer(ctx context.Context, mux *runtime.ServeMux, se
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.EasyCar/GetState", runtime.WithHTTPPathPattern("/proto.EasyCar/GetState"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/proto.EasyCar/GetState", runtime.WithHTTPPathPattern("/easycar/getState"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -380,7 +380,7 @@ func RegisterEasyCarHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/proto.EasyCar/Begin", runtime.WithHTTPPathPattern("/v1/begin"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/proto.EasyCar/Begin", runtime.WithHTTPPathPattern("/easycar/begin"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -402,7 +402,7 @@ func RegisterEasyCarHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/proto.EasyCar/Register", runtime.WithHTTPPathPattern("/v1/register"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/proto.EasyCar/Register", runtime.WithHTTPPathPattern("/easycar/register"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -424,7 +424,7 @@ func RegisterEasyCarHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/proto.EasyCar/Start", runtime.WithHTTPPathPattern("/proto.EasyCar/Start"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/proto.EasyCar/Start", runtime.WithHTTPPathPattern("/easycar/start"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -446,7 +446,7 @@ func RegisterEasyCarHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/proto.EasyCar/Abort", runtime.WithHTTPPathPattern("/proto.EasyCar/Abort"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/proto.EasyCar/Abort", runtime.WithHTTPPathPattern("/easycar/abort"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -468,7 +468,7 @@ func RegisterEasyCarHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/proto.EasyCar/GetState", runtime.WithHTTPPathPattern("/proto.EasyCar/GetState"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/proto.EasyCar/GetState", runtime.WithHTTPPathPattern("/easycar/getState"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -488,15 +488,15 @@ func RegisterEasyCarHandlerClient(ctx context.Context, mux *runtime.ServeMux, cl
 }
 
 var (
-	pattern_EasyCar_Begin_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "begin"}, ""))
+	pattern_EasyCar_Begin_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"easycar", "begin"}, ""))
 
-	pattern_EasyCar_Register_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "register"}, ""))
+	pattern_EasyCar_Register_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"easycar", "register"}, ""))
 
-	pattern_EasyCar_Start_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"proto.EasyCar", "Start"}, ""))
+	pattern_EasyCar_Start_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"easycar", "start"}, ""))
 
-	pattern_EasyCar_Abort_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"proto.EasyCar", "Abort"}, ""))
+	pattern_EasyCar_Abort_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"easycar", "abort"}, ""))
 
-	pattern_EasyCar_GetState_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"proto.EasyCar", "GetState"}, ""))
+	pattern_EasyCar_GetState_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"easycar", "getState"}, ""))
 )
 
 var (

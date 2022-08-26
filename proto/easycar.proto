@@ -11,19 +11,34 @@ import "google/api/annotations.proto";
 service EasyCar {
   rpc Begin(google.protobuf.Empty)returns(BeginResp){
     option (google.api.http) = {
-      post:"/v1/begin",
+      post:"/easycar/begin",
       body:"*"
     };
   }
   rpc Register(RegisterReq)returns(RegisterResp){
     option (google.api.http) = {
-      post:"/v1/register",
+      post:"/easycar/register",
       body:"*"
     };
   }
-  rpc Start(StartReq)returns(StartResp){}
-  rpc Abort(AbortReq) returns(AbortResp){}
-  rpc GetState(GetStateReq) returns(GetStateResp){}
+  rpc Start(StartReq)returns(StartResp){
+    option (google.api.http) = {
+      post:"/easycar/start",
+      body:"*"
+    };
+  }
+  rpc Abort(AbortReq) returns(AbortResp){
+    option (google.api.http) = {
+      post:"/easycar/abort",
+      body:"*"
+    };
+  }
+  rpc GetState(GetStateReq) returns(GetStateResp){
+    option (google.api.http) = {
+      post:"/easycar/getState",
+      body:"*"
+    };
+  }
 }
 
 

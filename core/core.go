@@ -65,7 +65,8 @@ func (core *Core) Run() error {
 	}()
 
 	// http service
-	conn, err := grpc.Dial(fmt.Sprintf(":%d", core.opts.grpcPort),
+	conn, err := grpc.DialContext(context.Background(), fmt.Sprintf(":%d", core.opts.grpcPort),
+		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
