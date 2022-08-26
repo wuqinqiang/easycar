@@ -103,6 +103,10 @@ func (core *Core) Register(ctx context.Context, req *proto.RegisterReq) (*proto.
 	var (
 		list entity.BranchList
 	)
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
 	list = list.AssignmentByGrpc(req.GetGId(), req.Branches)
 	if err := core.coordinator.Register(ctx, req.GetGId(), list); err != nil {
 		return nil, err
@@ -112,6 +116,10 @@ func (core *Core) Register(ctx context.Context, req *proto.RegisterReq) (*proto.
 }
 
 func (core *Core) Start(ctx context.Context, req *proto.StartReq) (*proto.StartResp, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
+
 	global, err := core.check(ctx, req.GetGId(), func(g *entity.Global) error {
 		if !g.IsReady() {
 			return fmt.Errorf("global state:%v can not start", g.GetState())
@@ -145,6 +153,9 @@ func (core *Core) Abort(ctx context.Context, req *proto.AbortReq) (*proto.AbortR
 }
 
 func (core *Core) GetState(ctx context.Context, req *proto.GetStateReq) (*proto.GetStateResp, error) {
+	if err := req.Validate(); err != nil {
+		return nil, err
+	}
 	global, err := core.coordinator.GetGlobal(ctx, req.GetGId())
 	if err != nil {
 		return nil, err

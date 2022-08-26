@@ -6,6 +6,7 @@ option go_package = "github.com/wuqinqiang/easycar/proto";
 
 import "google/protobuf/empty.proto";
 import "google/api/annotations.proto";
+import "validate/validate.proto";
 
 
 service EasyCar {
@@ -73,17 +74,13 @@ enum BranchState {
 
 message RegisterReq {
   message Branch {
-    string branchId = 1;
-    string uri = 2;
+    string uri = 2 [(validate.rules).string = {min_len:1,max_len:299}];
     string reqData = 3;
-    TranType tranType = 4;
+    TranType tranType = 4 [(validate.rules).enum = {in:[1, 2]}];
+    string protocol = 6 [(validate.rules).string = {in:["http", "https", "grpc"]}];
+    Action action = 7 [(validate.rules).enum = {in:[1, 2, 3, 4, 5]}];
     // todo remove pid?
-    string pid = 5;
-    string protocol = 6;
-    Action action = 7;
-    BranchState state = 8;
-    // todo remove pid?
-    int32 level = 9;
+    int32 level = 9 [(validate.rules).int32.lte = 1];
   }
   string gId = 1;
   repeated Branch branches = 2;
@@ -106,17 +103,12 @@ enum GlobalState {
 }
 
 
-
-message BeginReq {
-  TranType tranType = 1;
-}
-
 message BeginResp {
   string gId = 1;
 }
 
 message StartReq {
-  string gId = 1;
+  string gId = 1 [(validate.rules).string.min_len = 1];
 }
 message StartResp {
   GlobalState state = 1;
@@ -124,14 +116,14 @@ message StartResp {
 
 
 message AbortReq {
-  string gId = 1;
+  string gId = 1 [(validate.rules).string.min_len = 1];
 }
 
 message AbortResp {
 }
 
 message GetStateReq {
-  string gId = 1;
+  string gId = 1 [(validate.rules).string.min_len = 1];
 }
 
 message GetStateResp {

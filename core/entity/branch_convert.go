@@ -35,11 +35,9 @@ func GetActionByPb(action proto.Action) consts.BranchAction {
 
 // AssignmentByPb todo
 func (b *Branch) AssignmentByPb(m *proto.RegisterReq_Branch) *Branch {
-	b.BranchId = m.GetBranchId()
 	b.Url = m.GetUri()
 	b.ReqData = m.GetReqData()
 	b.TranType = GetTranTypeByPb(m.GetTranType())
-	b.PId = m.GetPid()
 	b.Protocol = m.GetProtocol()
 	b.Action = GetActionByPb(m.GetAction())
 	b.Level = consts.Level(m.GetLevel())

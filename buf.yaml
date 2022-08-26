@@ -2,6 +2,7 @@ version: v1
 name: buf.build/wuqinqiang/easycar
 deps:
   - buf.build/googleapis/googleapis
+  - buf.build/envoyproxy/protoc-gen-validate
 breaking:
   use:
     - FILE
