@@ -15,9 +15,9 @@ var (
 // Mysql conf
 type Mysql struct {
 	DbURL        string `json:"dbURL" yaml:"dbURL"`
-	MaxLifetime  int64  `json:"maxLifetime" yaml:"maxLifetime"`
-	MaxIdleConns int64  `json:"maxIdleConns" yaml:"maxIdleConns"`
-	MaxOpenConns int64  `json:"maxOpenConns" yaml:"maxOpenConns"`
+	MaxLifetime  int    `json:"maxLifetime" yaml:"maxLifetime"`
+	MaxIdleConns int    `json:"maxIdleConns" yaml:"maxIdleConns"`
+	MaxOpenConns int    `json:"maxOpenConns" yaml:"maxOpenConns"`
 }
 
 func (m *Mysql) Init() *gorm.DB {
@@ -41,11 +41,11 @@ func (m *Mysql) Init() *gorm.DB {
 		d.SetConnMaxLifetime(time.Duration(m.MaxLifetime) * time.Second)
 	}
 	if m.MaxOpenConns > 0 {
-		d.SetMaxOpenConns(int(m.MaxOpenConns))
+		d.SetMaxOpenConns(m.MaxOpenConns)
 	}
 
 	if m.MaxIdleConns > 0 {
-		d.SetMaxIdleConns(int(m.MaxIdleConns))
+		d.SetMaxIdleConns(m.MaxIdleConns)
 	}
 
 	if err != nil {

@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/wuqinqiang/easycar/conf/envx"
+
 	"github.com/wuqinqiang/easycar/core"
 
 	"github.com/wuqinqiang/easycar/conf/file"
@@ -27,7 +29,6 @@ func main() {
 	if err := core.Run(); err != nil {
 		log.Fatal(err)
 	}
-
 	// everything is over
 }
 
@@ -42,7 +43,7 @@ func flagConf() conf.Conf {
 		c = file.NewFile(*filePath)
 	case conf.Etcd:
 	case conf.Env:
-
+		return new(envx.Env)
 	}
 	flag.Parse()
 	return c
