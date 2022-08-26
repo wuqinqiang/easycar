@@ -2,14 +2,25 @@ syntax = "proto3";
 
 package proto;
 
-option go_package = "/proto";
+option go_package = "github.com/wuqinqiang/easycar/proto";
 
 import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
 
 
 service EasyCar {
-  rpc Begin(google.protobuf.Empty)returns(BeginResp){}
-  rpc Register(RegisterReq)returns(RegisterResp){}
+  rpc Begin(google.protobuf.Empty)returns(BeginResp){
+    option (google.api.http) = {
+      post:"/v1/begin",
+      body:"*"
+    };
+  }
+  rpc Register(RegisterReq)returns(RegisterResp){
+    option (google.api.http) = {
+      post:"/v1/register",
+      body:"*"
+    };
+  }
   rpc Start(StartReq)returns(StartResp){}
   rpc Abort(AbortReq) returns(AbortResp){}
   rpc GetState(GetStateReq) returns(GetStateResp){}

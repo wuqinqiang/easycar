@@ -4,8 +4,15 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
 	"net"
+	"net/http"
+	"strconv"
 	"sync"
+
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/wuqinqiang/easycar/core/dao"
 
@@ -52,7 +59,26 @@ func (core *Core) Run() error {
 	// todo add opts
 	core.grpcServer = grpc.NewServer()
 	proto.RegisterEasyCarServer(core.grpcServer, core)
-	return core.grpcServer.Serve(core.lis)
+	go func() {
+		if err := core.grpcServer.Serve(core.lis); err != nil {
+			log.Fatal(err)
+		}
+	}()
+
+	// http service
+	conn, err := grpc.Dial(":"+strconv.Itoa(core.opts.port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return err
+	}
+	gwmux := runtime.NewServeMux()
+	if err = proto.RegisterEasyCarHandler(context.Background(), gwmux, conn); err != nil {
+		return err
+	}
+	gwServer := &http.Server{
+		Addr:    ":8084",
+		Handler: gwmux,
+	}
+	return gwServer.ListenAndServe()
 }
 
 //func (s *Core) Start(ctx context.Context) error {

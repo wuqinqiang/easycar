@@ -16,9 +16,14 @@ endif
 lint: checklint
 	golangci-lint run --skip-dirs-use-default
 
+
+
+
 .PHONY: proto
 proto:
-	protoc --go_out=:. --go-grpc_out=:. proto/*.proto
+	buf generate
+#	protoc --go_out=:. --go-grpc_out=:. proto/*.proto
+
 
 .PHONY: run
 run:
