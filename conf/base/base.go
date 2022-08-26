@@ -12,5 +12,6 @@ var DefaultConf = conf.EasyCar{
 			MaxOpenConns: 20,
 		},
 	},
-	Port: 8089,
+	GRPCPort: 8089,
+	HTTPPort: 8084,
 }

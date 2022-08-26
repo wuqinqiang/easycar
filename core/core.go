@@ -7,7 +7,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"strconv"
 	"sync"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -50,7 +49,7 @@ func New(fns ...OptsFn) (s *Core, err error) {
 		once:        sync.Once{},
 		coordinator: NewCoordinator(dao.GetTransaction()),
 	}
-	if s.lis, err = net.Listen("tcp", fmt.Sprintf(":%d", opts.port)); err != nil {
+	if s.lis, err = net.Listen("tcp", fmt.Sprintf(":%d", opts.grpcPort)); err != nil {
 		return
 	}
 	return
@@ -66,7 +65,8 @@ func (core *Core) Run() error {
 	}()
 
 	// http service
-	conn, err := grpc.Dial(":"+strconv.Itoa(core.opts.port), grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(fmt.Sprintf(":%d", core.opts.grpcPort),
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
@@ -75,15 +75,11 @@ func (core *Core) Run() error {
 		return err
 	}
 	gwServer := &http.Server{
-		Addr:    ":8084",
+		Addr:    fmt.Sprintf(":%d", core.opts.httpPort),
 		Handler: gwmux,
 	}
 	return gwServer.ListenAndServe()
 }
-
-//func (s *Core) Start(ctx context.Context) error {
-//	return nil
-//}
 
 func (core *Core) Stop() (err error) {
 	core.once.Do(func() {

@@ -33,7 +33,7 @@ func (env *Env) Load() (*conf.EasyCar, error) {
 
 	servicePort := convertFn("PORT")
 	if servicePort > 0 {
-		defaultConf.Port = servicePort
+		defaultConf.GRPCPort = servicePort
 	}
 
 	lifeTime := convertFn(os.Getenv("MYSQL_MAX_LIFE_TIME"))

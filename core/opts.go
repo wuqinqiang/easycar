@@ -18,7 +18,8 @@ type (
 )
 
 type opts struct {
-	port        int
+	grpcPort    int
+	httpPort    int
 	grpcTimeout time.Duration
 	timeout     time.Duration
 	conf        *conf.EasyCar
@@ -26,9 +27,15 @@ type opts struct {
 	grpcOpts []grpc.ServerOption
 }
 
-func WithPort(port int) OptsFn {
+func WithGrpcPort(port int) OptsFn {
 	return func(opts *opts) {
-		opts.port = port
+		opts.grpcPort = port
+	}
+}
+
+func WithHttpPort(port int) OptsFn {
+	return func(opts *opts) {
+		opts.httpPort = port
 	}
 }
 
