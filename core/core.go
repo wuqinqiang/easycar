@@ -19,6 +19,8 @@ import (
 	"github.com/wuqinqiang/easycar/core/entity"
 	"google.golang.org/protobuf/types/known/emptypb"
 
+	"github.com/fatih/color"
+
 	"github.com/wuqinqiang/easycar/proto"
 	"google.golang.org/grpc"
 )
@@ -69,8 +71,12 @@ func (core *Core) Run() error {
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
+		fmt.Println(color.HiRedString("grpc DialContext:err:%v", err))
 		return err
 	}
+
+	fmt.Println(color.BlueString("easycar grpc port:%d", core.opts.grpcPort))
+
 	gwmux := runtime.NewServeMux()
 	if err = proto.RegisterEasyCarHandler(context.Background(), gwmux, conn); err != nil {
 		return err
@@ -79,6 +85,7 @@ func (core *Core) Run() error {
 		Addr:    fmt.Sprintf(":%d", core.opts.httpPort),
 		Handler: gwmux,
 	}
+	fmt.Println(color.BlueString("easycar http port:%d", core.opts.httpPort))
 	return gwServer.ListenAndServe()
 }
 

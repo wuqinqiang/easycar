@@ -19,8 +19,8 @@ type (
 
 	EasyCar struct {
 		DB       DB  `yaml:"db"`
-		GRPCPort int `json:"grpcPort"`
-		HTTPPort int `json:"HttpPort"`
+		GRPCPort int `yaml:"grpcPort"`
+		HTTPPort int `yaml:"httpPort"`
 	}
 )
 

@@ -22,7 +22,7 @@ func main() {
 		log.Fatal(err)
 	}
 	easyCarConf.DB.Mysql.Init()
-	core, err := core.New(core.WithGrpcPort(8089), core.WithConf(easyCarConf))
+	core, err := core.New(core.WithHttpPort(easyCarConf.HTTPPort), core.WithGrpcPort(easyCarConf.GRPCPort))
 	if err != nil {
 		log.Fatal(err)
 	}

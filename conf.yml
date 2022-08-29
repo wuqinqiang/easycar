@@ -1,6 +1,11 @@
 ## conf
 
+
+grpcPort: 8089
+httpPort: 8084
+
 dirver: mysql
+
 db:
   mysql:
     dbURL: easycar:easycar@tcp(127.0.0.1:3306)/easycar?charset=utf8&parseTime=True&loc=Local
@@ -8,17 +13,10 @@ db:
     maxIdleConns: 20
     maxOpenConns: 10
 
-  ## todo add more store drivers
-
-server:
-  ## easycar coordinator server port
-  grpcPort: 8089
-  httpPort: 8084
-
   ## backOff for retry
-  backOff:
-    ##  max delay time for retry,unit senconds
-    maxDelay: 120
-    ## max retry times when rm is not available
-    maxRetries: 3
-    factor: 2
+backOff:
+  ##  max delay time for retry,unit senconds
+  maxDelay: 120
+  ## max retry times when rm is not available
+  maxRetries: 3
+  factor: 2
