@@ -63,8 +63,12 @@ func (g *Global) GetEndTime() int64 {
 	return g.EndTime
 }
 
-func (g *Global) CanSubmit() bool {
-	return g.State == consts.Ready
+func (g *Global) AllowSubmit() bool {
+	return g.IsReady()
+}
+
+func (g *Global) AllowRegister() bool {
+	return g.IsReady()
 }
 
 func (g *Global) GetBranches() []string {

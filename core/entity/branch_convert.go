@@ -44,7 +44,7 @@ func (b *Branch) AssignmentByPb(m *proto.RegisterReq_Branch) *Branch {
 	return b
 }
 
-func (list BranchList) AssignmentByGrpc(gid string, mList []*proto.RegisterReq_Branch) BranchList {
+func GetBranchList(gid string, mList []*proto.RegisterReq_Branch) (list BranchList) {
 	for i := range mList {
 		var (
 			b Branch
@@ -52,5 +52,5 @@ func (list BranchList) AssignmentByGrpc(gid string, mList []*proto.RegisterReq_B
 		b.GID = gid
 		list = append(list, b.AssignmentByPb(mList[i]))
 	}
-	return list
+	return
 }

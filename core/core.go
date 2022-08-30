@@ -26,7 +26,7 @@ import (
 )
 
 var (
-	ErrGlobalNotExist = errors.New("global not exist")
+	ErrGIdNotExist = errors.New("gid is not exist")
 )
 
 var _ proto.EasyCarServer = (*Core)(nil)
@@ -107,15 +107,21 @@ func (core *Core) Begin(ctx context.Context, empty *emptypb.Empty) (*proto.Begin
 }
 
 func (core *Core) Register(ctx context.Context, req *proto.RegisterReq) (*proto.RegisterResp, error) {
-	var (
-		list entity.BranchList
-	)
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
+	_, err := core.check(ctx, req.GetGId(), func(g *entity.Global) error {
+		if !g.AllowRegister() {
+			return errors.New("register not allowed")
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
 
-	list = list.AssignmentByGrpc(req.GetGId(), req.Branches)
-	if err := core.coordinator.Register(ctx, req.GetGId(), list); err != nil {
+	branchList := entity.GetBranchList(req.GetGId(), req.Branches)
+	if err := core.coordinator.Register(ctx, req.GetGId(), branchList); err != nil {
 		return nil, err
 	}
 	resp := new(proto.RegisterResp)
@@ -178,7 +184,7 @@ func (core *Core) check(ctx context.Context, gid string, fn func(g *entity.Globa
 		return
 	}
 	if g.IsEmpty() {
-		err = ErrGlobalNotExist
+		err = ErrGIdNotExist
 		return
 	}
 	if fn != nil {

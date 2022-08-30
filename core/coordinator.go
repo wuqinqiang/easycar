@@ -35,13 +35,6 @@ func (c *Coordinator) Begin(ctx context.Context) (string, error) {
 }
 
 func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.BranchList) error {
-	global, err := c.dao.GetGlobal(ctx, gId)
-	if err != nil {
-		return err
-	}
-	if global.IsEmpty() {
-		return ErrGlobalNotExist
-	}
 	return c.dao.CreateBatches(ctx, branches)
 }
 
