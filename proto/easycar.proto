@@ -74,13 +74,13 @@ enum BranchState {
 
 message RegisterReq {
   message Branch {
-    string uri = 2 [(validate.rules).string = {min_len:1,max_len:299}];
-    string reqData = 3;
-    TranType tranType = 4 [(validate.rules).enum = {in:[1, 2]}];
-    string protocol = 6 [(validate.rules).string = {in:["http", "https", "grpc"]}];
-    Action action = 7 [(validate.rules).enum = {in:[1, 2, 3, 4, 5]}];
+    string uri = 1 [(validate.rules).string = {min_len:1,max_len:299}];
+    string reqData = 2;
+    TranType tranType = 3 [(validate.rules).enum = {in: [1, 2]}];
+    string protocol = 4 [(validate.rules).string = {in: ["http", "https", "grpc"]}];
+    Action action = 5 [(validate.rules).enum = {in: [1, 2, 3, 4, 5]}];
     // todo remove pid?
-    int32 level = 9 [(validate.rules).int32.lte = 1];
+    int32 level = 6 [(validate.rules).int32.lte = 1];
   }
   string gId = 1;
   repeated Branch branches = 2;
