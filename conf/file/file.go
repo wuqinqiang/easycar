@@ -11,14 +11,14 @@ import (
 
 type File struct {
 	path string
-	*conf.EasyCar
+	*conf.Settings
 }
 
 func NewFile(path string) *File {
 	return &File{path: path}
 }
 
-func (f *File) Load() (*conf.EasyCar, error) {
+func (f *File) Load() (*conf.Settings, error) {
 	dir, err := os.Getwd()
 	if err != nil {
 		return nil, err
@@ -32,6 +32,6 @@ func (f *File) Load() (*conf.EasyCar, error) {
 	if err != nil {
 		return nil, err
 	}
-	err = yaml.Unmarshal(byteAll, &f.EasyCar)
-	return f.EasyCar, err
+	err = yaml.Unmarshal(byteAll, &f.Settings)
+	return f.Settings, err
 }

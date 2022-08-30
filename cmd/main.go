@@ -15,14 +15,14 @@ import (
 )
 
 func main() {
-	f := flagConf()
+	conf := getConf()
 	// init conf
-	easyCarConf, err := f.Load()
+	settings, err := conf.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
-	easyCarConf.DB.Mysql.Init()
-	core, err := core.New(core.WithHttpPort(easyCarConf.HTTPPort), core.WithGrpcPort(easyCarConf.GRPCPort))
+	settings.DB.Mysql.Init()
+	core, err := core.New(core.WithHttpPort(settings.HTTPPort), core.WithGrpcPort(settings.GRPCPort))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +32,7 @@ func main() {
 	// everything is over
 }
 
-func flagConf() conf.Conf {
+func getConf() conf.Conf {
 	var (
 		c conf.Conf
 	)
@@ -44,6 +44,9 @@ func flagConf() conf.Conf {
 	case conf.Etcd:
 	case conf.Env:
 		return new(envx.Env)
+	default:
+		// todo don't not be so rude!!
+		panic("conf mod not set")
 	}
 	flag.Parse()
 	return c

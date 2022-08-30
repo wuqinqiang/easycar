@@ -12,9 +12,8 @@ import (
 type Env struct {
 }
 
-func (env *Env) Load() (*conf.EasyCar, error) {
+func (env *Env) Load() (*conf.Settings, error) {
 	defaultConf := base.DefaultConf
-
 	driver := os.Getenv("DB_DRIVER")
 	if driver == "" {
 		defaultConf.DB.Driver = driver

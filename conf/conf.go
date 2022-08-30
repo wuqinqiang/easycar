@@ -17,7 +17,7 @@ type (
 		Mysql  Mysql  `json:"mysql"`
 	}
 
-	EasyCar struct {
+	Settings struct {
 		DB       DB  `yaml:"db"`
 		GRPCPort int `yaml:"grpcPort"`
 		HTTPPort int `yaml:"httpPort"`
@@ -25,5 +25,5 @@ type (
 )
 
 type Conf interface {
-	Load() (*EasyCar, error)
+	Load() (*Settings, error)
 }
