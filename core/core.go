@@ -9,6 +9,8 @@ import (
 	"net/http"
 	"sync"
 
+	"google.golang.org/grpc/reflection"
+
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 
 	"google.golang.org/grpc/credentials/insecure"
@@ -65,6 +67,8 @@ func (core *Core) Run() error {
 			log.Fatal(err)
 		}
 	}()
+
+	reflection.Register(core.grpcServer)
 
 	// http service
 	conn, err := grpc.DialContext(context.Background(), fmt.Sprintf(":%d", core.opts.grpcPort),
