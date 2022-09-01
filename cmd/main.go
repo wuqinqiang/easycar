@@ -1,9 +1,17 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"fmt"
 	"log"
 	"os"
+
+	"github.com/wuqinqiang/easycar/core/servers/runner"
+
+	"github.com/wuqinqiang/easycar/core/servers/httpsrv"
+
+	"github.com/wuqinqiang/easycar/core/servers/grpcsrv"
 
 	"github.com/wuqinqiang/easycar/conf/envx"
 
@@ -22,11 +30,22 @@ func main() {
 		log.Fatal(err)
 	}
 	settings.DB.Mysql.Init()
-	core, err := core.New(core.WithHttpPort(settings.HTTPPort), core.WithGrpcPort(settings.GRPCPort))
+
+	grpcSrv, err := grpcsrv.New(settings.GRPCPort)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := core.Run(); err != nil {
+	httpProxySrv := httpsrv.New(settings.HTTPPort, settings.GRPCPort)
+	//runner
+	runnerSrv, err := runner.NewRunner("@every 5s", func(ctx context.Context) {
+		fmt.Println("hello world")
+	})
+
+	core := core.New(core.WithServers(grpcSrv, httpProxySrv, runnerSrv))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := core.Run(context.Background()); err != nil {
 		log.Fatal(err)
 	}
 	// everything is over
