@@ -26,6 +26,7 @@ require (
 	github.com/kr/pretty v0.3.0 // indirect
 	github.com/mattn/go-colorable v0.1.6 // indirect
 	github.com/mattn/go-isatty v0.0.12 // indirect
+	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	golang.org/x/mod v0.5.0 // indirect
 	golang.org/x/net v0.0.0-20220630215102-69896b714898 // indirect
