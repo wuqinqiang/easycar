@@ -6,7 +6,7 @@ import (
 
 type Global struct {
 	GID          string             `gorm:"column:g_id;type:varchar(255);not null"`                // global id
-	State        consts.GlobalState `gorm:"column:state;type:varchar(255);not null;default:begin"` // global State
+	State        consts.GlobalState `gorm:"column:state;type:varchar(255);not null;default:ready"` // global State
 	EndTime      int64              `gorm:"column:end_time;type:int;not null;default:0"`           // end time for the transaction
 	NextCronTime int64              `gorm:"column:next_cron_time;type:int;not null;default:0"`     // next cron time
 }

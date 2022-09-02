@@ -22,11 +22,7 @@ func NewGlobalImpl() GlobalImpl {
 }
 
 func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) error {
-	var (
-		m entity.Global
-	)
-	m.GID = global.GetGId()
-	err := g.query.Global.WithContext(ctx).Create(&m)
+	err := g.query.Global.WithContext(ctx).Create(global)
 	return tools.WrapDbErr(err)
 }
 
