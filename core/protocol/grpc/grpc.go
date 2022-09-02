@@ -23,11 +23,7 @@ func (g *Protocol) GetType() common.NetType {
 	return common.Grpc
 }
 
-func (g *Protocol) Request(ctx context.Context, req *common.Req, optFns ...common.OptsFn) (*common.Resp, error) {
-	opts := common.DefaultOps
-	for _, optFn := range optFns {
-		optFn(&opts)
-	}
+func (g *Protocol) Request(ctx context.Context, req *common.Req) (*common.Resp, error) {
 	parse, err := g.getParse(g.uri)
 	if err != nil {
 		return nil, err

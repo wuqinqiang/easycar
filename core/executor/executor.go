@@ -9,8 +9,6 @@ import (
 
 	"github.com/wuqinqiang/easycar/core/dao"
 
-	"github.com/wuqinqiang/easycar/tools/retry"
-
 	"github.com/wuqinqiang/easycar/core/protocol"
 	"github.com/wuqinqiang/easycar/core/protocol/common"
 
@@ -81,25 +79,19 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 			b := branch
 			errGroup.Go(func() error {
 				net, err := protocol.GetTransport(common.NetType(b.Protocol), b.Url)
-
 				if err != nil {
 					return fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
 				}
 				// todo add header
-				// todo replace factor
 				req := common.NewReq([]byte(b.ReqData), nil)
-				r := retry.NewRetry(2, 2, func() error {
-					_, err = net.Request(groupCtx, req)
-					return err
-				})
 
 				var (
 					branchState = consts.BranchSucceed
 					errmsg      string
 				)
 
-				if err = r.Run(); err != nil {
-					fmt.Printf("[Executor] Run branch:%vrequest error:%v", b, err)
+				if _, err = net.Request(groupCtx, req); err != nil {
+					fmt.Printf("[Executor] Request branch:%vrequest error:%v", b, err)
 					errmsg = err.Error()
 					branchState = consts.BranchFailState
 				}

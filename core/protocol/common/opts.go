@@ -2,30 +2,32 @@ package common
 
 import "time"
 
-var DefaultOps = Opts{timeOut: 5 * time.Second}
-
 type (
-	Req struct {
+	ReqOpt func(req *Req)
+	Req    struct {
 		Body    []byte
 		Headers map[string]string
-		Opts    *Opts
-	}
-
-	Opts struct {
 		timeOut time.Duration
 	}
-	OptsFn func(*Opts)
 )
 
-func NewReq(body []byte, headers map[string]string) *Req {
-	return &Req{
+func NewReq(body []byte, headers map[string]string, opts ...ReqOpt) *Req {
+	req := &Req{
 		Body:    body,
 		Headers: headers,
+		timeOut: 8 * time.Second,
 	}
+	for _, opt := range opts {
+		opt(req)
+	}
+	return req
 }
 
-func WithTimeOut(t time.Duration) OptsFn {
-	return func(netOpts *Opts) {
-		netOpts.timeOut = t
+func WithTimeOut(t time.Duration) ReqOpt {
+	return func(req *Req) {
+		if t == 0 {
+			return
+		}
+		req.timeOut = t
 	}
 }
