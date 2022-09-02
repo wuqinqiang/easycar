@@ -83,7 +83,7 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					return fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
 				}
 				// todo add header
-				req := common.NewReq([]byte(b.ReqData), nil)
+				req := common.NewReq([]byte(b.ReqData), []byte(b.ReqHeader))
 
 				var (
 					branchState = consts.BranchSucceed

@@ -1045,6 +1045,8 @@ func (m *RegisterReq_Branch) validate(all bool) error {
 
 	// no validation rules for ReqData
 
+	// no validation rules for ReqHeader
+
 	if _, ok := _RegisterReq_Branch_TranType_InLookup[m.GetTranType()]; !ok {
 		err := RegisterReq_BranchValidationError{
 			field:  "TranType",

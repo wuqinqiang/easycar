@@ -6,15 +6,16 @@ import (
 
 type (
 	Branch struct {
-		GID      string                 `gorm:"column:g_id;type:varchar(255);not null"`                      // global id
-		BranchId string                 `gorm:"column:branch_id;type:varchar(255);not null"`                 // branch id
-		Url      string                 `gorm:"column:url;type:varchar(255);not null"`                       // branch request url (example grpc or http)
-		ReqData  string                 `gorm:"column:req_data;type:varchar(255);not null"`                  // request data
-		TranType consts.TransactionType `gorm:"column:tran_type;type:varchar(255);not null"`                 // transaction type:tcc or saga or others
-		PId      string                 `gorm:"column:p_id;type:varchar(255);not null"`                      // parent branch id
-		Protocol string                 `gorm:"column:protocol;type:varchar(255);not null;default:http"`     //http,grpc
-		Action   consts.BranchAction    `gorm:"column:action;type:varchar(255);not null"`                    // action type of transaction
-		State    consts.BranchState     `gorm:"column:state;type:varchar(255);not null;default:branchReady"` // branch State
+		GID       string                 `gorm:"column:g_id;type:varchar(255);not null"`                      // global id
+		BranchId  string                 `gorm:"column:branch_id;type:varchar(255);not null"`                 // branch id
+		Url       string                 `gorm:"column:url;type:varchar(255);not null"`                       // branch request url (example grpc or http)
+		ReqData   string                 `gorm:"column:req_data;type:varchar(255);not null"`                  // request data
+		ReqHeader string                 `gorm:"column:req_header;type:varchar(255);not null"`                // request data
+		TranType  consts.TransactionType `gorm:"column:tran_type;type:varchar(255);not null"`                 // transaction type:tcc or saga or others
+		PId       string                 `gorm:"column:p_id;type:varchar(255);not null"`                      // parent branch id
+		Protocol  string                 `gorm:"column:protocol;type:varchar(255);not null;default:http"`     //http,grpc
+		Action    consts.BranchAction    `gorm:"column:action;type:varchar(255);not null"`                    // action type of transaction
+		State     consts.BranchState     `gorm:"column:state;type:varchar(255);not null;default:branchReady"` // branch State
 		//ChildrenList      []*Branch               //	children branch list
 		EndTime int64 `gorm:"column:end_time;type:int;not null;default:0"`
 		// 07-10 add

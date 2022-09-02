@@ -43,11 +43,11 @@ func GetActionByPb(action proto.Action) consts.BranchAction {
 func (b *Branch) AssignmentByPb(m *proto.RegisterReq_Branch) *Branch {
 	b.Url = m.GetUri()
 	b.ReqData = m.GetReqData()
+	b.ReqHeader = m.GetReqHeader()
 	b.TranType = GetTranTypeByPb(m.GetTranType())
 	b.Protocol = m.GetProtocol()
 	b.Action = GetActionByPb(m.GetAction())
 	b.Level = consts.Level(m.GetLevel())
-
 	var (
 		buffer bytes.Buffer
 	)

@@ -76,11 +76,11 @@ message RegisterReq {
   message Branch {
     string uri = 1 [(validate.rules).string = {min_len:1,max_len:299}];
     string reqData = 2;
-    TranType tranType = 3 [(validate.rules).enum = {in: [1, 2]}];
-    string protocol = 4 [(validate.rules).string = {in: ["http", "https", "grpc"]}];
-    Action action = 5 [(validate.rules).enum = {in: [1, 2, 3, 4, 5]}];
-    // todo remove pid?
-    int32 level = 6 [(validate.rules).int32 = {gte:1,lte:99999}];
+    string reqHeader = 3;
+    TranType tranType = 4 [(validate.rules).enum = {in: [1, 2]}];
+    string protocol = 5 [(validate.rules).string = {in: ["http", "https", "grpc"]}];
+    Action action = 6 [(validate.rules).enum = {in: [1, 2, 3, 4, 5]}];
+    int32 level = 7 [(validate.rules).int32 = {gte:1,lte:99999}];
   }
   string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
   repeated Branch branches = 2;

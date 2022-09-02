@@ -1,6 +1,9 @@
 package common
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type (
 	ReqOpt func(req *Req)
@@ -11,10 +14,14 @@ type (
 	}
 )
 
-func NewReq(body []byte, headers map[string]string, opts ...ReqOpt) *Req {
+func NewReq(body []byte, headers []byte, opts ...ReqOpt) *Req {
+	h := make(map[string]string)
+	if len(headers) > 0 {
+		_ = json.Unmarshal(headers, &h)
+	}
 	req := &Req{
 		Body:    body,
-		Headers: headers,
+		Headers: h,
 		timeOut: 8 * time.Second,
 	}
 	for _, opt := range opts {

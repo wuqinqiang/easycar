@@ -28,6 +28,7 @@ func newBranch(db *gorm.DB) branch {
 	_branch.BranchId = field.NewString(tableName, "branch_id")
 	_branch.Url = field.NewString(tableName, "url")
 	_branch.ReqData = field.NewString(tableName, "req_data")
+	_branch.ReqHeader = field.NewString(tableName, "req_header")
 	_branch.TranType = field.NewString(tableName, "tran_type")
 	_branch.PId = field.NewString(tableName, "p_id")
 	_branch.Protocol = field.NewString(tableName, "protocol")
@@ -37,11 +38,12 @@ func newBranch(db *gorm.DB) branch {
 	_branch.Level = field.NewUint8(tableName, "level")
 	_branch.LastErrMsg = field.NewString(tableName, "last_err_msg")
 
-	_branch.fieldMap = make(map[string]field.Expr, 12)
+	_branch.fieldMap = make(map[string]field.Expr, 13)
 	_branch.fieldMap["g_id"] = _branch.GID
 	_branch.fieldMap["branch_id"] = _branch.BranchId
 	_branch.fieldMap["url"] = _branch.Url
 	_branch.fieldMap["req_data"] = _branch.ReqData
+	_branch.fieldMap["req_header"] = _branch.ReqHeader
 	_branch.fieldMap["tran_type"] = _branch.TranType
 	_branch.fieldMap["p_id"] = _branch.PId
 	_branch.fieldMap["protocol"] = _branch.Protocol
@@ -62,6 +64,7 @@ type branch struct {
 	BranchId   field.String
 	Url        field.String
 	ReqData    field.String
+	ReqHeader  field.String
 	TranType   field.String
 	PId        field.String
 	Protocol   field.String
