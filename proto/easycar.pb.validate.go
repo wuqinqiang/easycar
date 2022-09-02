@@ -57,7 +57,16 @@ func (m *RegisterReq) validate(all bool) error {
 
 	var errors []error
 
-	// no validation rules for GId
+	if l := utf8.RuneCountInString(m.GetGId()); l < 1 || l > 50 {
+		err := RegisterReqValidationError{
+			field:  "GId",
+			reason: "value length must be between 1 and 50 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
 
 	for idx, item := range m.GetBranches() {
 		_, _ = idx, item
@@ -392,10 +401,10 @@ func (m *StartReq) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetGId()) < 1 {
+	if l := utf8.RuneCountInString(m.GetGId()); l < 1 || l > 50 {
 		err := StartReqValidationError{
 			field:  "GId",
-			reason: "value length must be at least 1 runes",
+			reason: "value length must be between 1 and 50 runes, inclusive",
 		}
 		if !all {
 			return err
@@ -603,10 +612,10 @@ func (m *AbortReq) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetGId()) < 1 {
+	if l := utf8.RuneCountInString(m.GetGId()); l < 1 || l > 50 {
 		err := AbortReqValidationError{
 			field:  "GId",
-			reason: "value length must be at least 1 runes",
+			reason: "value length must be between 1 and 50 runes, inclusive",
 		}
 		if !all {
 			return err
@@ -812,10 +821,10 @@ func (m *GetStateReq) validate(all bool) error {
 
 	var errors []error
 
-	if utf8.RuneCountInString(m.GetGId()) < 1 {
+	if l := utf8.RuneCountInString(m.GetGId()); l < 1 || l > 50 {
 		err := GetStateReqValidationError{
 			field:  "GId",
-			reason: "value length must be at least 1 runes",
+			reason: "value length must be between 1 and 50 runes, inclusive",
 		}
 		if !all {
 			return err
@@ -1069,10 +1078,10 @@ func (m *RegisterReq_Branch) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
-	if m.GetLevel() > 1 {
+	if val := m.GetLevel(); val < 1 || val > 99999 {
 		err := RegisterReq_BranchValidationError{
 			field:  "Level",
-			reason: "value must be less than or equal to 1",
+			reason: "value must be inside range [1, 99999]",
 		}
 		if !all {
 			return err

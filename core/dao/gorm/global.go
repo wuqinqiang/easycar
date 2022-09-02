@@ -37,6 +37,10 @@ func (g GlobalImpl) GetGlobal(ctx context.Context, gid string) (entity.Global, e
 	if err != nil {
 		return entity.Global{}, err
 	}
+	if m == nil {
+		return entity.Global{}, nil
+	}
+
 	return *m, nil
 }
 

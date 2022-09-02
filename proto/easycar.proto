@@ -80,9 +80,9 @@ message RegisterReq {
     string protocol = 4 [(validate.rules).string = {in: ["http", "https", "grpc"]}];
     Action action = 5 [(validate.rules).enum = {in: [1, 2, 3, 4, 5]}];
     // todo remove pid?
-    int32 level = 6 [(validate.rules).int32.lte = 1];
+    int32 level = 6 [(validate.rules).int32 = {gte:1,lte:99999}];
   }
-  string gId = 1;
+  string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
   repeated Branch branches = 2;
 }
 message RegisterResp {
@@ -108,7 +108,7 @@ message BeginResp {
 }
 
 message StartReq {
-  string gId = 1 [(validate.rules).string.min_len = 1];
+  string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
 }
 message StartResp {
   GlobalState state = 1;
@@ -116,14 +116,14 @@ message StartResp {
 
 
 message AbortReq {
-  string gId = 1 [(validate.rules).string.min_len = 1];
+  string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
 }
 
 message AbortResp {
 }
 
 message GetStateReq {
-  string gId = 1 [(validate.rules).string.min_len = 1];
+  string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
 }
 
 message GetStateResp {

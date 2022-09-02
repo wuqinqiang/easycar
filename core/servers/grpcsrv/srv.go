@@ -157,7 +157,7 @@ func (s *GrpcSrv) GetState(ctx context.Context, req *proto.GetStateReq) (*proto.
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
-	global, err := s.coordinator.GetGlobal(ctx, req.GetGId())
+	global, err := s.check(ctx, req.GetGId(), nil)
 	if err != nil {
 		return nil, err
 	}
