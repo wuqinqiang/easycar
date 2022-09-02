@@ -58,7 +58,6 @@ func (core *Core) Run(ctx context.Context) error {
 		})
 	}
 	// wait for all service is  start
-
 	core.runWaitGroup.Wait()
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
