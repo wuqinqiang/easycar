@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/wuqinqiang/easycar/tools"
 
@@ -42,6 +43,7 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 	phase1State := consts.Phase1Success
 	err := c.Phase1(ctx, branches)
 	if err != nil {
+		fmt.Printf("[Start] Phase1 err:%v\n", err)
 		phase1State = consts.Phase1Failed
 	}
 	global.State = phase1State
@@ -53,6 +55,7 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 		// todo replace ctx
 		ctx2 := context.Background()
 		if err = c.Phase2(ctx2, global, branches); err != nil {
+			fmt.Printf("[Start] Phase2:err:%v", err)
 			return
 		}
 	})

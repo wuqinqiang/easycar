@@ -107,6 +107,8 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					return
 				}
 				req := common.NewReq([]byte(b.ReqData), nil)
+
+				// todo replace factor
 				r := retry.NewRetry(2, 2, func() error {
 					_, err = transport.Request(ctx, req)
 					return err

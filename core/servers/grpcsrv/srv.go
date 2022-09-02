@@ -121,13 +121,17 @@ func (s *GrpcSrv) Start(ctx context.Context, req *proto.StartReq) (*proto.StartR
 		return nil, err
 	}
 
-	global, err := s.check(ctx, req.GetGId(), func(g *entity.Global) error {
+	var (
+		global entity.Global
+		err    error
+	)
+
+	if global, err = s.check(ctx, req.GetGId(), func(g *entity.Global) error {
 		if !g.IsReady() {
 			return fmt.Errorf("global state:%v can not start", g.GetState())
 		}
 		return nil
-	})
-	if err != nil {
+	}); err != nil {
 		return nil, err
 	}
 
