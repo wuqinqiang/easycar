@@ -1,6 +1,12 @@
 package entity
 
 import (
+	"bytes"
+	"fmt"
+	"math/rand"
+	"strconv"
+	"time"
+
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/proto"
 )
@@ -41,7 +47,19 @@ func (b *Branch) AssignmentByPb(m *proto.RegisterReq_Branch) *Branch {
 	b.Protocol = m.GetProtocol()
 	b.Action = GetActionByPb(m.GetAction())
 	b.Level = consts.Level(m.GetLevel())
+
+	var (
+		buffer bytes.Buffer
+	)
+	// such as:saga-normal-166210685961363520
+	buffer.WriteString(string(b.TranType) + "-" + string(b.Action) + "-" + strconv.Itoa(int(time.Now().Unix())) +
+		CreateCaptcha())
+	b.BranchId = buffer.String()
 	return b
+}
+
+func CreateCaptcha() string {
+	return fmt.Sprintf("%07d", rand.New(rand.NewSource(time.Now().UnixNano())).Int31n(99999999))
 }
 
 func GetBranchList(gid string, mList []*proto.RegisterReq_Branch) (list BranchList) {

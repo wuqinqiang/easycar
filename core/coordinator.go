@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/wuqinqiang/easycar/tools"
-
 	"github.com/wuqinqiang/easycar/core/executor"
 
 	"github.com/wuqinqiang/easycar/core/consts"
@@ -51,14 +49,14 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 		return err
 	}
 
-	tools.GoSafe(func() {
-		// todo replace ctx
-		ctx2 := context.Background()
-		if err = c.Phase2(ctx2, global, branches); err != nil {
-			fmt.Printf("[Start] Phase2:err:%v", err)
-			return
-		}
-	})
+	//tools.GoSafe(func() {
+	//	// todo replace ctx
+	//	ctx2 := context.Background()
+	//	if err = c.Phase2(ctx2, global, branches); err != nil {
+	//		fmt.Printf("[Start] Phase2:err:%v", err)
+	//		return
+	//	}
+	//})
 	global.State = phase1State
 	return nil
 }

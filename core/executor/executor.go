@@ -4,20 +4,15 @@ import (
 	"context"
 	"fmt"
 	"sort"
-	"sync"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/wuqinqiang/easycar/core/dao"
 
 	"github.com/wuqinqiang/easycar/tools/retry"
 
-	"github.com/pkg/errors"
-
 	"github.com/wuqinqiang/easycar/core/protocol"
 	"github.com/wuqinqiang/easycar/core/protocol/common"
-
-	"github.com/wuqinqiang/easycar/tools"
-
-	"github.com/wuqinqiang/easycar/tools/fx"
 
 	"github.com/wuqinqiang/easycar/core/consts"
 
@@ -76,70 +71,49 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 		phaseList[bucketIndex] = append(phaseList[bucketIndex], branch)
 	}
 
-	var (
-		wg sync.WaitGroup
-	)
+	errGroup, groupCtx := errgroup.WithContext(ctx)
 
 	for _, tierList := range phaseList {
-		branches := tierList
-		if len(branches) == 0 {
+		if len(tierList) == 0 {
 			continue
 		}
-		var (
-			err = errors.New("[execute]")
-		)
-		wg.Add(1)
-		tools.GoSafe(func() {
-			defer wg.Done()
-			fx.From(func(source chan<- interface{}) {
-				for i := range branches {
-					source <- branches[i]
-				}
-			}).Walk(func(item interface{}, pipe chan<- interface{}) {
-				b, ok := item.(*entity.Branch)
-				if !ok {
-					pipe <- fmt.Errorf("[Executor]invalid branch:%+v", item)
-					return
-				}
-				transport, err := protocol.GetTransport(common.NetType(b.Protocol), b.Url)
-				if err != nil {
-					pipe <- fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
-					return
-				}
-				req := common.NewReq([]byte(b.ReqData), nil)
+		for _, branch := range tierList {
+			b := branch
+			errGroup.Go(func() error {
+				net, err := protocol.GetTransport(common.NetType(b.Protocol), b.Url)
 
+				if err != nil {
+					return fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
+				}
+				// todo add header
 				// todo replace factor
+				req := common.NewReq([]byte(b.ReqData), nil)
 				r := retry.NewRetry(2, 2, func() error {
-					_, err = transport.Request(ctx, req)
+					_, err = net.Request(groupCtx, req)
 					return err
 				})
 
 				var (
 					branchState = consts.BranchSucceed
-					errMsg      = ""
+					errmsg      string
 				)
+
 				if err = r.Run(); err != nil {
-					errMsg = err.Error()
+					fmt.Printf("[Executor] Run branch:%vrequest error:%v", b, err)
+					errmsg = err.Error()
 					branchState = consts.BranchFailState
-					pipe <- fmt.Errorf("branch:%vrequest error:%v", b, err)
 				}
 
 				// todo replace with dao
-				if _, err = dao.GetTransaction().UpdateBranchStateByGid(ctx, b.BranchId,
-					branchState, errMsg); err != nil {
-					pipe <- fmt.Errorf("[Executor]update branch state error:%v", err)
+				if _, erro := dao.GetTransaction().UpdateBranchStateByGid(ctx, b.BranchId,
+					branchState, errmsg); err != nil {
+					fmt.Printf("[Executor]update branch state error:%v\n", erro)
 				}
-			}).ForEach(func(item interface{}) {
-				erro, ok := item.(error)
-				// todo add err log
-				if !ok {
-					return
-				}
-				err = errors.WithMessagef(err, erro.Error())
+				return err
 			})
-		})
-		wg.Wait()
-		if err != nil {
+		}
+		if err := errGroup.Wait(); err != nil {
+			fmt.Printf("[Executor] err:%v\n", err)
 			return err
 		}
 	}
