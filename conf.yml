@@ -3,7 +3,7 @@
 
 grpcPort: 8089
 httpPort: 8085
-automaticExecution2: true
+#automaticExecution2: true
 dirver: mysql
 
 db:

@@ -3,7 +3,6 @@ package core
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/wuqinqiang/easycar/core/executor"
 	"github.com/wuqinqiang/easycar/tools"
@@ -57,7 +56,6 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 	}
 
 	if c.automaticExecution2 {
-		time.Sleep(5 * time.Second)
 		fmt.Printf("[Start] Phase2 start gid:%v", global.GID)
 		tools.GoSafe(func() {
 			if err = c.Phase2(context.Background(), global, branches); err != nil {
@@ -74,8 +72,29 @@ func (c *Coordinator) Phase1(ctx context.Context, branchList entity.BranchList) 
 	return executor.Phase1Executor(branchList).Execute(ctx)
 }
 
-func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
-	return executor.NewPhase2Executor(global, branches).Execute(ctx)
+func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) (err error) {
+	var (
+		processingStateVal, overStateVal interface{}
+	)
+	processingStateVal = tools.IF(global.Phase1Failed(), consts.Phase2Rollbacking, consts.Phase2Commiting)
+	if _, err = c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(),
+		processingStateVal.(consts.GlobalState)); err != nil {
+		return
+	}
+
+	overStateVal = tools.IF(global.Phase1Failed(), consts.RollbackSuccess, consts.Success)
+
+	defer func() {
+		if err != nil {
+			overStateVal = tools.IF(global.Phase1Failed(), consts.Phase2RollbackFailed, consts.Phase2CommitFailed)
+		}
+		_, erro := c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(), overStateVal.(consts.GlobalState))
+		if erro != nil {
+			fmt.Printf("[Phase2]UpdateGlobalStateByGid gid:%v err:%v", global.GetGId(), erro)
+		}
+	}()
+	err = executor.NewPhase2Executor(global, branches).Execute(ctx)
+	return
 }
 
 func (c *Coordinator) Commit(ctx context.Context, global *entity.Global, branches entity.BranchList) error {

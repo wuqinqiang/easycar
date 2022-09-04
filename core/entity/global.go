@@ -33,6 +33,10 @@ func (g *Global) IsPhase1Success() bool {
 	return g.State == consts.Phase1Success
 }
 
+func (g *Global) Phase1Failed() bool {
+	return g.State == consts.Phase1Failed
+}
+
 func (g *Global) IsPhase2Retrying() bool {
 	return g.State == consts.Phase1Retrying
 }

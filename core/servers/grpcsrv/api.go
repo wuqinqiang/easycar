@@ -35,6 +35,8 @@ func (s *GrpcSrv) Register(ctx context.Context, req *proto.RegisterReq) (*proto.
 		return nil, err
 	}
 
+	//todo  check register branches are match?
+
 	branchList := entity.GetBranchList(req.GetGId(), req.Branches)
 	if err := s.coordinator.Register(ctx, req.GetGId(), branchList); err != nil {
 		return nil, err

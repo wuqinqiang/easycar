@@ -16,6 +16,15 @@ const (
 	Phase1Failed     GlobalState = "phase1_failed"
 	Phase1Success    GlobalState = "phase1_success"
 
+	Phase2Commiting      GlobalState = "phase2_commiting"
+	Phase2Rollbacking    GlobalState = "phase2_rollbacking"
+	Phase2CommitFailed   GlobalState = "phase2_commit_failed"
+	Phase2RollbackFailed GlobalState = "phase2_rollback_failed"
+
+	//Success Distributed transaction executed successfully
+	Success         GlobalState = "success"
+	RollbackSuccess GlobalState = "rollback_success"
+
 	Phase2Processing GlobalState = "phase2_processing"
 	Phase2Retrying   GlobalState = "phase2_retrying"
 	Phase2Failed     GlobalState = "phase2_failed"
