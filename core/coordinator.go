@@ -3,8 +3,10 @@ package core
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/wuqinqiang/easycar/core/executor"
+	"github.com/wuqinqiang/easycar/tools"
 
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/entity"
@@ -12,14 +14,19 @@ import (
 	"github.com/wuqinqiang/easycar/core/dao"
 )
 
+var (
+	ErrAutomatic = fmt.Errorf("transaction phase2 has been processed automatically")
+)
+
 type Coordinator struct {
-	// resty timeout
-	dao dao.TransactionDao
+	dao                 dao.TransactionDao
+	automaticExecution2 bool
 }
 
-func NewCoordinator(dao dao.TransactionDao) *Coordinator {
+func NewCoordinator(dao dao.TransactionDao, automaticExecution2 bool) *Coordinator {
 	c := &Coordinator{
-		dao: dao,
+		dao:                 dao,
+		automaticExecution2: automaticExecution2,
 	}
 	return c
 }
@@ -49,14 +56,16 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 		return err
 	}
 
-	//tools.GoSafe(func() {
-	//	// todo replace ctx
-	//	ctx2 := context.Background()
-	//	if err = c.Phase2(ctx2, global, branches); err != nil {
-	//		fmt.Printf("[Start] Phase2:err:%v", err)
-	//		return
-	//	}
-	//})
+	if c.automaticExecution2 {
+		time.Sleep(5 * time.Second)
+		fmt.Printf("[Start] Phase2 start gid:%v", global.GID)
+		tools.GoSafe(func() {
+			if err = c.Phase2(context.Background(), global, branches); err != nil {
+				fmt.Printf("[Start] Phase2:err:%v", err)
+				return
+			}
+		})
+	}
 	global.State = phase1State
 	return nil
 }
@@ -67,6 +76,20 @@ func (c *Coordinator) Phase1(ctx context.Context, branchList entity.BranchList) 
 
 func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
 	return executor.NewPhase2Executor(global, branches).Execute(ctx)
+}
+
+func (c *Coordinator) Commit(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
+	if c.automaticExecution2 {
+		return ErrAutomatic
+	}
+	return c.Phase2(ctx, global, branches)
+}
+
+func (c *Coordinator) Rollback(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
+	if c.automaticExecution2 {
+		return ErrAutomatic
+	}
+	return c.Phase2(ctx, global, branches)
 }
 
 func (c *Coordinator) GetGlobal(ctx context.Context, gid string) (entity.Global, error) {
@@ -81,4 +104,8 @@ func (c *Coordinator) UpdateGlobalState(ctx context.Context, gid string,
 	state consts.GlobalState) error {
 	_, err := c.dao.UpdateGlobalStateByGid(ctx, gid, state)
 	return err
+}
+
+func (c *Coordinator) GetAutomaticExecution2() bool {
+	return c.automaticExecution2
 }

@@ -95,10 +95,11 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					errmsg = err.Error()
 					branchState = consts.BranchFailState
 				}
+				b.State = branchState
 
 				// todo replace with dao
 				if _, erro := dao.GetTransaction().UpdateBranchStateByGid(ctx, b.BranchId,
-					branchState, errmsg); err != nil {
+					b.State, errmsg); err != nil {
 					fmt.Printf("[Executor]update branch state error:%v\n", erro)
 				}
 				return err
