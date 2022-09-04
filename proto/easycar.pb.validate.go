@@ -590,22 +590,22 @@ var _ interface {
 	ErrorName() string
 } = StartRespValidationError{}
 
-// Validate checks the field values on AbortReq with the rules defined in the
+// Validate checks the field values on CommitReq with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *AbortReq) Validate() error {
+func (m *CommitReq) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AbortReq with the rules defined in
+// ValidateAll checks the field values on CommitReq with the rules defined in
 // the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in AbortReqMultiError, or nil
+// result is a list of violation errors wrapped in CommitReqMultiError, or nil
 // if none found.
-func (m *AbortReq) ValidateAll() error {
+func (m *CommitReq) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AbortReq) validate(all bool) error {
+func (m *CommitReq) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -613,7 +613,7 @@ func (m *AbortReq) validate(all bool) error {
 	var errors []error
 
 	if l := utf8.RuneCountInString(m.GetGId()); l < 1 || l > 50 {
-		err := AbortReqValidationError{
+		err := CommitReqValidationError{
 			field:  "GId",
 			reason: "value length must be between 1 and 50 runes, inclusive",
 		}
@@ -624,18 +624,18 @@ func (m *AbortReq) validate(all bool) error {
 	}
 
 	if len(errors) > 0 {
-		return AbortReqMultiError(errors)
+		return CommitReqMultiError(errors)
 	}
 
 	return nil
 }
 
-// AbortReqMultiError is an error wrapping multiple validation errors returned
-// by AbortReq.ValidateAll() if the designated constraints aren't met.
-type AbortReqMultiError []error
+// CommitReqMultiError is an error wrapping multiple validation errors returned
+// by CommitReq.ValidateAll() if the designated constraints aren't met.
+type CommitReqMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AbortReqMultiError) Error() string {
+func (m CommitReqMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -644,11 +644,11 @@ func (m AbortReqMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AbortReqMultiError) AllErrors() []error { return m }
+func (m CommitReqMultiError) AllErrors() []error { return m }
 
-// AbortReqValidationError is the validation error returned by
-// AbortReq.Validate if the designated constraints aren't met.
-type AbortReqValidationError struct {
+// CommitReqValidationError is the validation error returned by
+// CommitReq.Validate if the designated constraints aren't met.
+type CommitReqValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -656,22 +656,22 @@ type AbortReqValidationError struct {
 }
 
 // Field function returns field value.
-func (e AbortReqValidationError) Field() string { return e.field }
+func (e CommitReqValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AbortReqValidationError) Reason() string { return e.reason }
+func (e CommitReqValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AbortReqValidationError) Cause() error { return e.cause }
+func (e CommitReqValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AbortReqValidationError) Key() bool { return e.key }
+func (e CommitReqValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AbortReqValidationError) ErrorName() string { return "AbortReqValidationError" }
+func (e CommitReqValidationError) ErrorName() string { return "CommitReqValidationError" }
 
 // Error satisfies the builtin error interface
-func (e AbortReqValidationError) Error() string {
+func (e CommitReqValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -683,14 +683,14 @@ func (e AbortReqValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAbortReq.%s: %s%s",
+		"invalid %sCommitReq.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AbortReqValidationError{}
+var _ error = CommitReqValidationError{}
 
 var _ interface {
 	Field() string
@@ -698,43 +698,54 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AbortReqValidationError{}
+} = CommitReqValidationError{}
 
-// Validate checks the field values on AbortResp with the rules defined in the
+// Validate checks the field values on CommitResp with the rules defined in the
 // proto definition for this message. If any rules are violated, the first
 // error encountered is returned, or nil if there are no violations.
-func (m *AbortResp) Validate() error {
+func (m *CommitResp) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on AbortResp with the rules defined in
+// ValidateAll checks the field values on CommitResp with the rules defined in
 // the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in AbortRespMultiError, or nil
-// if none found.
-func (m *AbortResp) ValidateAll() error {
+// result is a list of violation errors wrapped in CommitRespMultiError, or
+// nil if none found.
+func (m *CommitResp) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *AbortResp) validate(all bool) error {
+func (m *CommitResp) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
 
 	var errors []error
 
+	if l := utf8.RuneCountInString(m.GetGId()); l < 1 || l > 50 {
+		err := CommitRespValidationError{
+			field:  "GId",
+			reason: "value length must be between 1 and 50 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
 	if len(errors) > 0 {
-		return AbortRespMultiError(errors)
+		return CommitRespMultiError(errors)
 	}
 
 	return nil
 }
 
-// AbortRespMultiError is an error wrapping multiple validation errors returned
-// by AbortResp.ValidateAll() if the designated constraints aren't met.
-type AbortRespMultiError []error
+// CommitRespMultiError is an error wrapping multiple validation errors
+// returned by CommitResp.ValidateAll() if the designated constraints aren't met.
+type CommitRespMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m AbortRespMultiError) Error() string {
+func (m CommitRespMultiError) Error() string {
 	var msgs []string
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -743,11 +754,11 @@ func (m AbortRespMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m AbortRespMultiError) AllErrors() []error { return m }
+func (m CommitRespMultiError) AllErrors() []error { return m }
 
-// AbortRespValidationError is the validation error returned by
-// AbortResp.Validate if the designated constraints aren't met.
-type AbortRespValidationError struct {
+// CommitRespValidationError is the validation error returned by
+// CommitResp.Validate if the designated constraints aren't met.
+type CommitRespValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -755,22 +766,22 @@ type AbortRespValidationError struct {
 }
 
 // Field function returns field value.
-func (e AbortRespValidationError) Field() string { return e.field }
+func (e CommitRespValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e AbortRespValidationError) Reason() string { return e.reason }
+func (e CommitRespValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e AbortRespValidationError) Cause() error { return e.cause }
+func (e CommitRespValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e AbortRespValidationError) Key() bool { return e.key }
+func (e CommitRespValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e AbortRespValidationError) ErrorName() string { return "AbortRespValidationError" }
+func (e CommitRespValidationError) ErrorName() string { return "CommitRespValidationError" }
 
 // Error satisfies the builtin error interface
-func (e AbortRespValidationError) Error() string {
+func (e CommitRespValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -782,14 +793,14 @@ func (e AbortRespValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sAbortResp.%s: %s%s",
+		"invalid %sCommitResp.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = AbortRespValidationError{}
+var _ error = CommitRespValidationError{}
 
 var _ interface {
 	Field() string
@@ -797,7 +808,227 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = AbortRespValidationError{}
+} = CommitRespValidationError{}
+
+// Validate checks the field values on RollBckReq with the rules defined in the
+// proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *RollBckReq) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RollBckReq with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RollBckReqMultiError, or
+// nil if none found.
+func (m *RollBckReq) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RollBckReq) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if l := utf8.RuneCountInString(m.GetGId()); l < 1 || l > 50 {
+		err := RollBckReqValidationError{
+			field:  "GId",
+			reason: "value length must be between 1 and 50 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return RollBckReqMultiError(errors)
+	}
+
+	return nil
+}
+
+// RollBckReqMultiError is an error wrapping multiple validation errors
+// returned by RollBckReq.ValidateAll() if the designated constraints aren't met.
+type RollBckReqMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RollBckReqMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RollBckReqMultiError) AllErrors() []error { return m }
+
+// RollBckReqValidationError is the validation error returned by
+// RollBckReq.Validate if the designated constraints aren't met.
+type RollBckReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RollBckReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RollBckReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RollBckReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RollBckReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RollBckReqValidationError) ErrorName() string { return "RollBckReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RollBckReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRollBckReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RollBckReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RollBckReqValidationError{}
+
+// Validate checks the field values on RollBckResp with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *RollBckResp) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on RollBckResp with the rules defined in
+// the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in RollBckRespMultiError, or
+// nil if none found.
+func (m *RollBckResp) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *RollBckResp) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	if l := utf8.RuneCountInString(m.GetGId()); l < 1 || l > 50 {
+		err := RollBckRespValidationError{
+			field:  "GId",
+			reason: "value length must be between 1 and 50 runes, inclusive",
+		}
+		if !all {
+			return err
+		}
+		errors = append(errors, err)
+	}
+
+	if len(errors) > 0 {
+		return RollBckRespMultiError(errors)
+	}
+
+	return nil
+}
+
+// RollBckRespMultiError is an error wrapping multiple validation errors
+// returned by RollBckResp.ValidateAll() if the designated constraints aren't met.
+type RollBckRespMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m RollBckRespMultiError) Error() string {
+	var msgs []string
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m RollBckRespMultiError) AllErrors() []error { return m }
+
+// RollBckRespValidationError is the validation error returned by
+// RollBckResp.Validate if the designated constraints aren't met.
+type RollBckRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e RollBckRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e RollBckRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e RollBckRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e RollBckRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e RollBckRespValidationError) ErrorName() string { return "RollBckRespValidationError" }
+
+// Error satisfies the builtin error interface
+func (e RollBckRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sRollBckResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = RollBckRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = RollBckRespValidationError{}
 
 // Validate checks the field values on GetStateReq with the rules defined in
 // the proto definition for this message. If any rules are violated, the first

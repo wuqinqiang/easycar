@@ -15,11 +15,11 @@ var NotFoundTransport = errors.New("not found protocol")
 
 type NetTransport interface {
 	// GetType returns the type of the net protocol
-	GetType() common.NetType
+	GetType() common.Net
 	Request(ctx context.Context, req *common.Req) (*common.Resp, error)
 }
 
-func GetTransport(net common.NetType, service string) (NetTransport, error) {
+func GetTransport(net common.Net, service string) (NetTransport, error) {
 	switch net {
 	case common.Http:
 		return http.NewHttpTransport(service), nil

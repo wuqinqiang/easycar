@@ -1,10 +1,10 @@
 package common
 
 type (
-	NetType string
+	Net string
 )
 
 const (
-	Http NetType = "http"
-	Grpc NetType = "grpc"
+	Http Net = "http"
+	Grpc Net = "grpc"
 )

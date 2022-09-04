@@ -25,8 +25,12 @@ const _ = grpc.SupportPackageIsVersion7
 type EasyCarClient interface {
 	Begin(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BeginResp, error)
 	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
+	// phase1
 	Start(ctx context.Context, in *StartReq, opts ...grpc.CallOption) (*StartResp, error)
-	Abort(ctx context.Context, in *AbortReq, opts ...grpc.CallOption) (*AbortResp, error)
+	// phase2 for commit
+	Commit(ctx context.Context, in *CommitReq, opts ...grpc.CallOption) (*CommitResp, error)
+	// phase2 for rollback
+	Rollback(ctx context.Context, in *RollBckReq, opts ...grpc.CallOption) (*RollBckResp, error)
 	GetState(ctx context.Context, in *GetStateReq, opts ...grpc.CallOption) (*GetStateResp, error)
 }
 
@@ -65,9 +69,18 @@ func (c *easyCarClient) Start(ctx context.Context, in *StartReq, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *easyCarClient) Abort(ctx context.Context, in *AbortReq, opts ...grpc.CallOption) (*AbortResp, error) {
-	out := new(AbortResp)
-	err := c.cc.Invoke(ctx, "/proto.EasyCar/Abort", in, out, opts...)
+func (c *easyCarClient) Commit(ctx context.Context, in *CommitReq, opts ...grpc.CallOption) (*CommitResp, error) {
+	out := new(CommitResp)
+	err := c.cc.Invoke(ctx, "/proto.EasyCar/Commit", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *easyCarClient) Rollback(ctx context.Context, in *RollBckReq, opts ...grpc.CallOption) (*RollBckResp, error) {
+	out := new(RollBckResp)
+	err := c.cc.Invoke(ctx, "/proto.EasyCar/Rollback", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,8 +102,12 @@ func (c *easyCarClient) GetState(ctx context.Context, in *GetStateReq, opts ...g
 type EasyCarServer interface {
 	Begin(context.Context, *emptypb.Empty) (*BeginResp, error)
 	Register(context.Context, *RegisterReq) (*RegisterResp, error)
+	// phase1
 	Start(context.Context, *StartReq) (*StartResp, error)
-	Abort(context.Context, *AbortReq) (*AbortResp, error)
+	// phase2 for commit
+	Commit(context.Context, *CommitReq) (*CommitResp, error)
+	// phase2 for rollback
+	Rollback(context.Context, *RollBckReq) (*RollBckResp, error)
 	GetState(context.Context, *GetStateReq) (*GetStateResp, error)
 	mustEmbedUnimplementedEasyCarServer()
 }
@@ -108,8 +125,11 @@ func (UnimplementedEasyCarServer) Register(context.Context, *RegisterReq) (*Regi
 func (UnimplementedEasyCarServer) Start(context.Context, *StartReq) (*StartResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
 }
-func (UnimplementedEasyCarServer) Abort(context.Context, *AbortReq) (*AbortResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Abort not implemented")
+func (UnimplementedEasyCarServer) Commit(context.Context, *CommitReq) (*CommitResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Commit not implemented")
+}
+func (UnimplementedEasyCarServer) Rollback(context.Context, *RollBckReq) (*RollBckResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Rollback not implemented")
 }
 func (UnimplementedEasyCarServer) GetState(context.Context, *GetStateReq) (*GetStateResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetState not implemented")
@@ -181,20 +201,38 @@ func _EasyCar_Start_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
-func _EasyCar_Abort_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AbortReq)
+func _EasyCar_Commit_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommitReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EasyCarServer).Abort(ctx, in)
+		return srv.(EasyCarServer).Commit(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/proto.EasyCar/Abort",
+		FullMethod: "/proto.EasyCar/Commit",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EasyCarServer).Abort(ctx, req.(*AbortReq))
+		return srv.(EasyCarServer).Commit(ctx, req.(*CommitReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _EasyCar_Rollback_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RollBckReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EasyCarServer).Rollback(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/proto.EasyCar/Rollback",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EasyCarServer).Rollback(ctx, req.(*RollBckReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -237,8 +275,12 @@ var EasyCar_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _EasyCar_Start_Handler,
 		},
 		{
-			MethodName: "Abort",
-			Handler:    _EasyCar_Abort_Handler,
+			MethodName: "Commit",
+			Handler:    _EasyCar_Commit_Handler,
+		},
+		{
+			MethodName: "Rollback",
+			Handler:    _EasyCar_Rollback_Handler,
 		},
 		{
 			MethodName: "GetState",

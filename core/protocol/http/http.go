@@ -26,7 +26,7 @@ func NewHttpTransport(uri string) *Transport {
 	}
 }
 
-func (cli *Transport) GetType() common.NetType {
+func (cli *Transport) GetType() common.Net {
 	return common.Http
 }
 
@@ -44,8 +44,6 @@ func (cli *Transport) req(ctx context.Context, body []byte, headers map[string]s
 	if err != nil {
 		return nil, err
 	}
-
-	// todo more,such as validate data from response
 	if resp.StatusCode() != http.StatusOK {
 		return nil, fmt.Errorf("[http Transport]http status code: %d", resp.StatusCode())
 	}

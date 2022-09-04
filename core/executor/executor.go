@@ -78,7 +78,7 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 		for _, branch := range tierList {
 			b := branch
 			errGroup.Go(func() error {
-				net, err := protocol.GetTransport(common.NetType(b.Protocol), b.Url)
+				net, err := protocol.GetTransport(common.Net(b.Protocol), b.Url)
 				if err != nil {
 					return fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
 				}

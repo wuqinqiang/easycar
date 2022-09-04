@@ -22,18 +22,31 @@ service EasyCar {
       body:"*"
     };
   }
+
+  // phase1
   rpc Start(StartReq)returns(StartResp){
     option (google.api.http) = {
       post:"/easycar/start",
       body:"*"
     };
   }
-  rpc Abort(AbortReq) returns(AbortResp){
+
+  // phase2 for commit
+  rpc Commit(CommitReq) returns(CommitResp) {
     option (google.api.http) = {
-      post:"/easycar/abort",
-      body:"*"
+      post:"/easycar/commit",
+      body:"*",
     };
   }
+
+  // phase2 for rollback
+  rpc Rollback(RollBckReq) returns(RollBckResp) {
+    option (google.api.http) = {
+      post: "/easycar/rollback",
+      body:"*",
+    };
+  }
+
   rpc GetState(GetStateReq) returns(GetStateResp){
     option (google.api.http) = {
       post:"/easycar/getState",
@@ -114,13 +127,22 @@ message StartResp {
   GlobalState state = 1;
 }
 
-
-message AbortReq {
+message CommitReq {
   string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
 }
 
-message AbortResp {
+message CommitResp {
+  string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
 }
+
+message RollBckReq {
+  string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
+}
+
+message RollBckResp {
+  string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
+}
+
 
 message GetStateReq {
   string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];

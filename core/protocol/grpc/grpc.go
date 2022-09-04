@@ -19,7 +19,7 @@ func NewProtocol(uri string) *Protocol {
 	return &Protocol{uri: uri}
 }
 
-func (g *Protocol) GetType() common.NetType {
+func (g *Protocol) GetType() common.Net {
 	return common.Grpc
 }
 

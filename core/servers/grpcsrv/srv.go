@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
+	"google.golang.org/grpc/reflection"
+
 	"github.com/wuqinqiang/easycar/core/dao"
 
 	"github.com/fatih/color"
-	"google.golang.org/grpc/reflection"
-
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/entity"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -65,13 +65,13 @@ func New(port int, opts ...Opt) (*GrpcSrv, error) {
 func (s *GrpcSrv) Run(ctx context.Context) error {
 	s.grpcServer = grpc.NewServer()
 	proto.RegisterEasyCarServer(s.grpcServer, s)
+	// for reflection
+	reflection.Register(s.grpcServer)
 	go func() {
 		if err := s.grpcServer.Serve(s.lis); err != nil {
 			log.Fatal(err)
 		}
 	}()
-	// for reflection
-	reflection.Register(s.grpcServer)
 	fmt.Println(color.BlueString("easycar grpc port:%d", s.port))
 	return nil
 }
@@ -153,8 +153,50 @@ func (s *GrpcSrv) Start(ctx context.Context, req *proto.StartReq) (*proto.StartR
 	return resp, nil
 }
 
-func (s *GrpcSrv) Abort(ctx context.Context, req *proto.AbortReq) (*proto.AbortResp, error) {
-	return nil, nil
+func (s *GrpcSrv) commonPhase2(ctx context.Context, gid string,
+	filterFn func(g *entity.Global) error) (err error) {
+	var (
+		global entity.Global
+	)
+	if global, err = s.check(ctx, gid, filterFn); err != nil {
+		return
+	}
+	var (
+		branches entity.BranchList
+	)
+	if branches, err = s.coordinator.GetBranchList(ctx, global.GetGId()); err != nil {
+		return
+	}
+	err = s.coordinator.Phase2(ctx, &global, branches)
+	return
+}
+
+func (s *GrpcSrv) Commit(ctx context.Context, req *proto.CommitReq) (*proto.CommitResp, error) {
+	err := s.commonPhase2(ctx, req.GetGId(), func(g *entity.Global) error {
+		if !g.IsPhase1Success() {
+			return fmt.Errorf("gid:%v can not commit", req.GetGId())
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	resp := new(proto.CommitResp)
+	return resp, nil
+}
+
+func (s *GrpcSrv) Rollback(ctx context.Context, req *proto.RollBckReq) (*proto.RollBckResp, error) {
+	err := s.commonPhase2(ctx, req.GetGId(), func(g *entity.Global) error {
+		if !g.IsPhase2Failed() {
+			return fmt.Errorf("gid:%v can not bollback", req.GetGId())
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	resp := new(proto.RollBckResp)
+	return resp, nil
 }
 
 func (s *GrpcSrv) GetState(ctx context.Context, req *proto.GetStateReq) (*proto.GetStateResp, error) {
