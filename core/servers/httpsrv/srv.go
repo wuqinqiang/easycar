@@ -7,7 +7,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/wuqinqiang/easycar/log"
+	"github.com/wuqinqiang/easycar/logging"
 
 	"github.com/wuqinqiang/easycar/tools"
 
@@ -65,7 +65,7 @@ func (srv *HttpSrv) Run(ctx context.Context) (err error) {
 			return
 		}
 	})
-	log.Info(fmt.Sprintf("[HttpSrv] http port:%d", srv.port))
+	logging.Info(fmt.Sprintf("[HttpSrv] http port:%d", srv.port))
 	return nil
 }
 
@@ -73,6 +73,6 @@ func (srv *HttpSrv) Stop(ctx context.Context) (err error) {
 	srv.once.Do(func() {
 		err = srv.httpServer.Close()
 	})
-	log.Info("[HttpSrv]Stopped")
+	logging.Info("[HttpSrv]Stopped")
 	return
 }

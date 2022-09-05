@@ -1,4 +1,4 @@
-package log
+package logging
 
 import (
 	"fmt"
@@ -73,7 +73,7 @@ func log(level zapcore.Level, msg string, keyvals ...interface{}) {
 	case zapcore.WarnLevel:
 		logger.Warn(msg, fields...)
 	default:
-		logger.Warn(fmt.Sprintf("log not included level:%v", level))
+		logger.Warn(fmt.Sprintf("logging not included level:%v", level))
 	}
 }
 

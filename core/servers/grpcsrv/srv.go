@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	elog "github.com/wuqinqiang/easycar/log"
+	elog "github.com/wuqinqiang/easycar/logging"
 
 	"google.golang.org/grpc/reflection"
 

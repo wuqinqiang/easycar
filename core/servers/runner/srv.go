@@ -4,7 +4,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/wuqinqiang/easycar/log"
+	"github.com/wuqinqiang/easycar/logging"
 
 	"github.com/robfig/cron/v3"
 )
@@ -33,7 +33,7 @@ type Runner struct {
 
 func (r *Runner) Run(ctx context.Context) error {
 	r.cron.Start()
-	log.Info("[Runner] start")
+	logging.Info("[Runner] start")
 	return nil
 }
 
@@ -41,6 +41,6 @@ func (r *Runner) Stop(ctx context.Context) error {
 	r.once.Do(func() {
 		r.cron.Stop()
 	})
-	log.Info("[Runner] stopped")
+	logging.Info("[Runner] stopped")
 	return nil
 }
