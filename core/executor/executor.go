@@ -90,6 +90,7 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					reqOpts = append(reqOpts, common.WithTimeOut(time.Duration(b.Timeout)*time.Second))
 				}
 				req := common.NewReq([]byte(b.ReqData), []byte(b.ReqHeader), reqOpts...)
+				req.AddEasyCarHeaders(b.GID, b.BranchId)
 
 				var (
 					branchState = consts.BranchSucceed

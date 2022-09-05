@@ -14,7 +14,7 @@ db:
     maxIdleConns: 20
     maxOpenConns: 10
 
-  ## add more   
+  ## add more
 
   ## backOff for retry
 backOff:

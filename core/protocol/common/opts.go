@@ -18,7 +18,7 @@ type (
 	}
 )
 
-func NewReq(body []byte, headers []byte, opts ...ReqOpt) *Req {
+func NewReq(body, headers []byte, opts ...ReqOpt) *Req {
 	h := make(map[string]string)
 	if len(headers) > 0 {
 		_ = json.Unmarshal(headers, &h)
@@ -32,6 +32,12 @@ func NewReq(body []byte, headers []byte, opts ...ReqOpt) *Req {
 		opt(req)
 	}
 	return req
+}
+
+func (r *Req) AddEasyCarHeaders(gId, branchId string) {
+	r.Headers["easyCarGId"] = gId
+	r.Headers["easyCarBranchId"] = branchId
+	//  should to add request id?
 }
 
 func WithTimeOut(t time.Duration) ReqOpt {

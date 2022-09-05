@@ -58,7 +58,8 @@ func New(port int, coordinator *core.Coordinator, opts ...Opt) (*GrpcSrv, error)
 }
 
 func (s *GrpcSrv) Run(ctx context.Context) error {
-	s.grpcServer = grpc.NewServer()
+	maxSize := 5 * 1024 * 1024 //5M:max Recv msg size
+	s.grpcServer = grpc.NewServer(grpc.MaxRecvMsgSize(maxSize))
 	proto.RegisterEasyCarServer(s.grpcServer, s)
 	// for reflection
 	reflection.Register(s.grpcServer)
