@@ -7,6 +7,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/wuqinqiang/easycar/log"
+
 	"github.com/wuqinqiang/easycar/tools"
 
 	"google.golang.org/grpc/credentials/insecure"
@@ -63,7 +65,7 @@ func (srv *HttpSrv) Run(ctx context.Context) (err error) {
 			return
 		}
 	})
-	fmt.Println(color.BlueString("easycar http port:%d", srv.port))
+	log.Info(fmt.Sprintf("[HttpSrv] http port:%d", srv.port))
 	return nil
 }
 
@@ -71,7 +73,6 @@ func (srv *HttpSrv) Stop(ctx context.Context) (err error) {
 	srv.once.Do(func() {
 		err = srv.httpServer.Close()
 	})
-
-	fmt.Println("http over")
+	log.Info("[HttpSrv]Stopped")
 	return
 }

@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"google.golang.org/grpc/reflection"
+	elog "github.com/wuqinqiang/easycar/log"
 
-	"github.com/fatih/color"
+	"google.golang.org/grpc/reflection"
 
 	"github.com/wuqinqiang/easycar/core"
 
@@ -68,7 +68,7 @@ func (s *GrpcSrv) Run(ctx context.Context) error {
 			log.Fatal(err)
 		}
 	}()
-	fmt.Println(color.BlueString("easycar grpc port:%d", s.port))
+	elog.Info(fmt.Sprintf("[Grpc] grpc port:%d", s.port))
 	return nil
 }
 
@@ -76,6 +76,6 @@ func (s *GrpcSrv) Stop(ctx context.Context) (err error) {
 	s.once.Do(func() {
 		err = s.lis.Close()
 	})
-	fmt.Println("grpc over")
+	elog.Info("grpc stopped")
 	return
 }
