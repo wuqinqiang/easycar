@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/wuqinqiang/easycar/logging"
+
 	"github.com/wuqinqiang/easycar/core/executor"
 	"github.com/wuqinqiang/easycar/tools"
 
@@ -46,11 +48,14 @@ func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.
 func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
 	phase1State := consts.Phase1Success
 	err := c.Phase1(ctx, branches)
+
 	if err != nil {
 		fmt.Printf("[Start] Phase1 err:%v\n", err)
 		phase1State = consts.Phase1Failed
 	}
 	global.State = phase1State
+	logging.Infof("[Coordinator] phase1 end", "gid", global.GetGId(), "state", global.State)
+
 	if err = c.UpdateGlobalState(ctx, global.GetGId(), phase1State); err != nil {
 		return err
 	}
@@ -88,6 +93,7 @@ func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branche
 		if err != nil {
 			overStateVal = tools.IF(global.Phase1Failed(), consts.Phase2RollbackFailed, consts.Phase2CommitFailed)
 		}
+		logging.Infof("[Coordinator] Phase2 end", "gid", global.GID, "state", overStateVal)
 		_, erro := c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(), overStateVal.(consts.GlobalState))
 		if erro != nil {
 			fmt.Printf("[Phase2]UpdateGlobalStateByGid gid:%v err:%v", global.GetGId(), erro)
