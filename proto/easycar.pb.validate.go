@@ -1322,6 +1322,8 @@ func (m *RegisterReq_Branch) validate(all bool) error {
 		errors = append(errors, err)
 	}
 
+	// no validation rules for Timeout
+
 	if len(errors) > 0 {
 		return RegisterReq_BranchMultiError(errors)
 	}

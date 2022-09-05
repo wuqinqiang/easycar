@@ -41,7 +41,7 @@ func New(port, grpcPort int, opts ...Opt) *HttpSrv {
 }
 
 func (srv *HttpSrv) Run(ctx context.Context) (err error) {
-	conn, err := grpc.DialContext(context.Background(), fmt.Sprintf(":%d", srv.grpcPort),
+	conn, err := grpc.DialContext(ctx, fmt.Sprintf(":%d", srv.grpcPort),
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {

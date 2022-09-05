@@ -5,6 +5,7 @@ grpcPort: 8089
 httpPort: 8085
 #automaticExecution2: true
 dirver: mysql
+timeout: 7 #unit of second
 
 db:
   mysql:
@@ -12,6 +13,8 @@ db:
     maxLifetime: 7200
     maxIdleConns: 20
     maxOpenConns: 10
+
+  ## add more   
 
   ## backOff for retry
 backOff:

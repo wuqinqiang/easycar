@@ -31,15 +31,15 @@ func (cli *Transport) GetType() common.Net {
 }
 
 func (cli *Transport) Request(ctx context.Context, req *common.Req) (resp *common.Resp, err error) {
-	resp, err = cli.req(ctx, req.Body, req.Headers)
+	resp, err = cli.req(ctx, req)
 	return
 }
 
-func (cli *Transport) req(ctx context.Context, body []byte, headers map[string]string) (*common.Resp, error) {
-	resp, err := restyCli.R().
+func (cli *Transport) req(ctx context.Context, req *common.Req) (*common.Resp, error) {
+	resp, err := restyCli.SetTimeout(req.Timeout).R().
 		SetContext(ctx).
-		SetHeaders(headers).
-		SetBody(body).
+		SetHeaders(req.Headers).
+		SetBody(req.Body).
 		Post(cli.uri)
 	if err != nil {
 		return nil, err

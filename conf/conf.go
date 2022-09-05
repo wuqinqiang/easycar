@@ -18,10 +18,11 @@ type (
 	}
 
 	Settings struct {
-		DB                  DB   `yaml:"db"`
-		GRPCPort            int  `yaml:"grpcPort"`
-		HTTPPort            int  `yaml:"httpPort"`
-		AutomaticExecution2 bool `yaml:"automaticExecution2"`
+		DB                  DB    `yaml:"db"`
+		GRPCPort            int   `yaml:"grpcPort"`
+		HTTPPort            int   `yaml:"httpPort"`
+		Timeout             int64 `yaml:"timeout"`
+		AutomaticExecution2 bool  `yaml:"automaticExecution2"`
 	}
 )
 

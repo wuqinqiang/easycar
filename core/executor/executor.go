@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"time"
 
 	"golang.org/x/sync/errgroup"
 
@@ -82,8 +83,13 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 				if err != nil {
 					return fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
 				}
-				// todo add header
-				req := common.NewReq([]byte(b.ReqData), []byte(b.ReqHeader))
+				var (
+					reqOpts []common.ReqOpt
+				)
+				if b.Timeout > 0 {
+					reqOpts = append(reqOpts, common.WithTimeOut(time.Duration(b.Timeout)*time.Second))
+				}
+				req := common.NewReq([]byte(b.ReqData), []byte(b.ReqHeader), reqOpts...)
 
 				var (
 					branchState = consts.BranchSucceed

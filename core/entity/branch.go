@@ -22,6 +22,7 @@ type (
 		Level consts.Level `gorm:"column:level;type:int;not null;default:1"` // branch level in tree
 
 		LastErrMsg string `gorm:"column:last_err_msg;type:varchar(255);not null"`
+		Timeout    int64  `gorm:"column:timeout;type:int;not null;default:0"` //request branch timeout(seconds)
 	}
 	BranchList []*Branch
 )

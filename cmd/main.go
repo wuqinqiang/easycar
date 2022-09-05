@@ -6,6 +6,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
+
+	"github.com/wuqinqiang/easycar/core/protocol/common"
+
+	"github.com/wuqinqiang/easycar/core/dao"
 
 	"github.com/wuqinqiang/easycar/core/servers/runner"
 
@@ -29,15 +34,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	settings.DB.Mysql.Init()
+	MustLoad(settings)
 
-	grpcSrv, err := grpcsrv.New(settings.GRPCPort)
+	coordinator := core.NewCoordinator(dao.GetTransaction(), settings.AutomaticExecution2)
+	grpcSrv, err := grpcsrv.New(settings.GRPCPort, coordinator)
 	if err != nil {
 		log.Fatal(err)
 	}
 	httpProxySrv := httpsrv.New(settings.HTTPPort, settings.GRPCPort)
 	//runner
-	runnerSrv, err := runner.NewRunner("@every 5s", func(ctx context.Context) {
+	runnerSrv, err := runner.NewRunner("@every 50m", func(ctx context.Context) {
 		fmt.Println("hello world")
 	})
 
@@ -49,6 +55,15 @@ func main() {
 		log.Fatal(err)
 	}
 	// everything is over
+}
+
+func MustLoad(settings *conf.Settings) {
+
+	settings.DB.Mysql.Init()
+
+	if settings.Timeout > 0 {
+		common.ReplaceTimeOut(time.Duration(settings.Timeout) * time.Second)
+	}
 }
 
 func getConf() conf.Conf {

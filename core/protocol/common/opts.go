@@ -5,12 +5,16 @@ import (
 	"time"
 )
 
+var (
+	defaultTimeOut = 8 * time.Second
+)
+
 type (
 	ReqOpt func(req *Req)
 	Req    struct {
 		Body    []byte
 		Headers map[string]string
-		timeOut time.Duration
+		Timeout time.Duration
 	}
 )
 
@@ -22,7 +26,7 @@ func NewReq(body []byte, headers []byte, opts ...ReqOpt) *Req {
 	req := &Req{
 		Body:    body,
 		Headers: h,
-		timeOut: 8 * time.Second,
+		Timeout: defaultTimeOut,
 	}
 	for _, opt := range opts {
 		opt(req)
@@ -35,6 +39,12 @@ func WithTimeOut(t time.Duration) ReqOpt {
 		if t == 0 {
 			return
 		}
-		req.timeOut = t
+		req.Timeout = t
+	}
+}
+
+func ReplaceTimeOut(t time.Duration) {
+	if t > 0 {
+		defaultTimeOut = t
 	}
 }

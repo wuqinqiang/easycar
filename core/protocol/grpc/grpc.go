@@ -32,7 +32,9 @@ func (g *Protocol) Request(ctx context.Context, req *common.Req) (*common.Resp, 
 	if err != nil {
 		return nil, err
 	}
-	conn, err := g.getConn(ctx, server)
+	timeoutCtx, cancel := context.WithTimeout(ctx, req.Timeout)
+	defer cancel()
+	conn, err := g.getConn(timeoutCtx, server)
 	if err != nil {
 		return nil, err
 	}
