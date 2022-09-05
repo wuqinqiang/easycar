@@ -24,15 +24,15 @@ func GetTranTypeByPb(protoType proto.TranType) consts.TransactionType {
 
 func GetActionByPb(action proto.Action) consts.BranchAction {
 	switch action {
-	case proto.Action_Try:
+	case proto.Action_TRY:
 		return consts.Try
-	case proto.Action_Confirm:
+	case proto.Action_CONFIRM:
 		return consts.Confirm
-	case proto.Action_Cancel:
+	case proto.Action_CANCEL:
 		return consts.Cancel
-	case proto.Action_Normal:
+	case proto.Action_NORMAL:
 		return consts.Normal
-	case proto.Action_Compensation:
+	case proto.Action_COMPENSATION:
 		return consts.Compensation
 	default:
 	}

@@ -5,10 +5,12 @@ import (
 )
 
 type Global struct {
-	GID          string             `gorm:"column:g_id;type:varchar(255);not null"`                // global id
-	State        consts.GlobalState `gorm:"column:state;type:varchar(255);not null;default:ready"` // global State
-	EndTime      int64              `gorm:"column:end_time;type:int;not null;default:0"`           // end time for the transaction
-	NextCronTime int64              `gorm:"column:next_cron_time;type:int;not null;default:0"`     // next cron time
+	GID          string             `gorm:"column:g_id;type:varchar(255);not null"`               // global id
+	State        consts.GlobalState `gorm:"column:state;type:varchar(255);not null;default:init"` // global State
+	EndTime      int64              `gorm:"column:end_time;type:int;not null;default:0"`          // end time for the transaction
+	NextCronTime int64              `gorm:"column:next_cron_time;type:int;not null;default:0"`    // next cron time
+	CreateTime   int64              `gorm:"create_time;autoCreateTime" json:"create_time"`        // create time
+	UpdateTime   int64              `gorm:"update_time;autoCreateTime" json:"update_time"`        // last update time
 }
 
 func (g Global) TableName() string {
@@ -44,8 +46,8 @@ func (g *Global) IsPhase1Retrying() bool {
 	return g.State == consts.Phase1Retrying
 }
 
-func (g *Global) IsReady() bool {
-	return g.State == consts.Ready
+func (g *Global) Init() bool {
+	return g.State == consts.Init
 }
 
 func (g *Global) IsEmpty() bool {
@@ -72,11 +74,11 @@ func (g *Global) GetEndTime() int64 {
 }
 
 func (g *Global) AllowSubmit() bool {
-	return g.IsReady()
+	return g.Init()
 }
 
 func (g *Global) AllowRegister() bool {
-	return g.IsReady()
+	return g.Init()
 }
 
 func (g *Global) GetBranches() []string {

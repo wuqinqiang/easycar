@@ -13,5 +13,5 @@ func init() {
 }
 
 func GetGid() string {
-	return "easycar" + node.Generate().String()
+	return "w" + node.Generate().String()
 }

@@ -30,14 +30,14 @@ func newBranch(db *gorm.DB) branch {
 	_branch.ReqData = field.NewString(tableName, "req_data")
 	_branch.ReqHeader = field.NewString(tableName, "req_header")
 	_branch.TranType = field.NewString(tableName, "tran_type")
-	_branch.PId = field.NewString(tableName, "p_id")
 	_branch.Protocol = field.NewString(tableName, "protocol")
 	_branch.Action = field.NewString(tableName, "action")
 	_branch.State = field.NewString(tableName, "state")
-	_branch.EndTime = field.NewInt64(tableName, "end_time")
 	_branch.Level = field.NewUint8(tableName, "level")
 	_branch.LastErrMsg = field.NewString(tableName, "last_err_msg")
 	_branch.Timeout = field.NewInt64(tableName, "timeout")
+	_branch.CreateTime = field.NewInt64(tableName, "create_time")
+	_branch.UpdateTime = field.NewInt64(tableName, "update_time")
 
 	_branch.fieldMap = make(map[string]field.Expr, 14)
 	_branch.fieldMap["g_id"] = _branch.GID
@@ -46,14 +46,14 @@ func newBranch(db *gorm.DB) branch {
 	_branch.fieldMap["req_data"] = _branch.ReqData
 	_branch.fieldMap["req_header"] = _branch.ReqHeader
 	_branch.fieldMap["tran_type"] = _branch.TranType
-	_branch.fieldMap["p_id"] = _branch.PId
 	_branch.fieldMap["protocol"] = _branch.Protocol
 	_branch.fieldMap["action"] = _branch.Action
 	_branch.fieldMap["state"] = _branch.State
-	_branch.fieldMap["end_time"] = _branch.EndTime
 	_branch.fieldMap["level"] = _branch.Level
 	_branch.fieldMap["last_err_msg"] = _branch.LastErrMsg
 	_branch.fieldMap["timeout"] = _branch.Timeout
+	_branch.fieldMap["create_time"] = _branch.CreateTime
+	_branch.fieldMap["update_time"] = _branch.UpdateTime
 
 	return _branch
 }
@@ -68,14 +68,14 @@ type branch struct {
 	ReqData    field.String
 	ReqHeader  field.String
 	TranType   field.String
-	PId        field.String
 	Protocol   field.String
 	Action     field.String
 	State      field.String
-	EndTime    field.Int64
 	Level      field.Uint8
 	LastErrMsg field.String
 	Timeout    field.Int64
+	CreateTime field.Int64
+	UpdateTime field.Int64
 
 	fieldMap map[string]field.Expr
 }

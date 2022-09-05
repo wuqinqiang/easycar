@@ -7,8 +7,8 @@ type ( // GlobalState is a global state of the application
 )
 
 const (
-	// Ready global state
-	Ready GlobalState = "ready"
+	// Init init global state
+	Init GlobalState = "init"
 
 	//************global state***************
 	Phase1Processing GlobalState = "phase1_processing"
@@ -16,24 +16,19 @@ const (
 	Phase1Failed     GlobalState = "phase1_failed"
 	Phase1Success    GlobalState = "phase1_success"
 
-	Phase2Commiting      GlobalState = "phase2_commiting"
+	Phase2Committing     GlobalState = "phase2_committing"
 	Phase2Rollbacking    GlobalState = "phase2_rollbacking"
 	Phase2CommitFailed   GlobalState = "phase2_commit_failed"
 	Phase2RollbackFailed GlobalState = "phase2_rollback_failed"
 
-	//Success Distributed transaction executed successfully
-	Success         GlobalState = "success"
-	RollbackSuccess GlobalState = "rollback_success"
-
-	Phase2Processing GlobalState = "phase2_processing"
-	Phase2Retrying   GlobalState = "phase2_retrying"
-	Phase2Failed     GlobalState = "phase2_failed"
-	Phase2Success    GlobalState = "phase2_success"
+	//Committed Distributed transaction executed successfully
+	Committed  GlobalState = "committed"
+	Rollbacked GlobalState = "rollbacked"
 
 	//************branch state***************
 
-	BranchReady     BranchState = "branchReady"
-	BranchRetrying  BranchState = "branchRetrying"
+	BranchReady     BranchState = "ready"
+	BranchRetrying  BranchState = "retrying"
 	BranchSucceed   BranchState = "succeed"
 	BranchFailState BranchState = "failed"
 )

@@ -62,25 +62,25 @@ enum Err {
 }
 
 enum TranType {
-  UNKnow = 0;
+  UN_KNOW = 0;
   TCC = 1;
   SAGE = 2;
 }
 enum Action {
-  UnKnowTransactionType = 0;
-  Try = 1;
-  Confirm = 2;
-  Cancel = 3;
-  Normal = 4;
-  Compensation = 5;
+  UN_KNOW_TRANSACTION_TYPE = 0;
+  TRY = 1;
+  CONFIRM = 2;
+  CANCEL = 3;
+  NORMAL = 4;
+  COMPENSATION = 5;
 }
 
 enum BranchState {
-  UnknowState = 0;
-  Ready = 1;
-  Retrying = 2;
-  Success = 3;
-  FailState = 4;
+  UN_KNOW_STATE = 0;
+  READY = 1;
+  RETRYING = 2;
+  SUCCEED = 3;
+  FAILED = 4;
 }
 
 
@@ -105,15 +105,19 @@ message RegisterResp {
 
 enum GlobalState {
   GLOBAL_DEFAULT = 0;
-  Begin = 1;
-  Phase1Processing = 2;
-  Phase1Retrying = 3;
-  Phase1Failed = 4;
-  Phase1Success = 5;
-  Phase2Processing = 6;
-  Phase2Retrying = 7;
-  Phase2Failed = 8;
-  Phase2Success = 9;
+  INIT = 1;
+  PHASE1_PROCESSING = 2;
+  PHASE1_RETRYING = 3;
+  PHASE1_FAILED = 4;
+  PHASE1_SUCCESS = 5;
+
+  PHASE2_COMMITTING = 6;
+  PHASE2_ROLLBACKING = 7;
+  PHASE2_COMMIT_FAILED = 8;
+  PHASE2_ROLLBACK_FAILED = 9;
+
+  COMMITTED = 10;
+  ROLLBACKED = 11;
 }
 
 

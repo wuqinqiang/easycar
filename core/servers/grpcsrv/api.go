@@ -56,7 +56,7 @@ func (s *GrpcSrv) Start(ctx context.Context, req *proto.StartReq) (*proto.StartR
 	)
 
 	if global, err = s.check(ctx, req.GetGId(), func(g *entity.Global) error {
-		if !g.IsReady() {
+		if !g.Init() {
 			return fmt.Errorf("global state:%v can not start", g.GetState())
 		}
 		return nil

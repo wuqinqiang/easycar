@@ -34,7 +34,7 @@ func (c *Coordinator) Begin(ctx context.Context) (string, error) {
 	gid := GetGid()
 
 	g := entity.NewGlobal(gid)
-	g.SetState(consts.Ready)
+	g.SetState(consts.Init)
 	err := c.dao.CreateGlobal(ctx, g)
 	return gid, err
 }
@@ -76,13 +76,13 @@ func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branche
 	var (
 		processingStateVal, overStateVal interface{}
 	)
-	processingStateVal = tools.IF(global.Phase1Failed(), consts.Phase2Rollbacking, consts.Phase2Commiting)
+	processingStateVal = tools.IF(global.Phase1Failed(), consts.Phase2Rollbacking, consts.Phase2Committing)
 	if _, err = c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(),
 		processingStateVal.(consts.GlobalState)); err != nil {
 		return
 	}
 
-	overStateVal = tools.IF(global.Phase1Failed(), consts.RollbackSuccess, consts.Success)
+	overStateVal = tools.IF(global.Phase1Failed(), consts.Rollbacked, consts.Committed)
 
 	defer func() {
 		if err != nil {

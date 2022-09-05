@@ -6,23 +6,20 @@ import (
 
 type (
 	Branch struct {
-		GID       string                 `gorm:"column:g_id;type:varchar(255);not null"`                      // global id
-		BranchId  string                 `gorm:"column:branch_id;type:varchar(255);not null"`                 // branch id
-		Url       string                 `gorm:"column:url;type:varchar(255);not null"`                       // branch request url (example grpc or http)
-		ReqData   string                 `gorm:"column:req_data;type:varchar(255);not null"`                  // request data
-		ReqHeader string                 `gorm:"column:req_header;type:varchar(255);not null"`                // request data
-		TranType  consts.TransactionType `gorm:"column:tran_type;type:varchar(255);not null"`                 // transaction type:tcc or saga or others
-		PId       string                 `gorm:"column:p_id;type:varchar(255);not null"`                      // parent branch id
-		Protocol  string                 `gorm:"column:protocol;type:varchar(255);not null;default:http"`     //http,grpc
-		Action    consts.BranchAction    `gorm:"column:action;type:varchar(255);not null"`                    // action type of transaction
-		State     consts.BranchState     `gorm:"column:state;type:varchar(255);not null;default:branchReady"` // branch State
-		//ChildrenList      []*Branch               //	children branch list
-		EndTime int64 `gorm:"column:end_time;type:int;not null;default:0"`
-		// 07-10 add
-		Level consts.Level `gorm:"column:level;type:int;not null;default:1"` // branch level in tree
-
-		LastErrMsg string `gorm:"column:last_err_msg;type:varchar(255);not null"`
-		Timeout    int64  `gorm:"column:timeout;type:int;not null;default:0"` //request branch timeout(seconds)
+		GID        string                 `gorm:"column:g_id;not null"`                  // global id
+		BranchId   string                 `gorm:"column:branch_id;not null"`             // branch id
+		Url        string                 `gorm:"column:url;not null"`                   // branch request url (example grpc or http)
+		ReqData    string                 `gorm:"column:req_data;not null"`              // request data
+		ReqHeader  string                 `gorm:"column:req_header;not null"`            // request data
+		TranType   consts.TransactionType `gorm:"column:tran_type;not null"`             // transaction type:tcc or saga or others
+		Protocol   string                 `gorm:"column:protocol;not null;default:http"` //http,grpc
+		Action     consts.BranchAction    `gorm:"column:action;not null"`                // action type of transaction
+		State      consts.BranchState     `gorm:"column:state;not null;default:ready"`   // branch State
+		Level      consts.Level           `gorm:"column:level;not null;default:1"`       // branch level in tree
+		LastErrMsg string                 `gorm:"column:last_err_msg;not null"`
+		Timeout    int64                  `gorm:"column:timeout;not null;default:0"`             //request branch timeout(seconds)
+		CreateTime int64                  `gorm:"create_time;autoCreateTime" json:"create_time"` // create time
+		UpdateTime int64                  `gorm:"update_time;autoCreateTime" json:"update_time"` // last update time
 	}
 	BranchList []*Branch
 )
