@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 
+	"google.golang.org/grpc/metadata"
+
 	"google.golang.org/grpc/credentials/insecure"
 
 	"google.golang.org/grpc"
@@ -41,7 +43,8 @@ func (g *Protocol) Request(ctx context.Context, req *common.Req) (*common.Resp, 
 	var (
 		respM []byte
 	)
-	err = conn.Invoke(ctx, method, req.Body, &respM)
+	md := metadata.New(req.Headers)
+	err = conn.Invoke(metadata.NewOutgoingContext(ctx, md), method, req.Body, &respM)
 	return nil, err
 }
 

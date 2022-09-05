@@ -113,7 +113,6 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 			})
 		}
 		if err := errGroup.Wait(); err != nil {
-			fmt.Printf("[Executor] err:%v\n", err)
 			return err
 		}
 	}
