@@ -1,4 +1,4 @@
-package core
+package entity
 
 import "github.com/bwmarrin/snowflake"
 

@@ -33,8 +33,7 @@ func NewCoordinator(dao dao.TransactionDao, automaticExecution2 bool) *Coordinat
 }
 
 func (c *Coordinator) Begin(ctx context.Context) (string, error) {
-	gid := GetGid()
-
+	gid := entity.GetGid()
 	g := entity.NewGlobal(gid)
 	g.SetState(consts.Init)
 	err := c.dao.CreateGlobal(ctx, g)
@@ -61,10 +60,10 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 	}
 
 	if c.automaticExecution2 {
-		fmt.Printf("[Start] Phase2 start gid:%v", global.GID)
+		logging.Infof("[Coordinator] Phase2 start", "gid", global.GID)
 		tools.GoSafe(func() {
 			if err = c.Phase2(context.Background(), global, branches); err != nil {
-				fmt.Printf("[Start] Phase2:err:%v", err)
+				logging.Error(fmt.Sprintf("[Start] Phase2:err:%v", err))
 				return
 			}
 		})

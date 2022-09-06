@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"fmt"
 
 	"google.golang.org/grpc/metadata"
 
@@ -49,29 +48,10 @@ func (g *Protocol) Request(ctx context.Context, req *common.Req) (*common.Resp, 
 }
 
 func (g *Protocol) getConn(ctx context.Context, uri string) (*grpc.ClientConn, error) {
-	codecOpt := grpc.ForceCodec(rawCodec{})
-	opts := grpc.WithDefaultCallOptions(codecOpt)
+	opts := grpc.WithDefaultCallOptions(grpc.ForceCodec(rawCodec{}))
 	return grpc.DialContext(ctx, uri, grpc.WithTransportCredentials(insecure.NewCredentials()), opts)
 }
 
 func (g *Protocol) getParse(server string) (Parser, error) {
 	return NewDefault(server), nil
 }
-
-type rawCodec struct{}
-
-func (cb rawCodec) Marshal(v interface{}) ([]byte, error) {
-	return v.([]byte), nil
-}
-
-func (cb rawCodec) Unmarshal(data []byte, v interface{}) error {
-	ba, ok := v.(*[]byte)
-	if !ok {
-		return fmt.Errorf("please pass in *[]byte")
-	}
-	*ba = append(*ba, data...)
-
-	return nil
-}
-
-func (cb rawCodec) Name() string { return "easycar" }
