@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/wuqinqiang/easycar/core/coordinator/executor"
-
 	"github.com/wuqinqiang/easycar/logging"
 
 	"github.com/wuqinqiang/easycar/tools"
@@ -23,12 +21,14 @@ var (
 type Coordinator struct {
 	dao                 dao.TransactionDao
 	automaticExecution2 bool
+	executor            Executor
 }
 
-func NewCoordinator(dao dao.TransactionDao, automaticExecution2 bool) *Coordinator {
+func NewCoordinator(dao dao.TransactionDao, executor Executor, automaticExecution2 bool) *Coordinator {
 	c := &Coordinator{
 		dao:                 dao,
 		automaticExecution2: automaticExecution2,
+		executor:            executor,
 	}
 	return c
 }
@@ -64,7 +64,7 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 	return nil
 }
 
-func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branchList entity.BranchList) (err error) {
+func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branches entity.BranchList) (err error) {
 	phase1State := consts.Phase1Success
 	defer func() {
 		if err != nil {
@@ -78,7 +78,8 @@ func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branchL
 			logging.Error(fmt.Sprintf("[Coordinator]Phase1 UpdateGlobalState:%v", erro))
 		}
 	}()
-	err = executor.Phase1Executor(branchList).Execute(ctx)
+	err = c.executor.Phase1(ctx, global, branches)
+	//err = executor.Phase1Executor(branchList).Execute(ctx)
 	return
 }
 
@@ -104,7 +105,8 @@ func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branche
 			fmt.Printf("[Phase2]UpdateGlobalStateByGid gid:%v err:%v", global.GetGId(), erro)
 		}
 	}()
-	err = executor.NewPhase2Executor(global, branches).Execute(ctx)
+	err = c.executor.Phase2(ctx, global, branches)
+	//err = executor.NewPhase2Executor(global, branches).Execute(ctx)
 	return
 }
 

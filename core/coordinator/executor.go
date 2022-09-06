@@ -1,7 +1,12 @@
 package coordinator
 
-import "context"
+import (
+	"context"
+
+	"github.com/wuqinqiang/easycar/core/entity"
+)
 
 type Executor interface {
-	Execute(ctx context.Context) error
+	Phase1(ctx context.Context, global *entity.Global, branches entity.BranchList) error
+	Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) error
 }

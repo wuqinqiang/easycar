@@ -6,41 +6,54 @@ import (
 	"sort"
 	"time"
 
+	"github.com/wuqinqiang/easycar/core/transport"
+
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/core/entity"
-	"github.com/wuqinqiang/easycar/core/transport"
 	"github.com/wuqinqiang/easycar/core/transport/common"
 	"golang.org/x/sync/errgroup"
 )
 
 type (
-	OptsFn func(opts *Opts)
-	Opts   struct {
-		allowRetries uint32
-		factor       uint32
-		openRetry    bool
-	}
-)
 
-type (
 	// FilterFn is a function that filters branches
 	FilterFn func(branch *entity.Branch) bool
 
-	Executor struct {
+	executor struct {
+		option  *Option
 		manager transport.Manager
-		opts    Opts
 	}
 )
 
-var (
-	defaultExecutor = Executor{
-		opts:    Opts{openRetry: false},
-		manager: transport.NewManager(),
+func NewExecutor(opts ...OptFn) *executor {
+	executor := DefaultExecutor
+	for _, opt := range opts {
+		opt(executor.option)
 	}
-)
+	return executor
+}
 
-func (e *Executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
+func (e *executor) Phase1(ctx context.Context, _ *entity.Global, branches entity.BranchList) error {
+	return e.execute(ctx, branches, func(branch *entity.Branch) bool {
+		return branch.IsTccTry() || branch.IsSAGANormal()
+	})
+}
+
+func (e *executor) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
+	return e.execute(ctx, branches, func(branch *entity.Branch) bool {
+		if global.State == consts.Phase1Success {
+			return branch.IsTccConfirm()
+		}
+		// other phase1 failed
+		if branch.IsSAGACompensation() || branch.IsTccCancel() {
+			return true
+		}
+		return false
+	})
+}
+
+func (e *executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
 	phaseList := make([]entity.BranchList, len(branches))
 
 	// sort branches by level

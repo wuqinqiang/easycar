@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/wuqinqiang/easycar/core/coordinator/executor"
+
 	"github.com/wuqinqiang/easycar/core/coordinator"
 
 	"github.com/wuqinqiang/easycar/core/transport/common"
@@ -37,8 +39,8 @@ func main() {
 		log.Fatal(err)
 	}
 	MustLoad(settings)
-
-	coordinator := coordinator.NewCoordinator(dao.GetTransaction(), settings.AutomaticExecution2)
+	e := executor.NewExecutor()
+	coordinator := coordinator.NewCoordinator(dao.GetTransaction(), e, settings.AutomaticExecution2)
 	grpcSrv, err := grpcsrv.New(settings.GRPCPort, coordinator)
 	if err != nil {
 		log.Fatal(err)
