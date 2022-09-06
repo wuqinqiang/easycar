@@ -9,17 +9,38 @@ import (
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/core/entity"
-	"github.com/wuqinqiang/easycar/core/protocol"
-	"github.com/wuqinqiang/easycar/core/protocol/common"
+	"github.com/wuqinqiang/easycar/core/transport"
+	"github.com/wuqinqiang/easycar/core/transport/common"
 	"golang.org/x/sync/errgroup"
+)
+
+type (
+	OptsFn func(opts *Opts)
+	Opts   struct {
+		allowRetries uint32
+		factor       uint32
+		openRetry    bool
+	}
 )
 
 type (
 	// FilterFn is a function that filters branches
 	FilterFn func(branch *entity.Branch) bool
+
+	Executor struct {
+		manager transport.Manager
+		opts    Opts
+	}
 )
 
-func execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
+var (
+	defaultExecutor = Executor{
+		opts:    Opts{openRetry: false},
+		manager: transport.NewManager(),
+	}
+)
+
+func (e *Executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
 	phaseList := make([]entity.BranchList, len(branches))
 
 	// sort branches by level
@@ -55,7 +76,7 @@ func execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn)
 		for _, branch := range tierList {
 			b := branch
 			errGroup.Go(func() error {
-				net, err := protocol.GetTransport(common.Net(b.Protocol), b.Url)
+				transporter, err := e.manager.GetTransporter(common.Net(b.Protocol))
 				if err != nil {
 					return fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
 				}
@@ -73,14 +94,13 @@ func execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn)
 					errmsg      string
 				)
 
-				if _, err = net.Request(groupCtx, req); err != nil {
+				if _, err = transporter.Request(groupCtx, b.Url, req); err != nil {
 					fmt.Printf("[Executor] Request branch:%vrequest error:%v", b, err)
 					errmsg = err.Error()
 					branchState = consts.BranchFailState
 				}
 				b.State = branchState
 
-				// todo replace with dao
 				if _, erro := dao.GetTransaction().UpdateBranchStateByGid(ctx, b.BranchId,
 					b.State, errmsg); err != nil {
 					fmt.Printf("[Executor]update branch state error:%v\n", erro)

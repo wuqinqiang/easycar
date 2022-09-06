@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"context"
+	"sync"
 
 	"google.golang.org/grpc/metadata"
 
@@ -9,23 +10,23 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/wuqinqiang/easycar/core/protocol/common"
+	"github.com/wuqinqiang/easycar/core/transport/common"
 )
 
-type Protocol struct {
-	uri string
+func NewTransporter() *Transport {
+	return &Transport{m: &sync.Map{}}
 }
 
-func NewProtocol(uri string) *Protocol {
-	return &Protocol{uri: uri}
+type Transport struct {
+	m *sync.Map
 }
 
-func (g *Protocol) GetType() common.Net {
+func (g *Transport) GetType() common.Net {
 	return common.Grpc
 }
 
-func (g *Protocol) Request(ctx context.Context, req *common.Req) (*common.Resp, error) {
-	parse, err := g.getParse(g.uri)
+func (g *Transport) Request(ctx context.Context, uri string, req *common.Req) (*common.Resp, error) {
+	parse, err := g.getParse(uri)
 	if err != nil {
 		return nil, err
 	}
@@ -47,11 +48,15 @@ func (g *Protocol) Request(ctx context.Context, req *common.Req) (*common.Resp, 
 	return nil, err
 }
 
-func (g *Protocol) getConn(ctx context.Context, uri string) (*grpc.ClientConn, error) {
+func (g Transport) Close(ctx context.Context) error {
+	return nil
+}
+
+func (g *Transport) getConn(ctx context.Context, uri string) (*grpc.ClientConn, error) {
 	opts := grpc.WithDefaultCallOptions(grpc.ForceCodec(rawCodec{}))
 	return grpc.DialContext(ctx, uri, grpc.WithTransportCredentials(insecure.NewCredentials()), opts)
 }
 
-func (g *Protocol) getParse(server string) (Parser, error) {
+func (g *Transport) getParse(server string) (Parser, error) {
 	return NewDefault(server), nil
 }

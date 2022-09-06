@@ -1,6 +1,6 @@
 module github.com/wuqinqiang/easycar
 
-go 1.17
+go 1.18
 
 require (
 	github.com/bwmarrin/snowflake v0.3.0

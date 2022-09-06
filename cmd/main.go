@@ -10,7 +10,7 @@ import (
 
 	"github.com/wuqinqiang/easycar/core/coordinator"
 
-	"github.com/wuqinqiang/easycar/core/protocol/common"
+	"github.com/wuqinqiang/easycar/core/transport/common"
 
 	"github.com/wuqinqiang/easycar/core/dao"
 

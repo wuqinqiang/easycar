@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	executor2 "github.com/wuqinqiang/easycar/core/coordinator/executor"
+	"github.com/wuqinqiang/easycar/core/coordinator/executor"
 
 	"github.com/wuqinqiang/easycar/logging"
 
@@ -42,39 +42,44 @@ func (c *Coordinator) Begin(ctx context.Context) (string, error) {
 }
 
 func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.BranchList) error {
+	if len(branches) == 0 {
+		return nil
+	}
 	return c.dao.CreateBatches(ctx, branches)
 }
 
 func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
-	phase1State := consts.Phase1Success
-	err := c.Phase1(ctx, branches)
-
-	if err != nil {
-		fmt.Printf("[Start] Phase1 err:%v\n", err)
-		phase1State = consts.Phase1Failed
-	}
-	global.State = phase1State
-	logging.Infof("[Coordinator] phase1 end", "gid", global.GetGId(), "state", global.State)
-
-	if err = c.UpdateGlobalState(ctx, global.GetGId(), phase1State); err != nil {
+	if err := c.Phase1(ctx, global, branches); err != nil {
 		return err
 	}
-
 	if c.automaticExecution2 {
 		logging.Infof("[Coordinator] Phase2 start", "gid", global.GID)
 		tools.GoSafe(func() {
-			if err = c.Phase2(context.Background(), global, branches); err != nil {
+			if err := c.Phase2(context.Background(), global, branches); err != nil {
 				logging.Error(fmt.Sprintf("[Start] Phase2:err:%v", err))
 				return
 			}
 		})
 	}
-	global.State = phase1State
 	return nil
 }
 
-func (c *Coordinator) Phase1(ctx context.Context, branchList entity.BranchList) error {
-	return executor2.Phase1Executor(branchList).Execute(ctx)
+func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branchList entity.BranchList) (err error) {
+	phase1State := consts.Phase1Success
+	defer func() {
+		if err != nil {
+			logging.Errorf(fmt.Sprintf("[Coordinator]Phase1 Execute err:%v", err),
+				"gid", global.GetGId())
+			phase1State = consts.Phase1Failed
+		}
+		global.State = phase1State
+		logging.Infof("[Coordinator] phase1 end", "gid", global.GetGId(), "state", global.State)
+		if erro := c.UpdateGlobalState(ctx, global.GetGId(), phase1State); erro != nil {
+			logging.Error(fmt.Sprintf("[Coordinator]Phase1 UpdateGlobalState:%v", erro))
+		}
+	}()
+	err = executor.Phase1Executor(branchList).Execute(ctx)
+	return
 }
 
 func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) (err error) {
@@ -99,7 +104,7 @@ func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branche
 			fmt.Printf("[Phase2]UpdateGlobalStateByGid gid:%v err:%v", global.GetGId(), erro)
 		}
 	}()
-	err = executor2.NewPhase2Executor(global, branches).Execute(ctx)
+	err = executor.NewPhase2Executor(global, branches).Execute(ctx)
 	return
 }
 
@@ -129,8 +134,4 @@ func (c *Coordinator) UpdateGlobalState(ctx context.Context, gid string,
 	state consts.GlobalState) error {
 	_, err := c.dao.UpdateGlobalStateByGid(ctx, gid, state)
 	return err
-}
-
-func (c *Coordinator) GetAutomaticExecution2() bool {
-	return c.automaticExecution2
 }
