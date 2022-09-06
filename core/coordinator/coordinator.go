@@ -1,4 +1,4 @@
-package core
+package coordinator
 
 import (
 	"context"
@@ -6,7 +6,6 @@ import (
 
 	"github.com/wuqinqiang/easycar/logging"
 
-	"github.com/wuqinqiang/easycar/core/executor"
 	"github.com/wuqinqiang/easycar/tools"
 
 	"github.com/wuqinqiang/easycar/core/consts"
@@ -73,7 +72,7 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 }
 
 func (c *Coordinator) Phase1(ctx context.Context, branchList entity.BranchList) error {
-	return executor.Phase1Executor(branchList).Execute(ctx)
+	return Phase1Executor(branchList).Execute(ctx)
 }
 
 func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) (err error) {
@@ -98,7 +97,7 @@ func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branche
 			fmt.Printf("[Phase2]UpdateGlobalStateByGid gid:%v err:%v", global.GetGId(), erro)
 		}
 	}()
-	err = executor.NewPhase2Executor(global, branches).Execute(ctx)
+	err = NewPhase2Executor(global, branches).Execute(ctx)
 	return
 }
 

@@ -9,11 +9,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/wuqinqiang/easycar/core/coordinator"
+
 	elog "github.com/wuqinqiang/easycar/logging"
 
 	"google.golang.org/grpc/reflection"
-
-	"github.com/wuqinqiang/easycar/core"
 
 	"github.com/wuqinqiang/easycar/proto"
 
@@ -27,7 +27,7 @@ var (
 
 type GrpcSrv struct {
 	proto.UnimplementedEasyCarServer
-	coordinator *core.Coordinator
+	coordinator *coordinator.Coordinator
 
 	lis net.Listener
 
@@ -38,7 +38,7 @@ type GrpcSrv struct {
 	grpcServer *grpc.Server
 }
 
-func New(port int, coordinator *core.Coordinator, opts ...Opt) (*GrpcSrv, error) {
+func New(port int, coordinator *coordinator.Coordinator, opts ...Opt) (*GrpcSrv, error) {
 	srv := &GrpcSrv{
 		coordinator: coordinator,
 		timeout:     10 * time.Second,
