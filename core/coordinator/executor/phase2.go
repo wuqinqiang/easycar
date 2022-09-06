@@ -1,4 +1,4 @@
-package coordinator
+package executor
 
 import (
 	"context"
@@ -11,18 +11,17 @@ import (
 type Phase2 struct {
 	list   entity.BranchList
 	global *entity.Global
-	*executor
 }
 
 func NewPhase2Executor(global *entity.Global, branchList entity.BranchList) *Phase2 {
-	return &Phase2{list: branchList, global: global, executor: GetExecutor()}
+	return &Phase2{list: branchList, global: global}
 }
 
 func (e *Phase2) Execute(ctx context.Context) error {
 	if len(e.list) == 0 {
 		return nil
 	}
-	return e.execute(ctx, e.list, func(branch *entity.Branch) bool {
+	return execute(ctx, e.list, func(branch *entity.Branch) bool {
 		if e.global.State == consts.Phase1Success {
 			return branch.IsTccConfirm()
 		}

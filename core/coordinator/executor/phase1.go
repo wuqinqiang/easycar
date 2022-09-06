@@ -1,4 +1,4 @@
-package coordinator
+package executor
 
 import (
 	"context"
@@ -8,18 +8,17 @@ import (
 
 type Phase1 struct {
 	list entity.BranchList
-	*executor
 }
 
 func Phase1Executor(branchList entity.BranchList) *Phase1 {
-	return &Phase1{list: branchList, executor: GetExecutor()}
+	return &Phase1{list: branchList}
 }
 
 func (e *Phase1) Execute(ctx context.Context) error {
 	if len(e.list) == 0 {
 		return nil
 	}
-	return e.execute(ctx, e.list, func(branch *entity.Branch) bool {
+	return execute(ctx, e.list, func(branch *entity.Branch) bool {
 		return branch.IsTccTry() || branch.IsSAGANormal()
 	})
 }
