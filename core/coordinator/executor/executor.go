@@ -21,16 +21,12 @@ type (
 	FilterFn func(branch *entity.Branch) bool
 
 	executor struct {
-		option  *Option
 		manager transport.Manager
 	}
 )
 
-func NewExecutor(opts ...OptFn) *executor {
+func NewExecutor() *executor {
 	executor := DefaultExecutor
-	for _, opt := range opts {
-		opt(executor.option)
-	}
 	return executor
 }
 

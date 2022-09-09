@@ -18,8 +18,9 @@ db:
 
   ## backOff for retry
 backOff:
-  ##  max delay time for retry,unit senconds
+  open: true
+  ##  max delay time for retry,the unit is senconds, max 60 seconds
   maxDelay: 120
-  ## max retry times when rm is not available
-  maxRetries: 3
+  ## max retry times ，
+  retries: 3
   factor: 2

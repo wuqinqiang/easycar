@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/wuqinqiang/easycar/logging"
+
 	"github.com/wuqinqiang/easycar/core/coordinator/executor"
 
 	"github.com/wuqinqiang/easycar/core/coordinator"
@@ -32,16 +34,16 @@ import (
 )
 
 func main() {
-	conf := getConf()
+	c := getConf()
 	// init conf
-	settings, err := conf.Load()
+	settings, err := c.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
 	MustLoad(settings)
-	e := executor.NewExecutor()
-	coordinator := coordinator.NewCoordinator(dao.GetTransaction(), e, settings.AutomaticExecution2)
-	grpcSrv, err := grpcsrv.New(settings.GRPCPort, coordinator)
+	setCoordinator := coordinator.NewCoordinator(dao.GetTransaction(),
+		executor.NewExecutor(), settings.AutomaticExecution2)
+	grpcSrv, err := grpcsrv.New(settings.GRPCPort, setCoordinator)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -58,7 +60,7 @@ func main() {
 	if err := core.Run(context.Background()); err != nil {
 		log.Fatal(err)
 	}
-	// everything is over
+	logging.Infof("easycar server is stopped")
 }
 
 func MustLoad(settings *conf.Settings) {
@@ -84,7 +86,6 @@ func getConf() (c conf.Conf) {
 	case conf.Env:
 		return new(envx.Env)
 	default:
-		// todo don't not be so rude!!
 		panic("conf mod not set")
 	}
 	return c

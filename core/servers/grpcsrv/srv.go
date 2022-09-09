@@ -79,6 +79,6 @@ func (s *GrpcSrv) Stop(ctx context.Context) (err error) {
 	if err = s.coordinator.Close(ctx); err != nil {
 		return
 	}
-	elog.Info("GrpcSrv stopped")
+	elog.Info("[GrpcSrv] stopped")
 	return
 }
