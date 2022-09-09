@@ -53,9 +53,8 @@ func (e *executor) Phase2(ctx context.Context, global *entity.Global, branches e
 	})
 }
 
-func (e *executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
+func (e *executor) stratify(branches entity.BranchList, filterFn FilterFn) []entity.BranchList {
 	phaseList := make([]entity.BranchList, len(branches))
-
 	// sort branches by level
 	sort.Slice(branches, func(i, j int) bool {
 		return branches[i].Level < branches[j].Level
@@ -78,6 +77,14 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 			previousLevel = branch.Level
 		}
 		phaseList[bucketIndex] = append(phaseList[bucketIndex], branch)
+	}
+	return phaseList
+}
+
+func (e *executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
+	phaseList := e.stratify(branches, filterFn)
+	if len(phaseList) == 0 {
+		return nil
 	}
 
 	errGroup, groupCtx := errgroup.WithContext(ctx)
