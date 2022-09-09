@@ -70,14 +70,15 @@ func MustLoad(settings *conf.Settings) {
 	}
 }
 
-func getConf() conf.Conf {
+func getConf() (c conf.Conf) {
 	var (
-		c conf.Conf
+		confMod  = flag.String("mod", os.Getenv("CONF_MOD"), "configuration module")
+		filePath = flag.String("f", GetEnvOrDefault("FILE_PATH", "/conf.yml"), "configuration file")
 	)
-	confMod := flag.String("mod", os.Getenv("CONF_MOD"), "configuration module")
+	flag.Parse()
+
 	switch conf.Mode(*confMod) {
 	case conf.File:
-		filePath := flag.String("f", GetEnvOrDefault("FILE_PATH", "/conf.yml"), "configuration file")
 		c = file.NewFile(*filePath)
 	case conf.Etcd:
 	case conf.Env:
@@ -86,7 +87,6 @@ func getConf() conf.Conf {
 		// todo don't not be so rude!!
 		panic("conf mod not set")
 	}
-	flag.Parse()
 	return c
 }
 
