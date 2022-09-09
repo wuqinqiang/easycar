@@ -74,8 +74,11 @@ func (s *GrpcSrv) Run(ctx context.Context) error {
 
 func (s *GrpcSrv) Stop(ctx context.Context) (err error) {
 	s.once.Do(func() {
-		err = s.lis.Close()
+		s.grpcServer.GracefulStop()
 	})
-	elog.Info("grpc stopped")
+	if err = s.coordinator.Close(ctx); err != nil {
+		return
+	}
+	elog.Info("GrpcSrv stopped")
 	return
 }

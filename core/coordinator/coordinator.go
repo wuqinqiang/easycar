@@ -22,6 +22,7 @@ type Coordinator struct {
 	dao                 dao.TransactionDao
 	automaticExecution2 bool
 	executor            Executor
+	closeFn             func(ctx context.Context) error
 }
 
 func NewCoordinator(dao dao.TransactionDao, executor Executor, automaticExecution2 bool) *Coordinator {
@@ -29,6 +30,7 @@ func NewCoordinator(dao dao.TransactionDao, executor Executor, automaticExecutio
 		dao:                 dao,
 		automaticExecution2: automaticExecution2,
 		executor:            executor,
+		closeFn:             executor.Close,
 	}
 	return c
 }
@@ -39,6 +41,10 @@ func (c *Coordinator) Begin(ctx context.Context) (string, error) {
 	g.SetState(consts.Init)
 	err := c.dao.CreateGlobal(ctx, g)
 	return gid, err
+}
+
+func (c *Coordinator) Close(ctx context.Context) error {
+	return c.closeFn(ctx)
 }
 
 func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.BranchList) error {
@@ -79,7 +85,6 @@ func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branche
 		}
 	}()
 	err = c.executor.Phase1(ctx, global, branches)
-	//err = executor.Phase1Executor(branchList).Execute(ctx)
 	return
 }
 
@@ -106,7 +111,6 @@ func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branche
 		}
 	}()
 	err = c.executor.Phase2(ctx, global, branches)
-	//err = executor.NewPhase2Executor(global, branches).Execute(ctx)
 	return
 }
 

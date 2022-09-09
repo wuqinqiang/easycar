@@ -28,7 +28,7 @@ type (
 	}
 	Manager interface {
 		GetTransporter(net common.Net) (Transporter, error)
-		Stop(ctx context.Context)
+		Close(ctx context.Context) error
 	}
 )
 
@@ -58,12 +58,13 @@ func (manager *manager) GetTransporter(net common.Net) (Transporter, error) {
 	return val.(Transporter), nil
 }
 
-func (manager *manager) Stop(ctx context.Context) {
+func (manager *manager) Close(ctx context.Context) error {
 	manager.m.Range(func(key, value any) bool {
 		if err := value.(Transporter).Close(ctx); err != nil {
 			logging.Infof(fmt.Sprintf("[Manager] stop err:%v", err), "net", key, "transporter", value)
 		}
-		logging.Infof("[Manager] stop over", "net", key, "transporter", value)
+		logging.Infof("[Manager] close client connections", "net", key, "transporter", value)
 		return true
 	})
+	return nil
 }

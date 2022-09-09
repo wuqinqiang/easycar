@@ -34,6 +34,10 @@ func NewExecutor(opts ...OptFn) *executor {
 	return executor
 }
 
+func (e *executor) Close(ctx context.Context) error {
+	return e.manager.Close(ctx)
+}
+
 func (e *executor) Phase1(ctx context.Context, _ *entity.Global, branches entity.BranchList) error {
 	return e.execute(ctx, branches, func(branch *entity.Branch) bool {
 		return branch.IsTccTry() || branch.IsSAGANormal()
