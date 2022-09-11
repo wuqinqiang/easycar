@@ -7,6 +7,8 @@ import (
 	"sync"
 	"syscall"
 
+	"github.com/wuqinqiang/easycar/logging"
+
 	"golang.org/x/sync/errgroup"
 )
 
@@ -59,6 +61,8 @@ func (core *Core) Run(ctx context.Context) error {
 	}
 	// wait for all service is  start
 	core.runWaitGroup.Wait()
+	logging.Info("easycar start")
+
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
 

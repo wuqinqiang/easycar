@@ -1,10 +1,3 @@
-.PHONY:	proto
-#proto:
-#	cd pkg/apis && \
-#	protoc --go_out=. --go_opt=paths=source_relative \
-#    --go-grpc_out=. --go-grpc_opt=paths=source_relative \
-#    easycar.proto
-
 .PHONY: checklint
 checklint:
 ifeq (, $(shell which golangci-lint))
@@ -28,6 +21,6 @@ endif
 proto: checkbuf
 	buf generate
 
-.PHONY: run
-run:
-	go run cmd/main.go
+.PHONY: build
+build:
+	go build cmd/main.go
