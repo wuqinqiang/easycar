@@ -49,7 +49,7 @@ service EasyCar {
 
   rpc GetState(GetStateReq) returns(GetStateResp){
     option (google.api.http) = {
-      post:"/easycar/getState",
+      post:"/easycar/state",
       body:"*"
     };
   }
@@ -71,7 +71,7 @@ enum Action {
 
 enum BranchState {
   UN_KNOW_STATE = 0;
-  READY = 1;
+  B_INIT = 1;
   RETRYING = 2;
   SUCCEED = 3;
   FAILED = 4;
@@ -138,6 +138,20 @@ message GetStateReq {
 }
 
 message GetStateResp {
-  GlobalState state = 1;
-  // todo add branches state?
+  string gId = 1;
+  GlobalState state = 2;
+  int64 endTime = 3;
+  message branch {
+    string branchId = 1;
+    string reqData = 2;
+    string reqHeader = 3;
+    string uri = 4;
+    TranType tranType = 5;
+    string protocol = 6;
+    Action action = 7;
+    BranchState state = 8;
+    int64 level = 9;
+    string lastErrMsg = 10;
+  }
+  repeated branch branches = 4;
 }

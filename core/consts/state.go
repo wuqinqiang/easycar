@@ -32,7 +32,7 @@ const (
 
 	//************branch state***************
 
-	BranchReady     BranchState = "ready"
+	BranchInit      BranchState = "init"
 	BranchRetrying  BranchState = "retrying"
 	BranchSucceed   BranchState = "succeed"
 	BranchFailState BranchState = "failed"

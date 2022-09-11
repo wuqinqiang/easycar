@@ -132,8 +132,32 @@ func (s *GrpcSrv) GetState(ctx context.Context, req *proto.GetStateReq) (*proto.
 	if err != nil {
 		return nil, err
 	}
+	var (
+		branches entity.BranchList
+	)
+	if branches, err = s.coordinator.GetBranchList(ctx, global.GetGId()); err != nil {
+		return nil, err
+	}
 	resp := new(proto.GetStateResp)
+	resp.GId = global.GetGId()
+	resp.EndTime = global.GetEndTime()
 	resp.State = consts.ConvertStateToGrpc(global.GetState())
+
+	for i := range branches {
+		resp.Branches = append(resp.Branches, &proto.GetStateRespBranch{
+			BranchId:   branches[i].BranchId,
+			ReqData:    branches[i].ReqData,
+			ReqHeader:  branches[i].ReqHeader,
+			Uri:        branches[i].Url,
+			TranType:   consts.ConvertTranTypeToGrpc(branches[i].TranType),
+			Protocol:   branches[i].Protocol,
+			Action:     consts.ConvertBranchActionToGrpc(branches[i].Action),
+			State:      consts.ConvertBranchStateToGrpc(branches[i].State),
+			Level:      int64(branches[i].Level),
+			LastErrMsg: branches[i].LastErrMsg,
+		})
+	}
+
 	return resp, nil
 }
 

@@ -14,7 +14,7 @@ type (
 		TranType   consts.TransactionType `gorm:"column:tran_type;not null"`             // transaction type:tcc or saga or others
 		Protocol   string                 `gorm:"column:protocol;not null;default:http"` //http,grpc
 		Action     consts.BranchAction    `gorm:"column:action;not null"`                // action type of transaction
-		State      consts.BranchState     `gorm:"column:state;not null;default:ready"`   // branch State
+		State      consts.BranchState     `gorm:"column:state;not null;default:init"`    // branch State
 		Level      consts.Level           `gorm:"column:level;not null;default:1"`       // branch level in tree
 		LastErrMsg string                 `gorm:"column:last_err_msg;not null"`
 		Timeout    int64                  `gorm:"column:timeout;not null;default:0"`             //request branch timeout(seconds)
