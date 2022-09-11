@@ -8,36 +8,18 @@ NETWORKS_DRIVER=bridge
 TIMEZONE=Asia/Shanghai
 ### Redis  #######################################################
 
-REDIS_PORT=6379
-### MongoDB  #######################################################
-MONGODB_VERSION=latest
-MONGODB_PORT=27017
-MONGO_INITDB_ROOT_USERNAME=root
-MONGO_INITDB_ROOT_PASSWORD=root
-MONGO_INITDB_DATABASE=v1_nuwas
-MONGO_INITDB_USERNAME=nuwas
-MONGO_INITDB_PASSWORD=nuwas
-
-### ETCD  #######################################################
-ETCD_VERSION="v3.4.15"
-ETCD_PORT=2379
-### nuwas  #######################################################
-
-# ETCDKeeper
-ETCD_KEEPER_PORT=11004
-
 ### MYSQL #################################################
 
-# mysql版本
+# mysql version
 MYSQL_VERSION=8.0.29
 
 MYSQL_DATABASE=easycar
 
-# mysql 用户信息
+# mysql user info
 MYSQL_USER=easycar
 MYSQL_PASSWORD=easycar
 
-# mysql 映射到宿主机端口
+# mysql port
 MYSQL_PORT=3306
-# mysql root密码
+# mysql password
 MYSQL_ROOT_PASSWORD=root
