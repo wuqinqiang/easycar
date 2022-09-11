@@ -1,7 +1,7 @@
 package consts
 
 type (
-	// TransactionType 	is a type of transaction
+	// TransactionType 	transaction type
 	TransactionType string
 	// BranchAction branch action,such as tcc (try、confirm、cancel)
 	BranchAction string
