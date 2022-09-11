@@ -100,7 +100,7 @@ func (s *GrpcSrv) commonPhase2(ctx context.Context, gid string,
 
 func (s *GrpcSrv) Commit(ctx context.Context, req *proto.CommitReq) (*emptypb.Empty, error) {
 	err := s.commonPhase2(ctx, req.GetGId(), func(g *entity.Global) error {
-		if !g.IsPhase1Success() {
+		if !g.Phase1Success() {
 			return fmt.Errorf("gid:%v can not commit", req.GetGId())
 		}
 		return nil
@@ -113,7 +113,7 @@ func (s *GrpcSrv) Commit(ctx context.Context, req *proto.CommitReq) (*emptypb.Em
 
 func (s *GrpcSrv) Rollback(ctx context.Context, req *proto.RollBckReq) (*emptypb.Empty, error) {
 	err := s.commonPhase2(ctx, req.GetGId(), func(g *entity.Global) error {
-		if !g.IsPhase2Failed() {
+		if !g.Phase2Failed() {
 			return fmt.Errorf("gid:%v can not bollback", req.GetGId())
 		}
 		return nil

@@ -20,6 +20,7 @@ type (
 		Timeout    int64                  `gorm:"column:timeout;not null;default:0"`             //request branch timeout(seconds)
 		CreateTime int64                  `gorm:"create_time;autoCreateTime" json:"create_time"` // create time
 		UpdateTime int64                  `gorm:"update_time;autoCreateTime" json:"update_time"` // last update time
+		// todo add group id for branches
 	}
 	BranchList []*Branch
 )
@@ -28,41 +29,29 @@ func (b Branch) TableName() string {
 	return "branch"
 }
 
-func (b *Branch) IsSucceed() bool {
-	return b.State == consts.BranchSucceed
-}
-
-func (b *Branch) IsBranchFailState() {
-
-}
-
 func (b *Branch) IsTcc() bool {
 	return b.TranType == consts.TCC
 }
-func (b *Branch) IsTccTry() bool {
+func (b *Branch) TccTry() bool {
 	return b.Action == consts.Try && b.IsTcc()
 }
 
-func (b *Branch) IsTccCancel() bool {
+func (b *Branch) TccCancel() bool {
 	return b.Action == consts.Cancel && b.IsTcc()
 }
 
-func (b *Branch) IsTccConfirm() bool {
+func (b *Branch) TccConfirm() bool {
 	return b.Action == consts.Confirm
 }
 
-func (b *Branch) CanDo() {
-
-}
-
-func (b *Branch) IsSAGA() bool {
+func (b *Branch) SAGA() bool {
 	return b.TranType == consts.SAGA
 }
 
-func (b *Branch) IsSAGANormal() bool {
-	return b.Action == consts.Normal && b.IsSAGA()
+func (b *Branch) SAGANormal() bool {
+	return b.Action == consts.Normal && b.SAGA()
 }
 
-func (b *Branch) IsSAGACompensation() bool {
-	return b.Action == consts.Compensation && b.IsSAGA()
+func (b *Branch) SAGACompensation() bool {
+	return b.Action == consts.Compensation && b.SAGA()
 }

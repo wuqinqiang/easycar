@@ -36,17 +36,17 @@ func (e *executor) Close(ctx context.Context) error {
 
 func (e *executor) Phase1(ctx context.Context, _ *entity.Global, branches entity.BranchList) error {
 	return e.execute(ctx, branches, func(branch *entity.Branch) bool {
-		return branch.IsTccTry() || branch.IsSAGANormal()
+		return branch.TccTry() || branch.SAGANormal()
 	})
 }
 
 func (e *executor) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
 	return e.execute(ctx, branches, func(branch *entity.Branch) bool {
 		if global.State == consts.Phase1Success {
-			return branch.IsTccConfirm()
+			return branch.TccConfirm()
 		}
 		// other phase1 failed
-		if branch.IsSAGACompensation() || branch.IsTccCancel() {
+		if branch.SAGACompensation() || branch.TccCancel() {
 			return true
 		}
 		return false
