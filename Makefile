@@ -17,13 +17,16 @@ lint: checklint
 	golangci-lint run --skip-dirs-use-default
 
 
-
+.PHONY: checkbuf
+checkbuf:
+ifeq (,$(shell which buf))
+	@echo 'error:bufbuild/buf is not installed ,please exec `brew install bufbuild/buf/buf`'
+	@echo 1
+endif
 
 .PHONY: proto
-proto:
+proto: checkbuf
 	buf generate
-#	protoc --go_out=:. --go-grpc_out=:. proto/*.proto
-
 
 .PHONY: run
 run:
