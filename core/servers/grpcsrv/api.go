@@ -21,7 +21,7 @@ func (s *GrpcSrv) Begin(ctx context.Context, empty *emptypb.Empty) (*proto.Begin
 	return resp, nil
 }
 
-func (s *GrpcSrv) Register(ctx context.Context, req *proto.RegisterReq) (*proto.RegisterResp, error) {
+func (s *GrpcSrv) Register(ctx context.Context, req *proto.RegisterReq) (*emptypb.Empty, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -41,11 +41,10 @@ func (s *GrpcSrv) Register(ctx context.Context, req *proto.RegisterReq) (*proto.
 	if err := s.coordinator.Register(ctx, req.GetGId(), branchList); err != nil {
 		return nil, err
 	}
-	resp := new(proto.RegisterResp)
-	return resp, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (s *GrpcSrv) Start(ctx context.Context, req *proto.StartReq) (*proto.StartResp, error) {
+func (s *GrpcSrv) Start(ctx context.Context, req *proto.StartReq) (*emptypb.Empty, error) {
 	if err := req.Validate(); err != nil {
 		return nil, err
 	}
@@ -70,7 +69,7 @@ func (s *GrpcSrv) Start(ctx context.Context, req *proto.StartReq) (*proto.StartR
 	if branches, err = s.coordinator.GetBranchList(ctx, global.GetGId()); err != nil {
 		return nil, err
 	}
-	global.SetState(consts.Phase1Processing)
+	global.SetState(consts.Phase1Preparing)
 	if err = s.coordinator.UpdateGlobalState(ctx, global.GetGId(), global.State); err != nil {
 		return nil, err
 	}
@@ -78,8 +77,7 @@ func (s *GrpcSrv) Start(ctx context.Context, req *proto.StartReq) (*proto.StartR
 	if err = s.coordinator.Start(ctx, &global, branches); err != nil {
 		return nil, err
 	}
-	resp := new(proto.StartResp)
-	return resp, nil
+	return &emptypb.Empty{}, nil
 }
 
 func (s *GrpcSrv) commonPhase2(ctx context.Context, gid string,
@@ -100,7 +98,7 @@ func (s *GrpcSrv) commonPhase2(ctx context.Context, gid string,
 
 }
 
-func (s *GrpcSrv) Commit(ctx context.Context, req *proto.CommitReq) (*proto.CommitResp, error) {
+func (s *GrpcSrv) Commit(ctx context.Context, req *proto.CommitReq) (*emptypb.Empty, error) {
 	err := s.commonPhase2(ctx, req.GetGId(), func(g *entity.Global) error {
 		if !g.IsPhase1Success() {
 			return fmt.Errorf("gid:%v can not commit", req.GetGId())
@@ -110,11 +108,10 @@ func (s *GrpcSrv) Commit(ctx context.Context, req *proto.CommitReq) (*proto.Comm
 	if err != nil {
 		return nil, err
 	}
-	resp := new(proto.CommitResp)
-	return resp, nil
+	return &emptypb.Empty{}, nil
 }
 
-func (s *GrpcSrv) Rollback(ctx context.Context, req *proto.RollBckReq) (*proto.RollBckResp, error) {
+func (s *GrpcSrv) Rollback(ctx context.Context, req *proto.RollBckReq) (*emptypb.Empty, error) {
 	err := s.commonPhase2(ctx, req.GetGId(), func(g *entity.Global) error {
 		if !g.IsPhase2Failed() {
 			return fmt.Errorf("gid:%v can not bollback", req.GetGId())
@@ -124,8 +121,7 @@ func (s *GrpcSrv) Rollback(ctx context.Context, req *proto.RollBckReq) (*proto.R
 	if err != nil {
 		return nil, err
 	}
-	resp := new(proto.RollBckResp)
-	return resp, nil
+	return &emptypb.Empty{}, nil
 }
 
 func (s *GrpcSrv) GetState(ctx context.Context, req *proto.GetStateReq) (*proto.GetStateResp, error) {

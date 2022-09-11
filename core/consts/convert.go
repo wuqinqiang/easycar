@@ -6,7 +6,7 @@ func ConvertStateToGrpc(state GlobalState) proto.GlobalState {
 	switch state {
 	case Init:
 		return proto.GlobalState_INIT
-	case Phase1Processing:
+	case Phase1Preparing:
 		return proto.GlobalState_PHASE1_PROCESSING
 	case Phase1Retrying:
 		return proto.GlobalState_PHASE1_RETRYING

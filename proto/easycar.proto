@@ -16,7 +16,7 @@ service EasyCar {
       body:"*"
     };
   }
-  rpc Register(RegisterReq)returns(RegisterResp){
+  rpc Register(RegisterReq)returns(google.protobuf.Empty){
     option (google.api.http) = {
       post:"/easycar/register",
       body:"*"
@@ -24,7 +24,7 @@ service EasyCar {
   }
 
   // phase1
-  rpc Start(StartReq)returns(StartResp){
+  rpc Start(StartReq)returns(google.protobuf.Empty){
     option (google.api.http) = {
       post:"/easycar/start",
       body:"*"
@@ -32,7 +32,7 @@ service EasyCar {
   }
 
   // phase2 for commit
-  rpc Commit(CommitReq) returns(CommitResp) {
+  rpc Commit(CommitReq) returns(google.protobuf.Empty) {
     option (google.api.http) = {
       post:"/easycar/commit",
       body:"*",
@@ -40,7 +40,7 @@ service EasyCar {
   }
 
   // phase2 for rollback
-  rpc Rollback(RollBckReq) returns(RollBckResp) {
+  rpc Rollback(RollBckReq) returns(google.protobuf.Empty) {
     option (google.api.http) = {
       post: "/easycar/rollback",
       body:"*",
@@ -53,12 +53,6 @@ service EasyCar {
       body:"*"
     };
   }
-}
-
-
-enum Err {
-  CODE_SUCCESS = 0;
-  CODE_FAILED = 1;
 }
 
 enum TranType {
@@ -128,23 +122,13 @@ message BeginResp {
 message StartReq {
   string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
 }
-message StartResp {
-  GlobalState state = 1;
-}
 
 message CommitReq {
   string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
 }
 
-message CommitResp {
-  string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
-}
 
 message RollBckReq {
-  string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
-}
-
-message RollBckResp {
   string gId = 1 [(validate.rules).string = {min_len:1,max_len:50}];
 }
 

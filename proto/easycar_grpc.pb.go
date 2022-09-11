@@ -24,13 +24,13 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type EasyCarClient interface {
 	Begin(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*BeginResp, error)
-	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error)
+	Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// phase1
-	Start(ctx context.Context, in *StartReq, opts ...grpc.CallOption) (*StartResp, error)
+	Start(ctx context.Context, in *StartReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// phase2 for commit
-	Commit(ctx context.Context, in *CommitReq, opts ...grpc.CallOption) (*CommitResp, error)
+	Commit(ctx context.Context, in *CommitReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	// phase2 for rollback
-	Rollback(ctx context.Context, in *RollBckReq, opts ...grpc.CallOption) (*RollBckResp, error)
+	Rollback(ctx context.Context, in *RollBckReq, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetState(ctx context.Context, in *GetStateReq, opts ...grpc.CallOption) (*GetStateResp, error)
 }
 
@@ -51,8 +51,8 @@ func (c *easyCarClient) Begin(ctx context.Context, in *emptypb.Empty, opts ...gr
 	return out, nil
 }
 
-func (c *easyCarClient) Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*RegisterResp, error) {
-	out := new(RegisterResp)
+func (c *easyCarClient) Register(ctx context.Context, in *RegisterReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/proto.EasyCar/Register", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -60,8 +60,8 @@ func (c *easyCarClient) Register(ctx context.Context, in *RegisterReq, opts ...g
 	return out, nil
 }
 
-func (c *easyCarClient) Start(ctx context.Context, in *StartReq, opts ...grpc.CallOption) (*StartResp, error) {
-	out := new(StartResp)
+func (c *easyCarClient) Start(ctx context.Context, in *StartReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/proto.EasyCar/Start", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -69,8 +69,8 @@ func (c *easyCarClient) Start(ctx context.Context, in *StartReq, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *easyCarClient) Commit(ctx context.Context, in *CommitReq, opts ...grpc.CallOption) (*CommitResp, error) {
-	out := new(CommitResp)
+func (c *easyCarClient) Commit(ctx context.Context, in *CommitReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/proto.EasyCar/Commit", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -78,8 +78,8 @@ func (c *easyCarClient) Commit(ctx context.Context, in *CommitReq, opts ...grpc.
 	return out, nil
 }
 
-func (c *easyCarClient) Rollback(ctx context.Context, in *RollBckReq, opts ...grpc.CallOption) (*RollBckResp, error) {
-	out := new(RollBckResp)
+func (c *easyCarClient) Rollback(ctx context.Context, in *RollBckReq, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/proto.EasyCar/Rollback", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -101,13 +101,13 @@ func (c *easyCarClient) GetState(ctx context.Context, in *GetStateReq, opts ...g
 // for forward compatibility
 type EasyCarServer interface {
 	Begin(context.Context, *emptypb.Empty) (*BeginResp, error)
-	Register(context.Context, *RegisterReq) (*RegisterResp, error)
+	Register(context.Context, *RegisterReq) (*emptypb.Empty, error)
 	// phase1
-	Start(context.Context, *StartReq) (*StartResp, error)
+	Start(context.Context, *StartReq) (*emptypb.Empty, error)
 	// phase2 for commit
-	Commit(context.Context, *CommitReq) (*CommitResp, error)
+	Commit(context.Context, *CommitReq) (*emptypb.Empty, error)
 	// phase2 for rollback
-	Rollback(context.Context, *RollBckReq) (*RollBckResp, error)
+	Rollback(context.Context, *RollBckReq) (*emptypb.Empty, error)
 	GetState(context.Context, *GetStateReq) (*GetStateResp, error)
 	mustEmbedUnimplementedEasyCarServer()
 }
@@ -119,16 +119,16 @@ type UnimplementedEasyCarServer struct {
 func (UnimplementedEasyCarServer) Begin(context.Context, *emptypb.Empty) (*BeginResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Begin not implemented")
 }
-func (UnimplementedEasyCarServer) Register(context.Context, *RegisterReq) (*RegisterResp, error) {
+func (UnimplementedEasyCarServer) Register(context.Context, *RegisterReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedEasyCarServer) Start(context.Context, *StartReq) (*StartResp, error) {
+func (UnimplementedEasyCarServer) Start(context.Context, *StartReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
 }
-func (UnimplementedEasyCarServer) Commit(context.Context, *CommitReq) (*CommitResp, error) {
+func (UnimplementedEasyCarServer) Commit(context.Context, *CommitReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Commit not implemented")
 }
-func (UnimplementedEasyCarServer) Rollback(context.Context, *RollBckReq) (*RollBckResp, error) {
+func (UnimplementedEasyCarServer) Rollback(context.Context, *RollBckReq) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Rollback not implemented")
 }
 func (UnimplementedEasyCarServer) GetState(context.Context, *GetStateReq) (*GetStateResp, error) {
