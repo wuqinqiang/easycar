@@ -1,9 +1,7 @@
 ## conf
-
-
 grpcPort: 8089
 httpPort: 8085
-#automaticExecution2: true
+automaticExecution2: false  #If it is true, when the first stage of execution ends, it will automatically commit or rollback
 dirver: mysql
 timeout: 7 #unit of second
 
@@ -11,16 +9,16 @@ db:
   mysql:
     dbURL: easycar:easycar@tcp(127.0.0.1:3306)/easycar?charset=utf8&parseTime=True&loc=Local
     maxLifetime: 7200
-    maxIdleConns: 20
-    maxOpenConns: 10
+    maxIdleConns: 10
+    maxOpenConns: 20
+    ## add more
 
-  ## add more
-
+#### !!!!! temporarily useless
   ## backOff for retry
-backOff:
-  open: true
-  ##  max delay time for retry,the unit is senconds, max 60 seconds
-  maxDelay: 120
-  ## max retry times ，
-  retries: 3
-  factor: 2
+#backOff:
+#  open: true
+#  ##  max delay time for retry,the unit is senconds, max 60 seconds
+#  maxDelay: 120
+#  ## max retry times ，
+#  retries: 3
+#  factor: 2

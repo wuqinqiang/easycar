@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 	"time"
@@ -17,8 +16,6 @@ import (
 	"github.com/wuqinqiang/easycar/core/transport/common"
 
 	"github.com/wuqinqiang/easycar/core/dao"
-
-	"github.com/wuqinqiang/easycar/core/servers/runner"
 
 	"github.com/wuqinqiang/easycar/core/servers/httpsrv"
 
@@ -48,12 +45,13 @@ func main() {
 		log.Fatal(err)
 	}
 	httpProxySrv := httpsrv.New(settings.HTTPPort, settings.GRPCPort)
-	//runner
-	runnerSrv, err := runner.NewRunner("@every 50m", func(ctx context.Context) {
-		fmt.Println("hello world")
-	})
 
-	core := core.New(core.WithServers(grpcSrv, httpProxySrv, runnerSrv))
+	//runner
+	//runnerSrv, err := runner.NewRunner("@every 50m", func(ctx context.Context) {
+	//	fmt.Println("hello world")
+	//})
+
+	core := core.New(core.WithServers(grpcSrv, httpProxySrv))
 	if err != nil {
 		log.Fatal(err)
 	}
