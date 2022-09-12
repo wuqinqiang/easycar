@@ -1,30 +1,35 @@
 # easycar:A simple distributed transaction framework implemented by go
 
-#### easycar 是什么？
+## What is easycar？
 
-easycar is a distributed transaction framework implemented in go that supports a two-phase commit protocol. Its full name is (easy commit and rollback)
+easycar is a distributed transaction framework implemented in go that supports a two-phase commit protocol. Its full name is (easy commit and rollback).
 
-More about easycar can check this article 
+### Features
 
-#### Features
+#### Supports both protocol and transaction mode mixing
 
-##### Supports both protocol and transaction mode mixing
+Support for mixed use of each RM protocol in a distributed transaction (currently supports http and native grpc services). Support per RM transaction mode mix.
 
-Support for mixed use of each RM protocol in a distributed transaction (currently supports http and native grpc services). Support per RM transaction mode mix (currently supports TCC, Saga).
-
-##### Supports concurrent execution in layers
+#### Support for concurrent execution of transactions
 
 Supports concurrent execution in layers. The participating RMs are layered by the set weights, and RMs in the same layer can be invoked concurrently, and the next layer is processed after one layer is finished. On this basis, when a RM has a call error, then the next layer will not be executed and the whole distributed transaction needs to be rolled back.
 
 
-#### State
+
+
+
+More about easycar can check this article 
+
+
+
+## State
 
 global state
 ![global](https://cdn.syst.top/global.png)
 
-#### RUN
+## RUN
 
-##### Modify configuration
+### Modify configuration
 conf.yml file
 ```ymal
 grpcPort: 8089
@@ -51,12 +56,11 @@ When the configuration is complete, execute
 go run cmd/main.go -mod file # The follow-up can also be env、etcd......
 ```
 
-#### examples
+## examples
 
 see more examples to:[examples](https://github.com/easycar/examples)
 
-#### todo list
-
+## todo list
 - [ ] XA
 - [ ] AT
 - retry
