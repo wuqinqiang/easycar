@@ -1,44 +1,66 @@
-# easycar
+# easycar:A simple distributed transaction framework implemented by go
 
-what is easycar?
+#### easycar 是什么？
 
-a simple Distributed transactions implemented by go. the full name of easycar is (easy commit and rollback).
+easycar is a distributed transaction framework implemented in go that supports a two-phase commit protocol. Its full name is (easy commit and rollback)
 
-### role
+More about easycar can check this article 
 
-- coordinator
-- TM
-- RM
+#### Features
 
-### plan
+##### Supports both protocol and transaction mode mixing
 
-### struct
+Support for mixed use of each RM protocol in a distributed transaction (currently supports http and native grpc services). Support per RM transaction mode mix (currently supports TCC, Saga).
 
-```go
-type Branch struct {
-gId               string
-url               string
-reqData           string
-branchId          string
-PId  string     // 父级事务
-respData string //分支事务执行结果，子事务依赖父级事务的结果
-}
-transactionAction consts.BranchAction
-state             consts.BranchState
-protocol string //http or coordinator
-endTime  int64
-}
+##### Supports concurrent execution in layers
+
+Supports concurrent execution in layers. The participating RMs are layered by the set weights, and RMs in the same layer can be invoked concurrently, and the next layer is processed after one layer is finished. On this basis, when a RM has a call error, then the next layer will not be executed and the whole distributed transaction needs to be rolled back.
 
 
-type Global struct {
-gId      string
-state    consts.GlobalState
-endTime int64
-}
+#### State
+
+global state
+![global](https://cdn.syst.top/global.png)
+
+#### RUN
+
+##### Modify configuration
+conf.yml file
+```ymal
+grpcPort: 8089
+httpPort: 8085
+automaticExecution2: false  #If it is true, when the first stage of execution ends, it will automatically commit or rollback
+dirver: mysql
+timeout: 7 #unit of second
+
+db:
+  mysql:
+    dbURL: easycar:easycar@tcp(127.0.0.1:3306)/easycar?charset=utf8&parseTime=True&loc=Local
+    maxLifetime: 7200
+    maxIdleConns: 10
+    maxOpenConns: 20
+    ## add more
 ```
 
-#### 架构
+More configuration methods will be provided later
 
-#### 流转
 
-handler->Coordinator->tasks-work
+When the configuration is complete, execute
+
+```shell
+go run cmd/main.go -mod file # The follow-up can also be env、etcd......
+```
+
+#### examples
+
+see more examples to:[examples](https://github.com/easycar/examples)
+
+#### todo list
+
+- [ ] XA
+- [ ] AT
+- retry
+- easycar client
+- more store
+- ......
+
