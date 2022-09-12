@@ -1,5 +1,6 @@
 # easycar:A simple distributed transaction framework implemented by go
 
+[简体中文](https://github.com/wuqinqiang/easycar/blob/main/README_CN.md)
 ## What is easycar？
 
 easycar is a distributed transaction framework implemented in go that supports a two-phase commit protocol. Its full name is (easy commit and rollback).

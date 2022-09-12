@@ -4,7 +4,7 @@
 
 easycar 是一个用go实现的支持两阶段提交协议的分布式事务框架。它的全称是(easy commit and rollback)
 
-更多关于easycar可以查看这篇文章->
+更多关于easycar可以查看这篇文章:[about easycar](https://www.syst.top/posts/go/easycar/)
 
 #### Features
 
