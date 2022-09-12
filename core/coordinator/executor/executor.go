@@ -87,12 +87,11 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 		return nil
 	}
 
-	errGroup, groupCtx := errgroup.WithContext(ctx)
-
 	for _, tierList := range phaseList {
 		if len(tierList) == 0 {
 			continue
 		}
+		errGroup, groupCtx := errgroup.WithContext(ctx)
 		for _, branch := range tierList {
 			b := branch
 			errGroup.Go(func() error {
