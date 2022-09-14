@@ -2,7 +2,10 @@ package grpc
 
 import (
 	"context"
+	"fmt"
 	"sync"
+
+	"github.com/wuqinqiang/easycar/logging"
 
 	"google.golang.org/grpc/metadata"
 
@@ -36,19 +39,39 @@ func (g *Transport) Request(ctx context.Context, uri string, req *common.Req) (*
 	}
 	timeoutCtx, cancel := context.WithTimeout(ctx, req.Timeout)
 	defer cancel()
-	conn, err := g.getConn(timeoutCtx, server)
+
+	conn, err := g.getClient(timeoutCtx, server)
 	if err != nil {
 		return nil, err
 	}
-	var (
-		respM []byte
-	)
 	md := metadata.New(req.Headers)
-	err = conn.Invoke(metadata.NewOutgoingContext(ctx, md), method, req.Body, &respM)
+	err = conn.Invoke(metadata.NewOutgoingContext(ctx, md), method, req.Body, &[]byte{})
 	return nil, err
 }
 
-func (g Transport) Close(ctx context.Context) error {
+func (g *Transport) getClient(ctx context.Context, server string) (conn *grpc.ClientConn, err error) {
+	val, ok := g.m.Load(server)
+	if !ok {
+		conn, err = g.getConn(ctx, server)
+		if err != nil {
+			return
+		}
+		g.m.Store(server, conn)
+		return
+	}
+	conn = val.(*grpc.ClientConn)
+	return
+}
+
+func (g *Transport) Close(ctx context.Context) error {
+	g.m.Range(func(key, value any) bool {
+		conn := value.(*grpc.ClientConn)
+		if err := conn.Close(); err != nil {
+			logging.Error(fmt.Sprintf("[grpc] Transport close err:%v", err))
+		}
+		logging.Infof("[grpc] Transport close")
+		return true
+	})
 	return nil
 }
 

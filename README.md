@@ -67,5 +67,6 @@ see more examples to:[examples](https://github.com/easycar/examples)
 - retry
 - easycar client
 - more store
+- test
 - ......
 
