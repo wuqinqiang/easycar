@@ -6,6 +6,8 @@ import (
 	"sort"
 	"time"
 
+	"github.com/wuqinqiang/easycar/logging"
+
 	"github.com/wuqinqiang/easycar/core/transport"
 
 	"github.com/wuqinqiang/easycar/core/consts"
@@ -114,15 +116,15 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 				)
 
 				if _, err = transporter.Request(groupCtx, b.Url, req); err != nil {
-					fmt.Printf("[Executor] Request branch:%vrequest error:%v", b, err)
+					logging.Error(fmt.Sprintf("[Executor] Request branch:%vrequest error:%v", b, err))
 					errmsg = err.Error()
 					branchState = consts.BranchFailState
 				}
 				b.State = branchState
 
 				if _, erro := dao.GetTransaction().UpdateBranchStateByGid(ctx, b.BranchId,
-					b.State, errmsg); err != nil {
-					fmt.Printf("[Executor]update branch state error:%v\n", erro)
+					b.State, errmsg); erro != nil {
+					logging.Error(fmt.Sprintf("[Executor]update branch state error:%v\n", erro))
 				}
 				return err
 			})

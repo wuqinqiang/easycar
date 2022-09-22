@@ -50,9 +50,16 @@ db:
 go run cmd/main.go -mod file # mod 后续还可以是env......
 ```
 
+如果你使用的go服务，可以使用 [client](https://github.com/easycar/client-go) ,其他语言后续实现。
+当然你也可以直接调用http接口。
+
 #### examples
 
 see more examples to:[examples](https://github.com/easycar/examples)
+
+
+
+
 
 #### todo list
 

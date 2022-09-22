@@ -56,6 +56,10 @@ When the configuration is complete, execute
 ```shell
 go run cmd/main.go -mod file # The follow-up can also be env、etcd......
 ```
+If you use golang,use [client](https://github.com/easycar/client-go).
+of course, you can use directly http api.
+
+
 
 ## examples
 

@@ -9,8 +9,7 @@ import (
 	"github.com/wuqinqiang/easycar/conf"
 )
 
-type Env struct {
-}
+type Env struct{}
 
 func (env *Env) Load() (*conf.Settings, error) {
 	defaultConf := base.DefaultConf
