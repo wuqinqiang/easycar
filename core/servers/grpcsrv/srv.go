@@ -49,6 +49,8 @@ func New(port int, coordinator *coordinator.Coordinator, opts ...Opt) (*GrpcSrv,
 	for _, opt := range opts {
 		opt(srv)
 	}
+	maxSize := 5 * 1024 * 1024 //5M:max Recv msg size
+	srv.grpcOpts = append(srv.grpcOpts, grpc.MaxRecvMsgSize(maxSize))
 
 	var (
 		err error
@@ -58,8 +60,8 @@ func New(port int, coordinator *coordinator.Coordinator, opts ...Opt) (*GrpcSrv,
 }
 
 func (s *GrpcSrv) Run(ctx context.Context) error {
-	maxSize := 5 * 1024 * 1024 //5M:max Recv msg size
-	s.grpcServer = grpc.NewServer(grpc.MaxRecvMsgSize(maxSize))
+	s.grpcServer = grpc.NewServer(s.grpcOpts...)
+
 	proto.RegisterEasyCarServer(s.grpcServer, s)
 	// for reflection
 	reflection.Register(s.grpcServer)

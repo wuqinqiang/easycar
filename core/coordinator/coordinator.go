@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/wuqinqiang/easycar/logging"
+	"github.com/wuqinqiang/easycar/tracing"
 
 	"github.com/wuqinqiang/easycar/tools"
 
@@ -71,6 +72,10 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 }
 
 func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branches entity.BranchList) (err error) {
+
+	ctx, span := tracing.Tracer(ctx, "Phase1", "gid", global.GetGId())
+	defer span.End()
+
 	phase1State := consts.Phase1Success
 	defer func() {
 		if err != nil {
@@ -89,6 +94,11 @@ func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branche
 }
 
 func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) (err error) {
+
+	ctx, span := tracing.Tracer(ctx, "Phase2"+tools.IF(global.Phase1Failed(), "Rollback", "Commit").(string),
+		"gid", global.GetGId())
+	defer span.End()
+
 	var (
 		processingStateVal, overStateVal interface{}
 	)
