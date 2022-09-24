@@ -28,14 +28,11 @@ func (m *Mysql) Init() *gorm.DB {
 		DSN:               m.DbURL,
 		DefaultStringSize: 256,
 	}), &gorm.Config{SkipDefaultTransaction: true})
-	if err != nil {
-		panic(err)
-	}
+	tools.ErrToPanic(err)
 
 	d, err := db.DB()
-	if err != nil {
-		panic(err)
-	}
+
+	tools.ErrToPanic(err)
 
 	if m.MaxLifetime > 0 {
 		d.SetConnMaxLifetime(time.Duration(m.MaxLifetime) * time.Second)
@@ -47,12 +44,23 @@ func (m *Mysql) Init() *gorm.DB {
 	if m.MaxIdleConns > 0 {
 		d.SetMaxIdleConns(m.MaxIdleConns)
 	}
-
-	if err != nil {
-		tools.ErrToPanic(err)
-	}
+	// hooks
+	//db.Callback().Query().After("gorm:query").Register("afterQuery", registerCallback) //nolint:errcheck
+	//
+	//db.Callback().Create().After("gorm:create").Register("afterCreate", registerCallback) //nolint:errcheck
+	//
+	//db.Callback().Update().After("gorm:update").Register("afterUpdate", registerCallback) //nolint:errcheck
 	return db
 }
+
+//func registerCallback(db *gorm.DB) {
+//	_, span := tracing.Tracer().Start(db.Statement.Context, db.Statement.Table)
+//	span.SetAttributes(
+//		attribute.String("sql", db.Statement.SQL.String()),
+//		attribute.String("row", strconv.Itoa(int(db.RowsAffected))),
+//	)
+//	span.End()
+//}
 
 func GetDb() *gorm.DB {
 	if db == nil {

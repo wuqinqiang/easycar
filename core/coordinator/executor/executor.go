@@ -6,6 +6,9 @@ import (
 	"sort"
 	"time"
 
+	. "github.com/wuqinqiang/easycar/tracing"
+	"go.opentelemetry.io/otel/attribute"
+
 	"github.com/wuqinqiang/easycar/logging"
 
 	"github.com/wuqinqiang/easycar/core/transport"
@@ -89,11 +92,16 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 		return nil
 	}
 
+	execCtx, execSpan := Tracer().Start(ctx, "execute")
+	defer execSpan.End()
+
 	for _, tierList := range phaseList {
 		if len(tierList) == 0 {
 			continue
 		}
+
 		errGroup, groupCtx := errgroup.WithContext(ctx)
+
 		for _, branch := range tierList {
 			b := branch
 			errGroup.Go(func() error {
@@ -114,10 +122,17 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					branchState = consts.BranchSucceed
 					errmsg      string
 				)
+				_, span := Tracer().Start(execCtx, "transport")
+				span.SetAttributes(
+					attribute.String("protocol", string(transporter.GetType())),
+					attribute.String("reqUrl", b.Url),
+					attribute.String("branchId", b.BranchId),
+				)
 
 				if _, err = transporter.Request(groupCtx, b.Url, req); err != nil {
 					logging.Error(fmt.Sprintf("[Executor] Request branch:%vrequest error:%v", b, err))
 					errmsg = err.Error()
+					span.RecordError(err)
 					branchState = consts.BranchFailState
 				}
 				b.State = branchState
@@ -126,6 +141,7 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					b.State, errmsg); erro != nil {
 					logging.Error(fmt.Sprintf("[Executor]update branch state error:%v\n", erro))
 				}
+				span.End()
 				return err
 			})
 		}
