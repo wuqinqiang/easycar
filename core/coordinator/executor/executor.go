@@ -6,6 +6,8 @@ import (
 	"sort"
 	"time"
 
+	"go.opentelemetry.io/otel/codes"
+
 	. "github.com/wuqinqiang/easycar/tracing"
 	"go.opentelemetry.io/otel/attribute"
 
@@ -92,9 +94,6 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 		return nil
 	}
 
-	execCtx, execSpan := Tracer().Start(ctx, "execute")
-	defer execSpan.End()
-
 	for _, tierList := range phaseList {
 		if len(tierList) == 0 {
 			continue
@@ -122,7 +121,7 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					branchState = consts.BranchSucceed
 					errmsg      string
 				)
-				_, span := Tracer().Start(execCtx, "transport")
+				bCtx, span := Tracer(ctx, "reqRM")
 				span.SetAttributes(
 					attribute.String("protocol", string(transporter.GetType())),
 					attribute.String("reqUrl", b.Url),
@@ -132,12 +131,12 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 				if _, err = transporter.Request(groupCtx, b.Url, req); err != nil {
 					logging.Error(fmt.Sprintf("[Executor] Request branch:%vrequest error:%v", b, err))
 					errmsg = err.Error()
-					span.RecordError(err)
+					span.SetStatus(codes.Error, errmsg)
 					branchState = consts.BranchFailState
 				}
 				b.State = branchState
 
-				if _, erro := dao.GetTransaction().UpdateBranchStateByGid(ctx, b.BranchId,
+				if _, erro := dao.GetTransaction().UpdateBranchStateByGid(bCtx, b.BranchId,
 					b.State, errmsg); erro != nil {
 					logging.Error(fmt.Sprintf("[Executor]update branch state error:%v\n", erro))
 				}
