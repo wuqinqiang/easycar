@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/wuqinqiang/easycar/tracing"
+
 	"github.com/wuqinqiang/easycar/logging"
 
 	"github.com/wuqinqiang/easycar/core/coordinator/executor"
@@ -64,6 +66,8 @@ func main() {
 func MustLoad(settings *conf.Settings) {
 
 	settings.DB.Mysql.Init()
+
+	tracing.MustLoad(settings.Tracing.JaegerUri)
 
 	if settings.Timeout > 0 {
 		common.ReplaceTimeOut(time.Duration(settings.Timeout) * time.Second)
