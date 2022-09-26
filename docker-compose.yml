@@ -23,3 +23,14 @@ services:
       - "${MYSQL_PORT}:3306"
     networks:
       - easycar
+
+  jaeger:
+    container_name: jaeger
+    image: jaegertracing/all-in-one:1.19
+    ports:
+      - "6831:6831/udp"
+      - "5778:5778"
+      - "16686:16686"
+      - "14268:14268"
+    networks:
+      - easycar

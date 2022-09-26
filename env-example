@@ -1,4 +1,4 @@
-# 本地存储目录
+# local store path
 DATA_PATH_HOST=~/.easycar/data
 
 # NetWorks driver
