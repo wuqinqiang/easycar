@@ -1,25 +1,23 @@
 package retry
 
 import (
-	"fmt"
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewRetry(t *testing.T) {
+	retry := New(3, WithMaxBackOffTime(1*time.Second))
 
-	now := time.Now()
-	retry := NewRetry(3, 2, func() error {
-		fmt.Println("retry1")
+	assert.Equal(t, time.Second, retry.Duration())
+	assert.Equal(t, uint32(3), retry.allowAttempt)
+	assert.Equal(t, uint32(2), retry.factor)
+	assert.Equal(t, uint32(0), retry.currentAttempt)
+	err := retry.Run(func() error {
 		return nil
 	})
-	fmt.Println(retry.Duration())
-
-	if err := retry.Run(); err != nil {
-		fmt.Println("err:", err)
-	} else {
-		fmt.Println("done!")
-	}
-
-	fmt.Println("time.Now()-now:", time.Since(now))
+	assert.Equal(t, nil, err)
+	assert.Equal(t, time.Second, retry.Duration())
+	assert.Equal(t, uint32(1), retry.currentAttempt)
 }
