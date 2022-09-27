@@ -2,9 +2,12 @@ package executor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"time"
+
+	"github.com/wuqinqiang/easycar/tools/retry"
 
 	"go.opentelemetry.io/otel/codes"
 
@@ -61,7 +64,7 @@ func (e *executor) Phase2(ctx context.Context, global *entity.Global, branches e
 }
 
 func (e *executor) stratify(branches entity.BranchList, filterFn FilterFn) []entity.BranchList {
-	phaseList := make([]entity.BranchList, len(branches))
+	layerList := make([]entity.BranchList, len(branches))
 	// sort branches by level
 	sort.Slice(branches, func(i, j int) bool {
 		return branches[i].Level < branches[j].Level
@@ -83,25 +86,26 @@ func (e *executor) stratify(branches entity.BranchList, filterFn FilterFn) []ent
 			bucketIndex += 1
 			previousLevel = branch.Level
 		}
-		phaseList[bucketIndex] = append(phaseList[bucketIndex], branch)
+		layerList[bucketIndex] = append(layerList[bucketIndex], branch)
 	}
-	return phaseList
+	return layerList
 }
 
 func (e *executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
-	phaseList := e.stratify(branches, filterFn)
-	if len(phaseList) == 0 {
+	layerList := e.stratify(branches, filterFn)
+
+	if len(layerList) == 0 {
 		return nil
 	}
 
-	for _, tierList := range phaseList {
-		if len(tierList) == 0 {
+	for _, branchItems := range layerList {
+		if len(branchItems) == 0 {
 			continue
 		}
 
 		errGroup, groupCtx := errgroup.WithContext(ctx)
 
-		for _, branch := range tierList {
+		for _, branch := range branchItems {
 			b := branch
 			errGroup.Go(func() error {
 				transporter, err := e.manager.GetTransporter(common.Net(b.Protocol))
@@ -127,8 +131,17 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					attribute.String("reqUrl", b.Url),
 					attribute.String("branchId", b.BranchId),
 				)
+				r := retry.New(3, retry.WithMaxBackOffTime(1*time.Second))
 
-				if _, err = transporter.Request(groupCtx, b.Url, req); err != nil {
+				err = r.Run(func() error {
+					_, err = transporter.Request(groupCtx, b.Url, req)
+					return err
+				})
+
+				if err != nil {
+					if errors.Is(err, retry.ErrOverMaximumAttempt) {
+						logging.Warnf("over maximum attempt")
+					}
 					logging.Error(fmt.Sprintf("[Executor] Request branch:%vrequest error:%v", b, err))
 					errmsg = err.Error()
 					span.SetStatus(codes.Error, errmsg)

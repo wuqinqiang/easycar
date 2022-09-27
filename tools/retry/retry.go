@@ -8,67 +8,65 @@ import (
 )
 
 var (
-	// DefaultRetries everything only three times when you on china
-	DefaultRetries uint32 = 3
-	DefaultFactor  uint32 = 2
-	// MaxWaitBackOff 10 minutes
-	MaxWaitBackOff = time.Second * 10 * 60
-	// ErrMaxAttempt is returned when the max number of attempts has been reached
-	ErrMaxAttempt = fmt.Errorf("max attempt")
+	// DefaultAllowAttempt everything only three times when you on china
+	DefaultAllowAttempt uint32 = 3
+	DefaultFactor       uint32 = 2
+	// DefaultMaxBackOffTime 10 minutes
+	DefaultMaxBackOffTime = time.Second * 10 * 60
+	// ErrOverMaximumAttempt is returned when the max number of attempts has been reached
+	ErrOverMaximumAttempt = fmt.Errorf("over maximum attempt")
 )
 
-type (
-	Fn    func() error
-	Retry struct {
-		//min, max       time.Duration
-		factor         uint32
-		allowAttempt   uint32
-		currentAttempt uint32
-		timer          *time.Timer
-		fn             Fn
-		AfterFn        func() // AfterFn is called after the last attempt
-	}
-)
+type ExecuteFn func() error
 
-func NewRetry(allowRetries uint32, factor uint32, fn Fn) *Retry {
-	if allowRetries == 0 {
-		allowRetries = DefaultRetries
+type Retry struct {
+	factor         uint32
+	allowAttempt   uint32
+	currentAttempt uint32
+	timer          *time.Timer
+	maxBackOffTime time.Duration
+}
+
+func New(allowAttempt uint32, fns ...RetryFn) *Retry {
+
+	if allowAttempt == 0 {
+		allowAttempt = DefaultAllowAttempt
 	}
-	if factor == 0 {
-		factor = DefaultFactor
+
+	retry := &Retry{
+		allowAttempt:   allowAttempt,
+		factor:         DefaultFactor,
+		timer:          time.NewTimer(0),
+		maxBackOffTime: DefaultMaxBackOffTime,
 	}
-	b := &Retry{
-		allowAttempt: allowRetries,
-		factor:       factor,
-		fn:           fn,
-		timer:        time.NewTimer(0),
+	for _, fn := range fns {
+		fn(retry)
 	}
-	return b
+	return retry
 }
 func (b *Retry) Duration() time.Duration {
 	backDuration := time.Duration(math.Pow(float64(b.factor),
 		float64(b.currentAttempt))) * time.Second
-	if backDuration > MaxWaitBackOff {
-		backDuration = MaxWaitBackOff
+	if backDuration > b.maxBackOffTime {
+		backDuration = b.maxBackOffTime
 	}
 	return backDuration
 }
 
-func (b *Retry) Run() error {
-	atomic.AddUint32(&b.currentAttempt, 1)
+func (b *Retry) Run(fn ExecuteFn) error {
 	if b.currentAttempt > b.allowAttempt {
-		return ErrMaxAttempt
+		return ErrOverMaximumAttempt
 	}
+	atomic.AddUint32(&b.currentAttempt, 1)
 	<-b.timer.C
-	err := b.fn()
+	err := fn()
 	if err == nil {
 		b.timer.Stop()
 		return nil
 	}
 	b.timer.Reset(b.Duration())
-
-	if b.currentAttempt == b.allowAttempt {
+	if atomic.LoadUint32(&b.currentAttempt) == atomic.LoadUint32(&b.allowAttempt) {
 		return err
 	}
-	return b.Run()
+	return b.Run(fn)
 }

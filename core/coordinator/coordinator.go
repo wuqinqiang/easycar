@@ -79,8 +79,6 @@ func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branche
 	phase1State := consts.Phase1Success
 	defer func() {
 		if err != nil {
-			logging.Errorf(fmt.Sprintf("[Coordinator]Phase1 Execute err:%v", err),
-				"gid", global.GetGId())
 			phase1State = consts.Phase1Failed
 		}
 		global.State = phase1State
