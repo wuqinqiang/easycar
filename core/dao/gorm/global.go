@@ -21,7 +21,7 @@ type GlobalImpl struct {
 }
 
 func NewGlobalImpl() GlobalImpl {
-	return GlobalImpl{query: query.Use(conf.GetDb())}
+	return GlobalImpl{query: query.Use(conf.GetGorm())}
 }
 
 func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) error {
