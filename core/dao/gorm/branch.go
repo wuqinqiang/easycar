@@ -19,7 +19,7 @@ type BranchImpl struct {
 }
 
 func NewBranchImpl() BranchImpl {
-	return BranchImpl{query: query.Use(conf.GetDb())}
+	return BranchImpl{query: query.Use(conf.GetGorm())}
 }
 
 func (g BranchImpl) CreateBatches(ctx context.Context, list entity.BranchList) error {
