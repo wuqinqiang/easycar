@@ -3,6 +3,7 @@ package coordinator
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/wuqinqiang/easycar/logging"
 	"github.com/wuqinqiang/easycar/tracing"
@@ -40,6 +41,9 @@ func (c *Coordinator) Begin(ctx context.Context) (string, error) {
 	gid := entity.GetGid()
 	g := entity.NewGlobal(gid)
 	g.SetState(consts.Init)
+	now := time.Now().Unix()
+	g.CreateTime = now
+	g.UpdateTime = now
 	err := c.dao.CreateGlobal(ctx, g)
 	return gid, err
 }

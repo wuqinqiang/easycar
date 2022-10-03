@@ -6,8 +6,6 @@ import (
 
 	"gorm.io/gen/field"
 
-	"github.com/wuqinqiang/easycar/conf"
-
 	"github.com/wuqinqiang/easycar/tools"
 
 	"github.com/wuqinqiang/easycar/core/entity"
@@ -21,7 +19,7 @@ type GlobalImpl struct {
 }
 
 func NewGlobalImpl() GlobalImpl {
-	return GlobalImpl{query: query.Use(conf.GetGorm())}
+	return GlobalImpl{query: query.Use(db)}
 }
 
 func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) error {

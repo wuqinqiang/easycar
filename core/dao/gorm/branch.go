@@ -3,8 +3,6 @@ package gorm
 import (
 	"context"
 
-	"github.com/wuqinqiang/easycar/conf"
-
 	"github.com/wuqinqiang/easycar/tools"
 
 	"github.com/wuqinqiang/easycar/core/entity"
@@ -19,7 +17,7 @@ type BranchImpl struct {
 }
 
 func NewBranchImpl() BranchImpl {
-	return BranchImpl{query: query.Use(conf.GetGorm())}
+	return BranchImpl{query: query.Use(db)}
 }
 
 func (g BranchImpl) CreateBatches(ctx context.Context, list entity.BranchList) error {

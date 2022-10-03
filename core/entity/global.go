@@ -5,12 +5,12 @@ import (
 )
 
 type Global struct {
-	GID          string             `gorm:"column:g_id;type:varchar(255);not null"`               // global id
-	State        consts.GlobalState `gorm:"column:state;type:varchar(255);not null;default:init"` // global State
-	EndTime      int64              `gorm:"column:end_time;type:int;not null;default:0"`          // end time for the transaction
-	NextCronTime int64              `gorm:"column:next_cron_time;type:int;not null;default:0"`    // next cron time
-	CreateTime   int64              `gorm:"create_time;autoCreateTime" json:"create_time"`        // create time
-	UpdateTime   int64              `gorm:"update_time;autoCreateTime" json:"update_time"`        // last update time
+	GID          string             `gorm:"column:g_id;type:varchar(255);not null" bson:"g_id"`                      // global id
+	State        consts.GlobalState `gorm:"column:state;type:varchar(255);not null;default:init" bson:"state"`       // global State
+	EndTime      int64              `gorm:"column:end_time;type:int;not null;default:0" bson:"end_time"`             // end time for the transaction
+	NextCronTime int64              `gorm:"column:next_cron_time;type:int;not null;default:0" bson:"next_cron_time"` // next cron time
+	CreateTime   int64              `gorm:"create_time;autoCreateTime" json:"create_time" bson:"create_time"`        // create time
+	UpdateTime   int64              `gorm:"update_time;autoCreateTime" json:"update_time" bson:"update_time"`        // last update time
 }
 
 func (g Global) TableName() string {

@@ -48,6 +48,11 @@ func (b *Branch) AssignmentByPb(m *proto.RegisterReq_Branch) *Branch {
 	b.Protocol = m.GetProtocol()
 	b.Action = GetActionByPb(m.GetAction())
 	b.Level = consts.Level(m.GetLevel())
+	b.State = consts.BranchInit
+	now := time.Now().Unix()
+	b.CreateTime = now
+	b.UpdateTime = now
+
 	var (
 		buffer bytes.Buffer
 	)

@@ -48,11 +48,6 @@ func main() {
 	}
 	httpProxySrv := httpsrv.New(settings.HTTPPort, settings.GRPCPort)
 
-	//runner
-	//runnerSrv, err := runner.NewRunner("@every 50m", func(ctx context.Context) {
-	//	fmt.Println("hello world")
-	//})
-
 	core := core.New(core.WithServers(grpcSrv, httpProxySrv))
 	if err != nil {
 		log.Fatal(err)
@@ -64,8 +59,7 @@ func main() {
 }
 
 func MustLoad(settings *conf.Settings) {
-
-	settings.DB.Mysql.Init()
+	settings.DB.Init()
 
 	tracing.MustLoad(settings.Tracing.JaegerUri)
 
