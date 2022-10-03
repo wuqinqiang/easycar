@@ -1,5 +1,7 @@
 package conf
 
+import "fmt"
+
 type (
 	Mode string
 )
@@ -13,8 +15,9 @@ const (
 
 type (
 	DB struct {
-		Driver string `ymal:"driver"`
-		Mysql  Mysql  `json:"mysql"`
+		Driver  string        `yaml:"driver"`
+		Mysql   MysqlSettings `yaml:"mysql"`
+		Mongodb MongoSetting  `yaml:"mongodb"`
 	}
 
 	Settings struct {
@@ -44,4 +47,15 @@ func (r *Retry) IsOpen() bool {
 
 type Conf interface {
 	Load() (*Settings, error)
+}
+
+func (db *DB) Init() {
+	switch db.Driver {
+	case "mysql":
+		db.Mysql.Init()
+	case "mongodb":
+		db.Mongodb.Init()
+	default:
+		panic(fmt.Errorf("no support %s database", db.Driver))
+	}
 }

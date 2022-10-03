@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/wuqinqiang/easycar/core/dao"
+	"github.com/wuqinqiang/easycar/core/dao/mongodb"
+
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -17,26 +20,32 @@ const (
 )
 
 type MongoSetting struct {
-	Uri     string `yaml:"uri"` // example: mongodb://localhost:27017
+	Uri     string `yaml:"url"` // example: mongodb://localhost:27017
 	MinPool int    `yaml:"minPool"`
 	MaxPool int    `yaml:"maxPool"`
 }
 
-func (settings *MongoSetting) GetClient() (*mongo.Client, error) {
+func (settings *MongoSetting) Init() {
 	if settings.Uri == "" {
-		return nil, fmt.Errorf("empty mongo uri")
+		panic(fmt.Errorf("emtpy mongo uri"))
 	}
 	opts := new(options.ClientOptions)
 	opts.SetConnectTimeout(defaultTimeout)
 	opts.SetServerSelectionTimeout(defaultTimeout)
-	opts.SetMinPoolSize(uint64(settings.MinPool))
-	maxPool := settings.MaxPool
-	if maxPool > AllowMaxPool {
-		maxPool = AllowMaxPool
+	minPool := settings.MinPool
+	if minPool < MinPool {
+		minPool = MinPool
 	}
+	opts.SetMinPoolSize(uint64(minPool))
+	maxPool := settings.MaxPool
 	if maxPool < settings.MinPool {
 		maxPool = DefaultMaxPool
 	}
+
+	if maxPool > AllowMaxPool {
+		maxPool = AllowMaxPool
+	}
+
 	opts.SetMaxPoolSize(uint64(maxPool))
 
 	opts.ApplyURI(settings.Uri)
@@ -46,13 +55,14 @@ func (settings *MongoSetting) GetClient() (*mongo.Client, error) {
 	)
 	client, err = mongo.Connect(context.TODO(), opts)
 	if err != nil {
-		return nil, fmt.Errorf("mongo connect err: %v", err)
+		panic(fmt.Errorf("mongo connect err: %v", err))
 	}
 	// ping client conn
 	ctx, cancel := context.WithTimeout(context.TODO(), time.Second*2)
 	defer cancel()
 	if err = client.Ping(ctx, nil); err != nil {
-		return nil, fmt.Errorf("ping mongo err:%v", err)
+		panic(fmt.Errorf("ping mongo err:%v", err))
 	}
-	return client, nil
+	// todo option
+	dao.SetTransaction(mongodb.NewDao(client, "easycar"))
 }

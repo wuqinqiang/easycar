@@ -23,6 +23,17 @@ services:
       - "${MYSQL_PORT}:3306"
     networks:
       - easycar
+  mongodb:
+    image: mongo:${MONGODB_VERSION}
+    container_name: easycar_mongodb
+    #  restart: always
+    ports:
+      - "${MONGODB_PORT}:27017"
+    volumes:
+      - ${DATA_PATH_HOST}/mongodb/data/db:/data/db
+      - ${DATA_PATH_HOST}/mongodb/data/configdb:/data/configdb
+    networks:
+      - easycar
 
   jaeger:
     container_name: jaeger
