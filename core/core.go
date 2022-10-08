@@ -34,18 +34,18 @@ func New(opts ...Opt) *Core {
 		runWaitGroup: sync.WaitGroup{},
 		once:         sync.Once{},
 	}
-	var (
-		ctx context.Context
-	)
-	ctx, core.cancel = context.WithCancel(context.Background())
-	core.errGroup, core.stopCtx = errgroup.WithContext(ctx)
-
 	for _, opt := range opts {
 		opt(core)
 	}
 	return core
 }
 func (core *Core) Run(ctx context.Context) error {
+	var (
+		c1 context.Context
+	)
+	c1, core.cancel = context.WithCancel(ctx)
+	core.errGroup, core.stopCtx = errgroup.WithContext(c1)
+
 	for _, server := range core.servers {
 		core.runWaitGroup.Add(1)
 		srv := server
@@ -81,6 +81,9 @@ func (core *Core) Run(ctx context.Context) error {
 }
 
 func (core *Core) Stop() error {
+	if core.cancel == nil {
+		return nil
+	}
 	core.once.Do(func() {
 		core.cancel()
 	})

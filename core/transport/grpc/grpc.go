@@ -69,9 +69,9 @@ func (g *Transport) Close(ctx context.Context) error {
 		if err := conn.Close(); err != nil {
 			logging.Error(fmt.Sprintf("[grpc] Transport close err:%v", err))
 		}
-		logging.Infof("[grpc] Transport close")
 		return true
 	})
+	logging.Infof("[grpc] all ClientConn closed")
 	return nil
 }
 

@@ -36,16 +36,23 @@ conf.yml file
 grpcPort: 8089
 httpPort: 8085
 automaticExecution2: false  #If it is true, when the first stage of execution ends, it will automatically commit or rollback
-dirver: mysql
 timeout: 7 #unit of second
 
 db:
+  driver: mongodb
   mysql:
     dbURL: easycar:easycar@tcp(127.0.0.1:3306)/easycar?charset=utf8&parseTime=True&loc=Local
     maxLifetime: 7200
     maxIdleConns: 10
     maxOpenConns: 20
+  mongodb:
+    url: mongodb://127.0.0.1:27017/easycar
+    minPool: 10
+    maxPool: 20
     ## add more
+
+tracing:
+  jaegerUrl: http://localhost:14268/api/traces
 ```
 
 More configuration methods will be provided later
