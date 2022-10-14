@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"sync"
 	"time"
 
@@ -75,4 +76,11 @@ func (srv *HttpSrv) Stop(ctx context.Context) (err error) {
 	})
 	logging.Info("[HttpSrv]Stopped")
 	return
+}
+
+func (srv *HttpSrv) Endpoint() *url.URL {
+	return &url.URL{
+		Scheme: "http",
+		Host:   "127.0.0.1:8088",
+	}
 }

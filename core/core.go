@@ -6,6 +6,11 @@ import (
 	"os/signal"
 	"sync"
 	"syscall"
+	"time"
+
+	"github.com/wuqinqiang/easycar/core/endponit"
+
+	"github.com/wuqinqiang/easycar/core/registry"
 
 	"github.com/wuqinqiang/easycar/logging"
 
@@ -21,11 +26,19 @@ type Core struct {
 	errGroup     *errgroup.Group
 	cancel       func()
 	once         sync.Once
+	registry     registry.Registry
+	instance     *registry.EasyCarInstance
 }
 
 func WithServers(srvs ...Server) Opt {
 	return func(core *Core) {
 		core.servers = append(core.servers, srvs...)
+	}
+}
+
+func WithRegistry(r registry.Registry) Opt {
+	return func(core *Core) {
+		core.registry = r
 	}
 }
 
@@ -46,8 +59,14 @@ func (core *Core) Run(ctx context.Context) error {
 	c1, core.cancel = context.WithCancel(ctx)
 	core.errGroup, core.stopCtx = errgroup.WithContext(c1)
 
+	core.instance = registry.NewEasyCarInstance()
+
 	for _, server := range core.servers {
 		core.runWaitGroup.Add(1)
+
+		if e, ok := server.(endponit.Endpoint); ok {
+			core.instance.Node = append(core.instance.Node, e.Endpoint().String())
+		}
 		srv := server
 		core.errGroup.Go(func() error {
 			<-core.stopCtx.Done()
@@ -62,6 +81,12 @@ func (core *Core) Run(ctx context.Context) error {
 	// wait for all service is  start
 	core.runWaitGroup.Wait()
 	logging.Info("easycar start")
+
+	if core.registry != nil {
+		if err := core.registry.Register(c1, core.instance); err != nil {
+			return err
+		}
+	}
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGINT)
@@ -80,12 +105,17 @@ func (core *Core) Run(ctx context.Context) error {
 	return nil
 }
 
-func (core *Core) Stop() error {
+func (core *Core) Stop() (err error) {
 	if core.cancel == nil {
 		return nil
 	}
 	core.once.Do(func() {
+		if core.registry != nil {
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+			err = core.registry.DeRegister(ctx, core.instance)
+		}
 		core.cancel()
 	})
-	return nil
+	return
 }

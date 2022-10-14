@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/url"
 	"sync"
 	"time"
 
@@ -83,4 +84,11 @@ func (s *GrpcSrv) Stop(ctx context.Context) (err error) {
 	}
 	elog.Info("[GrpcSrv] stopped")
 	return
+}
+
+func (s *GrpcSrv) Endpoint() *url.URL {
+	return &url.URL{
+		Scheme: "grpc",
+		Host:   "127.0.0.1:8088",
+	}
 }
