@@ -7,8 +7,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/wuqinqiang/easycar/core/registry/etcdx"
-
 	"github.com/wuqinqiang/easycar/tracing"
 
 	"github.com/wuqinqiang/easycar/logging"
@@ -48,17 +46,22 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	httpProxySrv := httpsrv.New(settings.HTTPPort, settings.GRPCPort)
+	var (
+		opts []core.Opt
+	)
 
-	etcdRegistry, err := etcdx.NewRegistry(etcdx.Conf{
-		Hosts:              []string{"127.0.0.1:2379"},
-		InsecureSkipVerify: false,
-	})
-	if err != nil {
-		log.Fatal(err)
+	httpProxySrv := httpsrv.New(settings.HTTPPort, settings.GRPCPort)
+	opts = append(opts, core.WithServers(grpcSrv, httpProxySrv))
+
+	if !settings.IsRegistryEmpty() {
+		registry, err := settings.GetRegistry()
+		if err != nil {
+			log.Fatal(err)
+		}
+		opts = append(opts, core.WithRegistry(registry))
 	}
 
-	core := core.New(core.WithServers(grpcSrv, httpProxySrv), core.WithRegistry(etcdRegistry))
+	core := core.New(opts...)
 	if err != nil {
 		log.Fatal(err)
 	}

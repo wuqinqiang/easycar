@@ -8,6 +8,7 @@ import (
 )
 
 type watcher struct {
+	first     bool
 	ctx       context.Context
 	cancel    func()
 	key       string
@@ -17,6 +18,7 @@ type watcher struct {
 
 func NewWatcher(ctx context.Context, client *clientv3.Client, key string) (*watcher, error) {
 	w := &watcher{
+		first:  true,
 		key:    key,
 		client: client,
 	}
@@ -29,6 +31,11 @@ func NewWatcher(ctx context.Context, client *clientv3.Client, key string) (*watc
 }
 
 func (w *watcher) Next() ([]*registry.EasyCarInstance, error) {
+	if !w.first {
+		w.first = false
+		return w.getInstances()
+	}
+
 	select {
 	case <-w.ctx.Done():
 		return nil, w.ctx.Err()

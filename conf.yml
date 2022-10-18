@@ -16,7 +16,13 @@ db:
     minPool: 10
     maxPool: 20
 
-    ## add more
+registry:
+  etcd:
+    user: ""
+    pass: ""
+    hosts:
+      - 127.0.0.1:2379
+  ## add more
 
 tracing:
   jaegerUrl: http://localhost:14268/api/traces
