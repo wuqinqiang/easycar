@@ -20,13 +20,13 @@ type defaultResolver struct {
 	cancel  func()
 }
 
-func NewDefaultResolver(ctx context.Context, cancel func(), cc resolver.ClientConn, w registry.Watcher) *defaultResolver {
+func NewDefaultResolver(ctx context.Context, cc resolver.ClientConn, w registry.Watcher) *defaultResolver {
 	r := &defaultResolver{
 		cc:      cc,
 		watcher: w,
-		ctx:     ctx,
-		cancel:  cancel,
 	}
+	r.ctx, r.cancel = context.WithCancel(ctx)
+
 	tools.GoSafe(func() {
 		r.watch()
 	})

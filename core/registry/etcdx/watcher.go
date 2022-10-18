@@ -31,7 +31,7 @@ func NewWatcher(ctx context.Context, client *clientv3.Client, key string) (*watc
 }
 
 func (w *watcher) Next() ([]*registry.EasyCarInstance, error) {
-	if !w.first {
+	if w.first {
 		w.first = false
 		return w.getInstances()
 	}
