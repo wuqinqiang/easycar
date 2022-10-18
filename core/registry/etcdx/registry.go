@@ -58,9 +58,9 @@ func (r *Registry) Register(ctx context.Context, instance *registry.EasyCarInsta
 	return nil
 }
 
-func (r *Registry) Watch(ctx context.Context, key string) (registry.Watcher, error) {
-	w, err := NewWatcher(ctx, r.client, key)
-	return w, err
+func (r *Registry) DeRegister(ctx context.Context, instance *registry.EasyCarInstance) error {
+	_, err := r.client.Delete(ctx, instance.Key())
+	return err
 }
 
 func (r *Registry) keepalive(ctx context.Context, id clientv3.LeaseID) {
@@ -87,7 +87,7 @@ func (r *Registry) keepalive(ctx context.Context, id clientv3.LeaseID) {
 
 }
 
-func (r *Registry) DeRegister(ctx context.Context, instance *registry.EasyCarInstance) error {
-	_, err := r.client.Delete(ctx, instance.Key())
-	return err
+func (r *Registry) Watch(ctx context.Context, key string) (registry.Watcher, error) {
+	w, err := NewWatcher(ctx, r.client, key)
+	return w, err
 }

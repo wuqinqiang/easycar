@@ -44,12 +44,3 @@ type Registry interface {
 	Register(ctx context.Context, instance *EasyCarInstance) error
 	DeRegister(ctx context.Context, instance *EasyCarInstance) error
 }
-
-type Discovery interface {
-	Watch(ctx context.Context, key string) (Watcher, error)
-}
-
-type Watcher interface {
-	Next() ([]*EasyCarInstance, error)
-	Stop() error
-}

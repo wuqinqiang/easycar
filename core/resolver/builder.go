@@ -11,24 +11,29 @@ import (
 	"google.golang.org/grpc/resolver"
 )
 
-var _ resolver.Builder = (*builder)(nil)
-
-type builder struct {
+type Builder struct {
 	discoverer   registry.Discovery
 	watchTimeout time.Duration
 }
 
-func NewBuilder(d registry.Discovery) *builder {
-	return &builder{
-		discoverer:   d,
-		watchTimeout: time.Second * 8,
-	}
+func Init() {
+	resolver.Register(&Builder{})
 }
 
-func (b builder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
+func (b Builder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	watchCtx, watchCancel := context.WithTimeout(ctx, b.watchTimeout)
 	defer watchCancel()
+	var (
+		err error
+	)
+	if b.discoverer == nil {
+		if b.discoverer, err = registry.GetDiscovery(target.URL.Scheme); err != nil {
+			cancel()
+			return nil, err
+		}
+	}
+
 	watch, err := b.discoverer.Watch(watchCtx, strings.TrimPrefix(target.URL.Path, "/"))
 	if err != nil {
 		cancel()
@@ -41,6 +46,6 @@ func (b builder) Build(target resolver.Target, cc resolver.ClientConn, opts reso
 	return r, nil
 }
 
-func (b builder) Scheme() string {
+func (b Builder) Scheme() string {
 	return "easycar"
 }
