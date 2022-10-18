@@ -81,6 +81,6 @@ func (srv *HttpSrv) Stop(ctx context.Context) (err error) {
 func (srv *HttpSrv) Endpoint() *url.URL {
 	return &url.URL{
 		Scheme: "http",
-		Host:   "127.0.0.1:8088",
+		Host:   "127.0.0.1:8085",
 	}
 }
