@@ -35,7 +35,6 @@ func (w *watcher) Next() ([]*registry.EasyCarInstance, error) {
 		w.first = false
 		return w.getInstances()
 	}
-
 	select {
 	case <-w.ctx.Done():
 		return nil, w.ctx.Err()

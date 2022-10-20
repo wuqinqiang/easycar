@@ -6,8 +6,6 @@ import (
 
 	"github.com/wuqinqiang/easycar/core/endponit"
 
-	"github.com/wuqinqiang/easycar/tools"
-
 	"github.com/wuqinqiang/easycar/core/registry"
 	"github.com/wuqinqiang/easycar/logging"
 	"google.golang.org/grpc/resolver"
@@ -26,10 +24,6 @@ func NewDefaultResolver(ctx context.Context, cc resolver.ClientConn, w registry.
 		watcher: w,
 	}
 	r.ctx, r.cancel = context.WithCancel(ctx)
-
-	tools.GoSafe(func() {
-		r.watch()
-	})
 	return r
 }
 
@@ -53,9 +47,10 @@ func (r *defaultResolver) updateState(list []*registry.EasyCarInstance) {
 	var (
 		state resolver.State
 	)
+	logging.Info(fmt.Sprintf("[defaultResolver]updateState:%v", list))
 
 	for _, instance := range list {
-		e, err := endponit.GetHostByEndpoint(instance.Node, "grpc")
+		e, err := endponit.GetHostByEndpoint(instance.Nodes, "grpc")
 		if err != nil {
 			logging.Error(fmt.Sprintf("[updateState]GetHostByEndpoint err:%v", err))
 			continue
@@ -82,8 +77,7 @@ func (r *defaultResolver) updateState(list []*registry.EasyCarInstance) {
 	}
 }
 
-func (r *defaultResolver) ResolveNow(options resolver.ResolveNowOptions) {
-}
+func (r *defaultResolver) ResolveNow(options resolver.ResolveNowOptions) {}
 
 func (r *defaultResolver) Close() {
 	r.cancel()

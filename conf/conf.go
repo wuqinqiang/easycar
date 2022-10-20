@@ -28,8 +28,8 @@ type (
 
 	Settings struct {
 		DB                  DB               `yaml:"db"`
-		GRPCPort            int              `yaml:"grpcPort"`
-		HTTPPort            int              `yaml:"httpPort"`
+		GRPCListen          string           `yaml:"grpcListen"`
+		HTTPListen          string           `yaml:"httpListen"`
 		Timeout             int64            `yaml:"timeout"`
 		AutomaticExecution2 bool             `yaml:"automaticExecution2"`
 		Tracing             Tracing          `yaml:"tracing"`

@@ -6,6 +6,11 @@ import (
 	"fmt"
 )
 
+const (
+	ServerName string = "easycar"
+	Version    string = "v1"
+)
+
 type EasyCarInstance struct {
 	Id      string `json:"id"`
 	Name    string `json:"name"`
@@ -13,13 +18,17 @@ type EasyCarInstance struct {
 	// examples:
 	// http://127.0.0.1:8080
 	// grpc://127.0.0.1:8085
-	Node []string `json:"node"`
+	Nodes []string `json:"node"`
+}
+
+func (instance *EasyCarInstance) String() string {
+	return fmt.Sprintf("%+v", *instance)
 }
 
 func NewEasyCarInstance() *EasyCarInstance {
 	return &EasyCarInstance{
-		Name:    "/easycar",
-		Version: "v1",
+		Name:    ServerName,
+		Version: Version,
 	}
 }
 
@@ -37,7 +46,7 @@ func (instance *EasyCarInstance) Marshal() string {
 }
 
 func (instance *EasyCarInstance) Key() string {
-	return fmt.Sprintf("%s/%s", instance.Name, instance.Id)
+	return fmt.Sprintf("/%s/%s", instance.Name, instance.Id)
 }
 
 type Registry interface {

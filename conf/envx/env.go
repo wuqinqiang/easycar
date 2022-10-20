@@ -29,9 +29,9 @@ func (env *Env) Load() (*conf.Settings, error) {
 		return res
 	}
 
-	servicePort := convertFn("PORT")
-	if servicePort > 0 {
-		defaultConf.GRPCPort = servicePort
+	grpcListen := os.Getenv("GRPC_LISTEN")
+	if grpcListen != "" {
+		defaultConf.GRPCListen = grpcListen
 	}
 
 	lifeTime := convertFn(os.Getenv("MYSQL_MAX_LIFE_TIME"))
