@@ -11,31 +11,25 @@ import (
 	"github.com/wuqinqiang/easycar/logging"
 
 	"github.com/wuqinqiang/easycar/tools"
-
-	"google.golang.org/grpc/credentials/insecure"
-
-	"google.golang.org/grpc"
-
-	"github.com/fatih/color"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/wuqinqiang/easycar/proto"
 )
 
+type HandlerFn func(ctx context.Context) (http.Handler, error)
+
 type HttpSrv struct {
-	listenOn     string
-	grpcListenOn string
-	timeout      time.Duration
-	httpServer   *http.Server
-	once         sync.Once
+	listenOn   string
+	fn         HandlerFn
+	timeout    time.Duration
+	httpServer *http.Server
+	once       sync.Once
 	//tls     *tls.Config
 }
 
-func New(httpListenOn, grpcListenOn string, opts ...Opt) *HttpSrv {
+func New(httpListenOn string, fn HandlerFn, opts ...Opt) *HttpSrv {
 	h := &HttpSrv{
-		listenOn:     httpListenOn,
-		grpcListenOn: grpcListenOn,
-		once:         sync.Once{},
-		timeout:      10 * time.Second,
+		fn:       fn,
+		listenOn: httpListenOn,
+		once:     sync.Once{},
+		timeout:  10 * time.Second,
 	}
 	for _, opt := range opts {
 		opt(h)
@@ -43,26 +37,18 @@ func New(httpListenOn, grpcListenOn string, opts ...Opt) *HttpSrv {
 	return h
 }
 
-func (srv *HttpSrv) Run(ctx context.Context) (err error) {
-	conn, err := grpc.DialContext(ctx, srv.grpcListenOn, grpc.WithBlock(),
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
+func (srv *HttpSrv) Run(ctx context.Context) error {
+	h, err := srv.fn(ctx)
 	if err != nil {
-		fmt.Println(color.HiRedString("grpc DialContext:err:%v", err))
 		return err
 	}
-
-	gwmux := runtime.NewServeMux()
-	if err = proto.RegisterEasyCarHandler(ctx, gwmux, conn); err != nil {
-		return err
-	}
-
 	srv.httpServer = &http.Server{
 		Addr:    srv.listenOn,
-		Handler: gwmux,
+		Handler: h,
 	}
 	tools.GoSafe(func() {
 		if err = srv.httpServer.ListenAndServe(); err != nil {
-			return
+			logging.Error(fmt.Sprintf("[HttpSrv ]ListenAndServe err:%v", err))
 		}
 	})
 	logging.Info(fmt.Sprintf("[HttpSrv] http listen:%s", srv.listenOn))

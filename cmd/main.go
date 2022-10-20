@@ -52,7 +52,7 @@ func main() {
 		opts []core.Opt
 	)
 
-	httpProxySrv := httpsrv.New(tools.FigureOutListen(settings.HTTPListen), tools.FigureOutListen(settings.GRPCListen))
+	httpProxySrv := httpsrv.New(tools.FigureOutListen(settings.HTTPListen), grpcSrv.HttpHandler)
 	opts = append(opts, core.WithServers(grpcSrv, httpProxySrv))
 
 	if !settings.IsRegistryEmpty() {
