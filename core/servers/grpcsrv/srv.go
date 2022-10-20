@@ -6,9 +6,14 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"net/url"
 	"sync"
 	"time"
+
+	"github.com/fatih/color"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"github.com/wuqinqiang/easycar/core/coordinator"
 
@@ -73,6 +78,18 @@ func (s *GrpcSrv) Run(ctx context.Context) error {
 	}()
 	elog.Info(fmt.Sprintf("[Grpc] grpc listen:%s", s.listenOn))
 	return nil
+}
+
+func (s *GrpcSrv) HttpHandler(ctx context.Context) (http.Handler, error) {
+	conn, err := grpc.DialContext(ctx, s.listenOn, grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		fmt.Println(color.HiRedString("grpc DialContext:err:%v", err))
+		return nil, err
+	}
+	mux := runtime.NewServeMux()
+	err = proto.RegisterEasyCarHandler(ctx, mux, conn)
+	return mux, err
 }
 
 func (s *GrpcSrv) Stop(ctx context.Context) (err error) {
