@@ -72,14 +72,13 @@ func (r *Registry) keepalive(ctx context.Context, id clientv3.LeaseID) {
 
 	for {
 		select {
-		case resp, ok := <-resp:
+		case _, ok := <-resp:
 			if !ok {
 				if ctx.Err() != nil {
 					logging.Errorf(fmt.Sprintf("[keepalive] resp err:%v", err))
 					return
 				}
 			}
-			logging.Infof(fmt.Sprintf("[keepalive]:%+v", resp))
 		case <-r.opts.ctx.Done():
 			return
 		}

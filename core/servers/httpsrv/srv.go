@@ -22,20 +22,20 @@ import (
 )
 
 type HttpSrv struct {
-	port       int
-	grpcPort   int
-	timeout    time.Duration
-	httpServer *http.Server
-	once       sync.Once
+	listenOn     string
+	grpcListenOn string
+	timeout      time.Duration
+	httpServer   *http.Server
+	once         sync.Once
 	//tls     *tls.Config
 }
 
-func New(port, grpcPort int, opts ...Opt) *HttpSrv {
+func New(httpListenOn, grpcListenOn string, opts ...Opt) *HttpSrv {
 	h := &HttpSrv{
-		port:     port,
-		grpcPort: grpcPort,
-		once:     sync.Once{},
-		timeout:  10 * time.Second,
+		listenOn:     httpListenOn,
+		grpcListenOn: grpcListenOn,
+		once:         sync.Once{},
+		timeout:      10 * time.Second,
 	}
 	for _, opt := range opts {
 		opt(h)
@@ -44,8 +44,7 @@ func New(port, grpcPort int, opts ...Opt) *HttpSrv {
 }
 
 func (srv *HttpSrv) Run(ctx context.Context) (err error) {
-	conn, err := grpc.DialContext(ctx, fmt.Sprintf(":%d", srv.grpcPort),
-		grpc.WithBlock(),
+	conn, err := grpc.DialContext(ctx, srv.grpcListenOn, grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		fmt.Println(color.HiRedString("grpc DialContext:err:%v", err))
@@ -58,7 +57,7 @@ func (srv *HttpSrv) Run(ctx context.Context) (err error) {
 	}
 
 	srv.httpServer = &http.Server{
-		Addr:    fmt.Sprintf(":%d", srv.port),
+		Addr:    srv.listenOn,
 		Handler: gwmux,
 	}
 	tools.GoSafe(func() {
@@ -66,7 +65,7 @@ func (srv *HttpSrv) Run(ctx context.Context) (err error) {
 			return
 		}
 	})
-	logging.Info(fmt.Sprintf("[HttpSrv] http port:%d", srv.port))
+	logging.Info(fmt.Sprintf("[HttpSrv] http listen:%s", srv.listenOn))
 	return nil
 }
 
@@ -81,6 +80,6 @@ func (srv *HttpSrv) Stop(ctx context.Context) (err error) {
 func (srv *HttpSrv) Endpoint() *url.URL {
 	return &url.URL{
 		Scheme: "http",
-		Host:   "127.0.0.1:8085",
+		Host:   srv.listenOn,
 	}
 }

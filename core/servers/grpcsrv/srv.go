@@ -33,17 +33,17 @@ type GrpcSrv struct {
 	lis net.Listener
 
 	timeout    time.Duration
-	port       int
+	listenOn   string
 	once       sync.Once
 	grpcOpts   []grpc.ServerOption
 	grpcServer *grpc.Server
 }
 
-func New(port int, coordinator *coordinator.Coordinator, opts ...Opt) (*GrpcSrv, error) {
+func New(listenOn string, coordinator *coordinator.Coordinator, opts ...Opt) (*GrpcSrv, error) {
 	srv := &GrpcSrv{
 		coordinator: coordinator,
 		timeout:     10 * time.Second,
-		port:        port,
+		listenOn:    listenOn,
 		once:        sync.Once{},
 	}
 
@@ -56,7 +56,7 @@ func New(port int, coordinator *coordinator.Coordinator, opts ...Opt) (*GrpcSrv,
 	var (
 		err error
 	)
-	srv.lis, err = net.Listen("tcp", fmt.Sprintf(":%d", port))
+	srv.lis, err = net.Listen("tcp", listenOn)
 	return srv, err
 }
 
@@ -71,7 +71,7 @@ func (s *GrpcSrv) Run(ctx context.Context) error {
 			log.Fatal(err)
 		}
 	}()
-	elog.Info(fmt.Sprintf("[Grpc] grpc port:%d", s.port))
+	elog.Info(fmt.Sprintf("[Grpc] grpc listen:%s", s.listenOn))
 	return nil
 }
 
@@ -89,6 +89,6 @@ func (s *GrpcSrv) Stop(ctx context.Context) (err error) {
 func (s *GrpcSrv) Endpoint() *url.URL {
 	return &url.URL{
 		Scheme: "grpc",
-		Host:   "127.0.0.1:8089",
+		Host:   s.listenOn,
 	}
 }

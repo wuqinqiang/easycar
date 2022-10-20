@@ -65,7 +65,7 @@ func (core *Core) Run(ctx context.Context) error {
 		core.runWaitGroup.Add(1)
 
 		if e, ok := server.(endponit.Endpoint); ok {
-			core.instance.Node = append(core.instance.Node, e.Endpoint().String())
+			core.instance.Nodes = append(core.instance.Nodes, e.Endpoint().String())
 		}
 		srv := server
 		core.errGroup.Go(func() error {

@@ -1,6 +1,6 @@
 ## conf
-grpcPort: 8089
-httpPort: 8085
+grpcListen: 127.0.0.1:8089
+httpListen: 127.0.0.1:8085
 automaticExecution2: false  #If it is true, when the first stage of execution ends, it will automatically commit or rollback
 timeout: 7 #unit of second
 

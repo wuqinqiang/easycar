@@ -7,6 +7,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/wuqinqiang/easycar/tools"
+
 	"github.com/wuqinqiang/easycar/tracing"
 
 	"github.com/wuqinqiang/easycar/logging"
@@ -42,7 +44,7 @@ func main() {
 	MustLoad(settings)
 	setCoordinator := coordinator.NewCoordinator(dao.GetTransaction(),
 		executor.NewExecutor(), settings.AutomaticExecution2)
-	grpcSrv, err := grpcsrv.New(settings.GRPCPort, setCoordinator)
+	grpcSrv, err := grpcsrv.New(tools.FigureOutListen(settings.GRPCListen), setCoordinator)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -50,7 +52,7 @@ func main() {
 		opts []core.Opt
 	)
 
-	httpProxySrv := httpsrv.New(settings.HTTPPort, settings.GRPCPort)
+	httpProxySrv := httpsrv.New(tools.FigureOutListen(settings.HTTPListen), tools.FigureOutListen(settings.GRPCListen))
 	opts = append(opts, core.WithServers(grpcSrv, httpProxySrv))
 
 	if !settings.IsRegistryEmpty() {
