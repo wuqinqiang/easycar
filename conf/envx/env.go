@@ -31,7 +31,7 @@ func (env *Env) Load() (*conf.Settings, error) {
 
 	grpcListen := os.Getenv("GRPC_LISTEN")
 	if grpcListen != "" {
-		defaultConf.GRPCListen = grpcListen
+		defaultConf.Server.Grpc.ListenOn = "0.0.0.0:8089"
 	}
 
 	lifeTime := convertFn(os.Getenv("MYSQL_MAX_LIFE_TIME"))

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"crypto/tls"
 	"flag"
 	"log"
 	"os"
@@ -44,16 +45,32 @@ func main() {
 	MustLoad(settings)
 	setCoordinator := coordinator.NewCoordinator(dao.GetTransaction(),
 		executor.NewExecutor(), settings.AutomaticExecution2)
-	grpcSrv, err := grpcsrv.New(tools.FigureOutListen(settings.GRPCListen), setCoordinator)
-	if err != nil {
-		log.Fatal(err)
+
+	var grpcOpts []grpcsrv.Opt
+
+	if settings.Grpc.IsSSL() {
+		certificate, err := tls.LoadX509KeyPair(settings.Grpc.CertFile, settings.Grpc.KeyFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		grpcOpts = append(grpcOpts, grpcsrv.WithTls(&tls.Config{Certificates: []tls.Certificate{certificate}}))
 	}
+
 	var (
 		opts []core.Opt
 	)
 
-	httpProxySrv := httpsrv.New(tools.FigureOutListen(settings.HTTPListen), grpcSrv.HttpHandler)
-	opts = append(opts, core.WithServers(grpcSrv, httpProxySrv))
+	grpcSrv, err := grpcsrv.New(tools.FigureOutListen(settings.Server.Grpc.ListenOn), setCoordinator, grpcOpts...)
+	if err != nil {
+		log.Fatal(err)
+	}
+	opts = append(opts, core.WithServers(grpcSrv))
+
+	if settings.Grpc.IsOpenGateway() {
+		httpProxySrv := httpsrv.New(tools.FigureOutListen(settings.Http.ListenOn),
+			grpcSrv.HttpHandler(settings.Grpc.Gateway.CertFile, settings.Grpc.Gateway.ServerName))
+		opts = append(opts, core.WithServers(httpProxySrv))
+	}
 
 	if !settings.IsRegistryEmpty() {
 		registry, err := settings.GetRegistry()
@@ -77,6 +94,13 @@ func MustLoad(settings *conf.Settings) {
 	settings.DB.Init()
 
 	tracing.MustLoad(settings.Tracing.JaegerUri)
+
+	if settings.Server.Http.ListenOn == "" {
+		settings.Server.Http.ListenOn = "0.0.0.0:8085"
+	}
+	if settings.Server.Grpc.ListenOn == "" {
+		settings.Server.Grpc.ListenOn = "0.0.0.0:8088"
+	}
 
 	if settings.Timeout > 0 {
 		common.ReplaceTimeOut(time.Duration(settings.Timeout) * time.Second)

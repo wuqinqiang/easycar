@@ -2,6 +2,7 @@ package grpcsrv
 
 import (
 	"context"
+	"crypto/tls"
 	"errors"
 	"fmt"
 	"log"
@@ -11,10 +12,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fatih/color"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	"github.com/wuqinqiang/easycar/core/servers/httpsrv"
+
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
 
+	"github.com/fatih/color"
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/wuqinqiang/easycar/core/coordinator"
 
 	elog "github.com/wuqinqiang/easycar/logging"
@@ -42,6 +46,8 @@ type GrpcSrv struct {
 	once       sync.Once
 	grpcOpts   []grpc.ServerOption
 	grpcServer *grpc.Server
+
+	tls *tls.Config
 }
 
 func New(listenOn string, coordinator *coordinator.Coordinator, opts ...Opt) (*GrpcSrv, error) {
@@ -55,12 +61,15 @@ func New(listenOn string, coordinator *coordinator.Coordinator, opts ...Opt) (*G
 	for _, opt := range opts {
 		opt(srv)
 	}
-	maxSize := 5 * 1024 * 1024 //5M:max Recv msg size
-	srv.grpcOpts = append(srv.grpcOpts, grpc.MaxRecvMsgSize(maxSize))
-
+	// setup tls
 	var (
 		err error
 	)
+	if srv.tls != nil {
+		srv.grpcOpts = append(srv.grpcOpts, grpc.Creds(credentials.NewTLS(srv.tls)))
+	}
+	srv.grpcOpts = append(srv.grpcOpts, grpc.MaxRecvMsgSize(5*1024*1024)) //5M:max Recv msg size
+
 	srv.lis, err = net.Listen("tcp", listenOn)
 	return srv, err
 }
@@ -80,19 +89,38 @@ func (s *GrpcSrv) Run(ctx context.Context) error {
 	return nil
 }
 
-func (s *GrpcSrv) HttpHandler(ctx context.Context) (http.Handler, error) {
-	conn, err := grpc.DialContext(ctx, s.listenOn, grpc.WithBlock(),
-		grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		fmt.Println(color.HiRedString("grpc DialContext:err:%v", err))
-		return nil, err
+func (s *GrpcSrv) HttpHandler(certFile, name string) httpsrv.HandlerFn {
+	return func(ctx context.Context, fns ...httpsrv.OptsFn) (http.Handler, error) {
+		options := []grpc.DialOption{
+			grpc.WithBlock(),
+		}
+		var (
+			err error
+		)
+		creds := insecure.NewCredentials()
+
+		if certFile != "" {
+			creds, err = credentials.NewClientTLSFromFile(certFile, name)
+			if err != nil {
+				return nil, err
+			}
+		}
+		options = append(options, grpc.WithTransportCredentials(creds))
+		conn, err := grpc.DialContext(ctx, s.listenOn, options...) //todo replace
+		if err != nil {
+			fmt.Println(color.HiRedString("grpc DialContext:err:%v", err))
+			return nil, err
+		}
+		mux := runtime.NewServeMux()
+		err = proto.RegisterEasyCarHandler(ctx, mux, conn)
+		return mux, err
 	}
-	mux := runtime.NewServeMux()
-	err = proto.RegisterEasyCarHandler(ctx, mux, conn)
-	return mux, err
 }
 
 func (s *GrpcSrv) Stop(ctx context.Context) (err error) {
+	if s.grpcServer == nil {
+		return
+	}
 	s.once.Do(func() {
 		s.grpcServer.GracefulStop()
 	})

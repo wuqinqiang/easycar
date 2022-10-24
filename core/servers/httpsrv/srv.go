@@ -13,7 +13,26 @@ import (
 	"github.com/wuqinqiang/easycar/tools"
 )
 
-type HandlerFn func(ctx context.Context) (http.Handler, error)
+type HandleOptions struct {
+	certFile string
+	certName string
+}
+
+func WithCertFile(certFile string) OptsFn {
+	return func(options *HandleOptions) {
+		options.certFile = certFile
+	}
+}
+
+func WithCertName(name string) OptsFn {
+	return func(options *HandleOptions) {
+		options.certName = name
+	}
+}
+
+type OptsFn func(options *HandleOptions)
+
+type HandlerFn func(ctx context.Context, fns ...OptsFn) (http.Handler, error)
 
 type HttpSrv struct {
 	listenOn   string
@@ -38,7 +57,10 @@ func New(httpListenOn string, fn HandlerFn, opts ...Opt) *HttpSrv {
 }
 
 func (srv *HttpSrv) Run(ctx context.Context) error {
-	h, err := srv.fn(ctx)
+	hctx, cancel := context.WithTimeout(ctx, 8*time.Second)
+	defer cancel()
+
+	h, err := srv.fn(hctx)
 	if err != nil {
 		return err
 	}
@@ -56,6 +78,9 @@ func (srv *HttpSrv) Run(ctx context.Context) error {
 }
 
 func (srv *HttpSrv) Stop(ctx context.Context) (err error) {
+	if srv.httpServer == nil {
+		return
+	}
 	srv.once.Do(func() {
 		err = srv.httpServer.Close()
 	})

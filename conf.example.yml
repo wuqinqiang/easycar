@@ -1,8 +1,18 @@
 ## conf
-grpcListen: 127.0.0.1:8089
-httpListen: 127.0.0.1:8085
+#httpListen: 127.0.0.1:8085
 automaticExecution2: false  #If it is true, when the first stage of execution ends, it will automatically commit or rollback
 timeout: 7 #unit of second
+server:
+  grpc:
+    listenOn: 127.0.0.1:8088
+    keyFile:   #server key
+    certFile:  #server cert
+    gateway:
+      isOpen: true
+      certFile:  #client cert
+      serverName:
+  http:
+    listenOn: 127.0.0.1:8085
 
 db:
   driver: mongodb
@@ -26,12 +36,3 @@ registry:
 
 tracing:
   jaegerUrl: http://localhost:14268/api/traces
-  #### !!!!! temporarily useless
-  ## backOff for retry
-#backOff:
-#  open: true
-#  ##  max delay time for retry,the unit is senconds, max 60 seconds
-#  maxDelay: 120
-#  ## max retry times ，
-#  retries: 3
-#  factor: 2

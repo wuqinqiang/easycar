@@ -44,3 +44,11 @@
 
 build/.*
 support/tools/bin
+
+server.key
+server.crt
+server.csr
+ca.crt
+ca.csr
+ca.key
+conf.yml

@@ -12,6 +12,4 @@ var DefaultConf = conf.Settings{
 			MaxOpenConns: 20,
 		},
 	},
-	GRPCListen: "127.0.0.1:8089",
-	HTTPListen: "127.0.0.1:8084",
 }

@@ -26,10 +26,28 @@ type (
 		Mongodb MongoSetting  `yaml:"mongodb"`
 	}
 
+	Server struct {
+		Http struct {
+			ListenOn string `yaml:"listenOn"`
+		} `yaml:"http"`
+		Grpc Grpc `yaml:"grpc"`
+	}
+
+	Grpc struct {
+		ListenOn string  `yaml:"listenOn"`
+		KeyFile  string  `yaml:"keyFile"`
+		CertFile string  `yaml:"certFile"`
+		Gateway  Gateway `yaml:"gateway"`
+	}
+	Gateway struct {
+		IsOpen     bool   `yaml:"isOpen"`
+		CertFile   string `yaml:"certFile"`
+		ServerName string `yaml:"serverName"`
+	}
+
 	Settings struct {
+		Server              `json:"server"`
 		DB                  DB               `yaml:"db"`
-		GRPCListen          string           `yaml:"grpcListen"`
-		HTTPListen          string           `yaml:"httpListen"`
 		Timeout             int64            `yaml:"timeout"`
 		AutomaticExecution2 bool             `yaml:"automaticExecution2"`
 		Tracing             Tracing          `yaml:"tracing"`
@@ -68,4 +86,12 @@ func (s *Settings) GetRegistry() (registry.Registry, error) {
 		return etcdx.NewRegistry(s.Registry.Etcd)
 	}
 	return nil, nil
+}
+
+func (grpc *Grpc) IsSSL() bool {
+	return grpc.KeyFile != "" && grpc.CertFile != ""
+}
+
+func (grpc *Grpc) IsOpenGateway() bool {
+	return grpc.Gateway.IsOpen
 }
