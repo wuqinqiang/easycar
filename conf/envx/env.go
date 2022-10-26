@@ -4,15 +4,13 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/wuqinqiang/easycar/conf/base"
-
 	"github.com/wuqinqiang/easycar/conf"
 )
 
 type Env struct{}
 
 func (env *Env) Load() (*conf.Settings, error) {
-	defaultConf := base.DefaultConf
+	defaultConf := new(conf.Settings)
 	driver := os.Getenv("DB_DRIVER")
 	if driver == "" {
 		defaultConf.DB.Driver = driver
@@ -31,7 +29,7 @@ func (env *Env) Load() (*conf.Settings, error) {
 
 	grpcListen := os.Getenv("GRPC_LISTEN")
 	if grpcListen != "" {
-		defaultConf.Server.Grpc.ListenOn = "0.0.0.0:8089"
+		defaultConf.Grpc.ListenOn = "0.0.0.0:8089"
 	}
 
 	lifeTime := convertFn(os.Getenv("MYSQL_MAX_LIFE_TIME"))
@@ -48,5 +46,5 @@ func (env *Env) Load() (*conf.Settings, error) {
 	if maxOpenConn > 0 {
 		defaultConf.DB.Mysql.MaxOpenConns = maxOpenConn
 	}
-	return &defaultConf, nil
+	return defaultConf, nil
 }

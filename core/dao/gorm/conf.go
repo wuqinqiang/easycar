@@ -1,26 +1,23 @@
-package conf
+package gorm
 
 import (
 	"time"
 
 	"github.com/wuqinqiang/easycar/core/dao"
-
-	gormDb "github.com/wuqinqiang/easycar/core/dao/gorm"
-
 	"github.com/wuqinqiang/easycar/tools"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
 
-// MysqlSettings conf
-type MysqlSettings struct {
+// Settings conf
+type Settings struct {
 	DbURL        string `json:"dbURL" yaml:"dbURL"`
 	MaxLifetime  int    `json:"maxLifetime" yaml:"maxLifetime"`
 	MaxIdleConns int    `json:"maxIdleConns" yaml:"maxIdleConns"`
 	MaxOpenConns int    `json:"maxOpenConns" yaml:"maxOpenConns"`
 }
 
-func (m *MysqlSettings) Init() {
+func (m *Settings) Init() {
 	db, err := gorm.Open(mysql.New(mysql.Config{
 		DSN:               m.DbURL,
 		DefaultStringSize: 256,
@@ -42,6 +39,5 @@ func (m *MysqlSettings) Init() {
 		d.SetMaxIdleConns(m.MaxIdleConns)
 	}
 
-	dao.SetTransaction(gormDb.NewDao(db))
-
+	dao.SetTransaction(NewDao(db))
 }

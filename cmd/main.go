@@ -60,7 +60,7 @@ func main() {
 		opts []core.Option
 	)
 
-	grpcSrv, err := grpcsrv.New(tools.FigureOutListen(settings.Server.Grpc.ListenOn), setCoordinator, grpcOpts...)
+	grpcSrv, err := grpcsrv.New(tools.FigureOutListen(settings.Grpc.ListenOn), setCoordinator, grpcOpts...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -95,11 +95,11 @@ func MustLoad(settings *conf.Settings) {
 
 	tracing.MustLoad(settings.Tracing.JaegerUri)
 
-	if settings.Server.Http.ListenOn == "" {
-		settings.Server.Http.ListenOn = "0.0.0.0:8085"
+	if settings.Http.ListenOn == "" {
+		settings.Http.ListenOn = "0.0.0.0:8085"
 	}
-	if settings.Server.Grpc.ListenOn == "" {
-		settings.Server.Grpc.ListenOn = "0.0.0.0:8088"
+	if settings.Grpc.ListenOn == "" {
+		settings.Grpc.ListenOn = "0.0.0.0:8088"
 	}
 
 	if settings.Timeout > 0 {
