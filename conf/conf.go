@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/wuqinqiang/easycar/core/servers/httpsrv"
+
 	"github.com/wuqinqiang/easycar/core/transport/common"
 
 	"github.com/wuqinqiang/easycar/tracing"
@@ -47,9 +49,7 @@ type (
 	}
 
 	Server struct {
-		Http struct {
-			ListenOn string `yaml:"listenOn"`
-		} `yaml:"http"`
+		Http httpsrv.Http `yaml:"http"`
 		Grpc grpcsrv.Grpc `yaml:"grpc"`
 	}
 
@@ -92,8 +92,9 @@ func (s *Settings) Init() {
 	}
 }
 
-func (s *Settings) IsRegistryEmpty() bool {
+func (s *Settings) EmptyRegistry() bool {
 	return s.Registry.Etcd.IsEmpty()
+	// todo add more registry center
 }
 func (s *Settings) GetRegistry() (registry.Registry, error) {
 	if !s.Registry.Etcd.IsEmpty() {

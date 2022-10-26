@@ -13,24 +13,28 @@ import (
 	"github.com/wuqinqiang/easycar/tools"
 )
 
+var DefaultListen = "127.0.0.1:8085"
+
 type HttpSrv struct {
 	listenOn   string
-	fn         HandlerFn
+	fn         Handler
 	timeout    time.Duration
 	httpServer *http.Server
 	once       sync.Once
 	//tls     *tls.Config
 }
 
-func New(httpListenOn string, fn HandlerFn, opts ...Option) *HttpSrv {
+func New(conf Http, fn Handler) *HttpSrv {
+	listenOn := DefaultListen
+	if conf.ListenOn != "" {
+		listenOn = conf.ListenOn
+	}
+	listenOn = tools.FigureOutListen(listenOn)
 	h := &HttpSrv{
 		fn:       fn,
-		listenOn: httpListenOn,
+		listenOn: listenOn,
 		once:     sync.Once{},
 		timeout:  10 * time.Second,
-	}
-	for _, opt := range opts {
-		opt(h)
 	}
 	return h
 }

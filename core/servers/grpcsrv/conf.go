@@ -16,6 +16,6 @@ func (grpc *Grpc) Tls() bool {
 	return grpc.KeyFile != "" && grpc.CertFile != ""
 }
 
-func (grpc *Grpc) IsOpenGateway() bool {
+func (grpc *Grpc) OpenGateway() bool {
 	return grpc.Gateway.IsOpen
 }
