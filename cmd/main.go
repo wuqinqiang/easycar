@@ -27,8 +27,15 @@ import (
 	"github.com/wuqinqiang/easycar/conf"
 )
 
+var (
+	mod      = flag.String("m", GetEnvOrDefault("CONF_MOD", "file"), "configuration module")
+	filePath = flag.String("f", GetEnvOrDefault("FILE_PATH", "/conf.yml"), "configuration file")
+)
+
 func main() {
-	c := getConf()
+	flag.Parse()
+	c := getConf(*mod, *filePath)
+
 	// load conf settings from (file|etcd|env......)
 	settings, err := c.Load()
 	if err != nil {
@@ -85,17 +92,14 @@ func main() {
 	logging.Infof("easycar server is stopped")
 }
 
-func getConf() (c conf.Conf) {
-	var (
-		confMod  = flag.String("mod", os.Getenv("CONF_MOD"), "configuration module")
-		filePath = flag.String("f", GetEnvOrDefault("FILE_PATH", "/conf.yml"), "configuration file")
-	)
+func getConf(mod, filePath string) (c conf.Conf) {
 	flag.Parse()
 
-	switch conf.Mode(*confMod) {
+	switch conf.Mode(mod) {
 	case conf.File:
-		c = file.NewFile(*filePath)
+		c = file.NewFile(filePath)
 	case conf.Etcd:
+		// todo
 	case conf.Env:
 		return new(envx.Env)
 	default:
