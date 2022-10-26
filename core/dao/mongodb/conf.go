@@ -1,4 +1,4 @@
-package conf
+package mongodb
 
 import (
 	"context"
@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/wuqinqiang/easycar/core/dao"
-	"github.com/wuqinqiang/easycar/core/dao/mongodb"
-
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -19,13 +17,13 @@ const (
 	AllowMaxPool   = 250
 )
 
-type MongoSetting struct {
+type Settings struct {
 	Uri     string `yaml:"url"` // example: mongodb://localhost:27017
 	MinPool int    `yaml:"minPool"`
 	MaxPool int    `yaml:"maxPool"`
 }
 
-func (settings *MongoSetting) Init() {
+func (settings *Settings) Init() {
 	if settings.Uri == "" {
 		panic(fmt.Errorf("emtpy mongo uri"))
 	}
@@ -64,5 +62,5 @@ func (settings *MongoSetting) Init() {
 		panic(fmt.Errorf("ping mongo err:%v", err))
 	}
 	// todo option
-	dao.SetTransaction(mongodb.NewDao(client, "easycar"))
+	dao.SetTransaction(NewDao(client, "easycar"))
 }
