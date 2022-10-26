@@ -28,7 +28,7 @@ func (m *MockServer) Stop(ctx context.Context) error {
 
 func TestRun(t *testing.T) {
 	type args struct {
-		opts []Opt
+		opts []Option
 		ctx  context.Context
 	}
 
@@ -45,7 +45,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "context deadline exceeded",
 			args: args{
-				opts: []Opt{WithServers(NewMockServer(nil))},
+				opts: []Option{WithServers(NewMockServer(nil))},
 				ctx:  ctx,
 			},
 			want: context.DeadlineExceeded,
@@ -53,7 +53,7 @@ func TestRun(t *testing.T) {
 		{
 			name: "faild",
 			args: args{
-				opts: []Opt{WithServers(NewMockServer(err))},
+				opts: []Option{WithServers(NewMockServer(err))},
 				ctx:  context.Background(),
 			},
 			want: err,

@@ -50,7 +50,7 @@ type GrpcSrv struct {
 	tls *tls.Config
 }
 
-func New(listenOn string, coordinator *coordinator.Coordinator, opts ...Opt) (*GrpcSrv, error) {
+func New(listenOn string, coordinator *coordinator.Coordinator, opts ...Option) (*GrpcSrv, error) {
 	srv := &GrpcSrv{
 		coordinator: coordinator,
 		timeout:     10 * time.Second,

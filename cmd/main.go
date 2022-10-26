@@ -46,7 +46,7 @@ func main() {
 	setCoordinator := coordinator.NewCoordinator(dao.GetTransaction(),
 		executor.NewExecutor(), settings.AutomaticExecution2)
 
-	var grpcOpts []grpcsrv.Opt
+	var grpcOpts []grpcsrv.Option
 
 	if settings.Grpc.IsSSL() {
 		certificate, err := tls.LoadX509KeyPair(settings.Grpc.CertFile, settings.Grpc.KeyFile)
@@ -57,7 +57,7 @@ func main() {
 	}
 
 	var (
-		opts []core.Opt
+		opts []core.Option
 	)
 
 	grpcSrv, err := grpcsrv.New(tools.FigureOutListen(settings.Server.Grpc.ListenOn), setCoordinator, grpcOpts...)

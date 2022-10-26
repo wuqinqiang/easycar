@@ -113,7 +113,7 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					return fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
 				}
 				var (
-					reqOpts []common.ReqOpt
+					reqOpts []common.Option
 				)
 				if b.Timeout > 0 {
 					reqOpts = append(reqOpts, common.WithTimeOut(time.Duration(b.Timeout)*time.Second))
