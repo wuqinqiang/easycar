@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	defaultTimeOut = 8 * time.Second
+	defaultTimeout = 8 * time.Second
 )
 
 type (
@@ -26,7 +26,7 @@ func NewReq(body, headers []byte, opts ...Option) *Req {
 	req := &Req{
 		Body:    body,
 		Headers: h,
-		Timeout: defaultTimeOut,
+		Timeout: defaultTimeout,
 	}
 	for _, opt := range opts {
 		opt(req)
@@ -40,7 +40,7 @@ func (r *Req) AddEasyCarHeaders(gId, branchId string) {
 	//  should to add request id?
 }
 
-func WithTimeOut(t time.Duration) Option {
+func WithTimeout(t time.Duration) Option {
 	return func(req *Req) {
 		if t == 0 {
 			return
@@ -49,8 +49,8 @@ func WithTimeOut(t time.Duration) Option {
 	}
 }
 
-func ReplaceTimeOut(t time.Duration) {
+func ReplaceTimeout(t time.Duration) {
 	if t > 0 {
-		defaultTimeOut = t
+		defaultTimeout = t
 	}
 }

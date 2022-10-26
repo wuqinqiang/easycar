@@ -19,7 +19,7 @@ const (
 	version     = "unknown"
 )
 
-func MustLoad(url string) {
+func Init(url string) {
 	tp, err := tracerProvider(url)
 	if err != nil {
 		panic(err)
