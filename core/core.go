@@ -17,7 +17,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-type Opt func(core *Core)
+type Option func(core *Core)
 
 type Core struct {
 	servers      []Server
@@ -30,19 +30,19 @@ type Core struct {
 	instance     *registry.EasyCarInstance
 }
 
-func WithServers(srvs ...Server) Opt {
+func WithServers(srvs ...Server) Option {
 	return func(core *Core) {
 		core.servers = append(core.servers, srvs...)
 	}
 }
 
-func WithRegistry(r registry.Registry) Opt {
+func WithRegistry(r registry.Registry) Option {
 	return func(core *Core) {
 		core.registry = r
 	}
 }
 
-func New(opts ...Opt) *Core {
+func New(opts ...Option) *Core {
 	core := &Core{
 		runWaitGroup: sync.WaitGroup{},
 		once:         sync.Once{},

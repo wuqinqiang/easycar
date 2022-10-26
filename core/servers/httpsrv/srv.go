@@ -13,27 +13,6 @@ import (
 	"github.com/wuqinqiang/easycar/tools"
 )
 
-type HandleOptions struct {
-	certFile string
-	certName string
-}
-
-func WithCertFile(certFile string) OptsFn {
-	return func(options *HandleOptions) {
-		options.certFile = certFile
-	}
-}
-
-func WithCertName(name string) OptsFn {
-	return func(options *HandleOptions) {
-		options.certName = name
-	}
-}
-
-type OptsFn func(options *HandleOptions)
-
-type HandlerFn func(ctx context.Context, fns ...OptsFn) (http.Handler, error)
-
 type HttpSrv struct {
 	listenOn   string
 	fn         HandlerFn
@@ -43,7 +22,7 @@ type HttpSrv struct {
 	//tls     *tls.Config
 }
 
-func New(httpListenOn string, fn HandlerFn, opts ...Opt) *HttpSrv {
+func New(httpListenOn string, fn HandlerFn, opts ...Option) *HttpSrv {
 	h := &HttpSrv{
 		fn:       fn,
 		listenOn: httpListenOn,
