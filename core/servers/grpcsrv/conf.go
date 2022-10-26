@@ -12,7 +12,7 @@ type Gateway struct {
 	ServerName string `yaml:"serverName"`
 }
 
-func (grpc *Grpc) IsSSL() bool {
+func (grpc *Grpc) Tls() bool {
 	return grpc.KeyFile != "" && grpc.CertFile != ""
 }
 

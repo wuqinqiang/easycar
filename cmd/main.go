@@ -6,19 +6,14 @@ import (
 	"flag"
 	"log"
 	"os"
-	"time"
 
 	"github.com/wuqinqiang/easycar/tools"
-
-	"github.com/wuqinqiang/easycar/tracing"
 
 	"github.com/wuqinqiang/easycar/logging"
 
 	"github.com/wuqinqiang/easycar/core/coordinator/executor"
 
 	"github.com/wuqinqiang/easycar/core/coordinator"
-
-	"github.com/wuqinqiang/easycar/core/transport/common"
 
 	"github.com/wuqinqiang/easycar/core/dao"
 
@@ -37,33 +32,37 @@ import (
 
 func main() {
 	c := getConf()
-	// init conf
+	// load conf settings from (file|etcd|env......)
 	settings, err := c.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
-	MustLoad(settings)
-	setCoordinator := coordinator.NewCoordinator(dao.GetTransaction(),
+
+	// init config:db conf.....
+	settings.Init()
+
+	// Create a Coordinator,The core logic is here.
+	newCoordinator := coordinator.NewCoordinator(dao.GetTransaction(),
 		executor.NewExecutor(), settings.AutomaticExecution2)
 
+	// New grpc server
 	var grpcOpts []grpcsrv.Option
-
-	if settings.Grpc.IsSSL() {
+	if settings.Grpc.Tls() {
 		certificate, err := tls.LoadX509KeyPair(settings.Grpc.CertFile, settings.Grpc.KeyFile)
 		if err != nil {
 			log.Fatal(err)
 		}
 		grpcOpts = append(grpcOpts, grpcsrv.WithTls(&tls.Config{Certificates: []tls.Certificate{certificate}}))
 	}
+	grpcSrv, err := grpcsrv.New(tools.FigureOutListen(settings.Grpc.ListenOn), newCoordinator, grpcOpts...)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	var (
 		opts []core.Option
 	)
 
-	grpcSrv, err := grpcsrv.New(tools.FigureOutListen(settings.Grpc.ListenOn), setCoordinator, grpcOpts...)
-	if err != nil {
-		log.Fatal(err)
-	}
 	opts = append(opts, core.WithServers(grpcSrv))
 
 	if settings.Grpc.IsOpenGateway() {
@@ -88,23 +87,6 @@ func main() {
 		log.Fatal(err)
 	}
 	logging.Infof("easycar server is stopped")
-}
-
-func MustLoad(settings *conf.Settings) {
-	settings.DB.Init()
-
-	tracing.MustLoad(settings.Tracing.JaegerUri)
-
-	if settings.Http.ListenOn == "" {
-		settings.Http.ListenOn = "0.0.0.0:8085"
-	}
-	if settings.Grpc.ListenOn == "" {
-		settings.Grpc.ListenOn = "0.0.0.0:8088"
-	}
-
-	if settings.Timeout > 0 {
-		common.ReplaceTimeOut(time.Duration(settings.Timeout) * time.Second)
-	}
 }
 
 func getConf() (c conf.Conf) {

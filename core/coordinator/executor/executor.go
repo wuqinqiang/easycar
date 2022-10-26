@@ -116,7 +116,7 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					reqOpts []common.Option
 				)
 				if b.Timeout > 0 {
-					reqOpts = append(reqOpts, common.WithTimeOut(time.Duration(b.Timeout)*time.Second))
+					reqOpts = append(reqOpts, common.WithTimeout(time.Duration(b.Timeout)*time.Second))
 				}
 				req := common.NewReq([]byte(b.ReqData), []byte(b.ReqHeader), reqOpts...)
 				req.AddEasyCarHeaders(b.GID, b.BranchId)
