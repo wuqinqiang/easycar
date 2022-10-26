@@ -2,12 +2,9 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
 	"flag"
 	"log"
 	"os"
-
-	"github.com/wuqinqiang/easycar/tools"
 
 	"github.com/wuqinqiang/easycar/logging"
 
@@ -45,33 +42,31 @@ func main() {
 	newCoordinator := coordinator.NewCoordinator(dao.GetTransaction(),
 		executor.NewExecutor(), settings.AutomaticExecution2)
 
-	// New grpc server
-	var grpcOpts []grpcsrv.Option
-	if settings.Grpc.Tls() {
-		certificate, err := tls.LoadX509KeyPair(settings.Grpc.CertFile, settings.Grpc.KeyFile)
-		if err != nil {
-			log.Fatal(err)
-		}
-		grpcOpts = append(grpcOpts, grpcsrv.WithTls(&tls.Config{Certificates: []tls.Certificate{certificate}}))
-	}
-	grpcSrv, err := grpcsrv.New(tools.FigureOutListen(settings.Grpc.ListenOn), newCoordinator, grpcOpts...)
+	var (
+		servers []core.Server
+	)
+	// create grpc server
+	grpcSrv, err := grpcsrv.New(settings.Grpc, newCoordinator)
 	if err != nil {
 		log.Fatal(err)
+	}
+	servers = append(servers, grpcSrv)
+
+	// create http server if needed
+	if settings.Grpc.OpenGateway() {
+		httpProxySrv := httpsrv.New(settings.Http,
+			grpcSrv.Handler(settings.Grpc.Gateway.CertFile, settings.Grpc.Gateway.ServerName))
+		servers = append(servers, httpProxySrv)
 	}
 
 	var (
 		opts []core.Option
 	)
+	opts = append(opts, core.WithServers(servers...))
 
-	opts = append(opts, core.WithServers(grpcSrv))
-
-	if settings.Grpc.IsOpenGateway() {
-		httpProxySrv := httpsrv.New(tools.FigureOutListen(settings.Http.ListenOn),
-			grpcSrv.HttpHandler(settings.Grpc.Gateway.CertFile, settings.Grpc.Gateway.ServerName))
-		opts = append(opts, core.WithServers(httpProxySrv))
-	}
-
-	if !settings.IsRegistryEmpty() {
+	// If the registry is configured,
+	//we need to register the service to the  registry center when the server start
+	if !settings.EmptyRegistry() {
 		registry, err := settings.GetRegistry()
 		if err != nil {
 			log.Fatal(err)
@@ -79,11 +74,12 @@ func main() {
 		opts = append(opts, core.WithRegistry(registry))
 	}
 
-	core := core.New(opts...)
+	// servers start-up core
+	newCore := core.New(opts...)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := core.Run(context.Background()); err != nil {
+	if err := newCore.Run(context.Background()); err != nil {
 		log.Fatal(err)
 	}
 	logging.Infof("easycar server is stopped")

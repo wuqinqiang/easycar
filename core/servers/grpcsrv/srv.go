@@ -12,6 +12,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/wuqinqiang/easycar/tools"
+
 	"github.com/wuqinqiang/easycar/core/servers/httpsrv"
 
 	"google.golang.org/grpc/credentials"
@@ -35,6 +37,8 @@ var (
 	ErrGIdNotExist                     = errors.New("gid is not exist")
 )
 
+const DefaultListenOn = "127.0.0.1:8089"
+
 type GrpcSrv struct {
 	proto.UnimplementedEasyCarServer
 	coordinator *coordinator.Coordinator
@@ -46,30 +50,33 @@ type GrpcSrv struct {
 	once       sync.Once
 	grpcOpts   []grpc.ServerOption
 	grpcServer *grpc.Server
-
-	tls *tls.Config
 }
 
-func New(listenOn string, coordinator *coordinator.Coordinator, opts ...Option) (*GrpcSrv, error) {
+func New(settings Grpc, coordinator *coordinator.Coordinator) (*GrpcSrv, error) {
+	listenOn := DefaultListenOn
+	if settings.ListenOn != "" {
+		listenOn = settings.ListenOn
+	}
+	listenOn = tools.FigureOutListen(listenOn)
 	srv := &GrpcSrv{
 		coordinator: coordinator,
 		timeout:     10 * time.Second,
 		listenOn:    listenOn,
 		once:        sync.Once{},
 	}
-
-	for _, opt := range opts {
-		opt(srv)
-	}
 	// setup tls
 	var (
 		err error
 	)
-	if srv.tls != nil {
-		srv.grpcOpts = append(srv.grpcOpts, grpc.Creds(credentials.NewTLS(srv.tls)))
+	if settings.Tls() {
+		certificate, err := tls.LoadX509KeyPair(settings.CertFile, settings.KeyFile)
+		if err != nil {
+			log.Fatal(err)
+		}
+		tlsConf := &tls.Config{Certificates: []tls.Certificate{certificate}}
+		srv.grpcOpts = append(srv.grpcOpts, grpc.Creds(credentials.NewTLS(tlsConf)))
 	}
 	srv.grpcOpts = append(srv.grpcOpts, grpc.MaxRecvMsgSize(5*1024*1024)) //5M:max Recv msg size
-
 	srv.lis, err = net.Listen("tcp", listenOn)
 	return srv, err
 }
@@ -89,8 +96,8 @@ func (s *GrpcSrv) Run(ctx context.Context) error {
 	return nil
 }
 
-func (s *GrpcSrv) HttpHandler(certFile, name string) httpsrv.HandlerFn {
-	return func(ctx context.Context, fns ...httpsrv.OptsFn) (http.Handler, error) {
+func (s *GrpcSrv) Handler(certFile, name string) httpsrv.Handler {
+	return func(ctx context.Context) (http.Handler, error) {
 		options := []grpc.DialOption{
 			grpc.WithBlock(),
 		}
