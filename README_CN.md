@@ -26,19 +26,44 @@ global state
 ##### 修改配置文件
 conf.yml 文件
 ```ymal
-grpcPort: 8089
-httpPort: 8085
+## conf
+#httpListen: 127.0.0.1:8085
 automaticExecution2: false  #If it is true, when the first stage of execution ends, it will automatically commit or rollback
-dirver: mysql
 timeout: 7 #unit of second
+server:
+  grpc:
+    listenOn: 127.0.0.1:8088
+    keyFile:   #server key
+    certFile:  #server cert
+    gateway:
+      isOpen: true
+      certFile:  #client cert
+      serverName:
+  http:
+    listenOn: 127.0.0.1:8085
 
-db:
+db: # easycar server db
+  driver: mongodb
   mysql:
     dbURL: easycar:easycar@tcp(127.0.0.1:3306)/easycar?charset=utf8&parseTime=True&loc=Local
     maxLifetime: 7200
     maxIdleConns: 10
     maxOpenConns: 20
-    ## add more
+  mongodb:
+    url: mongodb://127.0.0.1:27017/easycar
+    minPool: 10
+    maxPool: 20
+
+registry: #// If the registry is configured,we need to register the service to the  registry center when the server start
+  etcd:
+    user: ""
+    pass: ""
+    hosts:
+      - 127.0.0.1:2379
+  ## add more
+
+tracing:
+  jaegerUrl: http://localhost:14268/api/traces
 ```
 
 后续会提供更多配置方式
