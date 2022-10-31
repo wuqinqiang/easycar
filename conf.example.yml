@@ -31,7 +31,7 @@ registry: #// If the registry is configured,we need to register the service to t
     user: ""
     pass: ""
     hosts:
-      - 127.0.0.1:2379
+     - #127.0.0.1:2379
   ## add more
 
 tracing:
