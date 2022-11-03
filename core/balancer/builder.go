@@ -12,15 +12,31 @@ var (
 	_           grpcBalancer.Picker = (*Picker)(nil)
 )
 
-func init() {
-	builder := base.NewBalancerBuilder(
-		BuilderName,
-		&Builder{},
-		base.Config{HealthCheck: true})
-	grpcBalancer.Register(builder)
+type Option func(options *Options)
+
+type Options struct {
+	tactics TacticsName
 }
 
-type Builder struct{}
+func WithTactics(tacticsName TacticsName) Option {
+	return func(options *Options) {
+		options.tactics = tacticsName
+	}
+}
+
+func Register(fns ...Option) {
+	// RandomBalancer default tactics
+	initOption := &Options{tactics: RandomBalancer}
+	for _, fn := range fns {
+		fn(initOption)
+	}
+	builder := &Builder{options: initOption}
+	grpcBalancer.Register(base.NewBalancerBuilder(BuilderName, builder, base.Config{HealthCheck: true}))
+}
+
+type Builder struct {
+	options *Options
+}
 
 func (b *Builder) Build(info base.PickerBuildInfo) grpcBalancer.Picker {
 	if len(info.ReadySCs) == 0 {
@@ -36,11 +52,13 @@ func (b *Builder) Build(info base.PickerBuildInfo) grpcBalancer.Picker {
 		hosts = append(hosts, connInfo.Address.Addr)
 		picker.readyAddrConn[connInfo.Address.Addr] = subConn
 	}
-	balancer, err := balancer.Build(balancer.P2CBalancer, hosts)
+	var (
+		err error
+	)
+	picker.balancer, err = balancer.Build(b.options.tactics.Name(), hosts)
 	if err != nil {
-		panic(err)
+		return base.NewErrPicker(err)
 	}
-	picker.balancer = balancer
 	return picker
 }
 
