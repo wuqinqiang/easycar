@@ -20,7 +20,7 @@ func (c *Conf) IsEmpty() bool {
 	return len(c.Hosts) == 0
 }
 
-type OptFn func(options *Options)
+type Option func(options *Options)
 
 type Options struct {
 	ttl time.Duration
