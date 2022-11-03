@@ -18,7 +18,7 @@ type Registry struct {
 	client *clientv3.Client
 }
 
-func NewRegistry(conf Conf, fns ...OptFn) (*Registry, error) {
+func NewRegistry(conf Conf, fns ...Option) (*Registry, error) {
 	opts := newDefault()
 
 	for _, fn := range fns {
