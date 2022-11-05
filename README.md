@@ -1,41 +1,69 @@
 # easycar:A simple distributed transaction framework implemented by go
 
 [简体中文](https://github.com/wuqinqiang/easycar/blob/main/README_CN.md)
+
 ## What is easycar？
 
-easycar is a distributed transaction framework implemented in go that supports a two-phase commit protocol. Its full name is (easy commit and rollback).
+easycar is a distributed transaction framework implemented in go that supports a two-phase commit protocol. Its full
+name is (easy commit and rollback).
 
-### Features
+For more information about easycar see this post [easycar](https://www.syst.top/posts/go/easycar/).
+
+Architecture
+
+![easycar](https://cdn.syst.top/easycar.png)
+
+## Features
 
 #### Supports both protocol and transaction mode mixing
 
-Support for mixed use of each RM protocol in a distributed transaction (currently supports http and native grpc services). Support per RM transaction mode mix.
+In a set of distributed transactions, each RM can use a different transport protocol (HTTP/gRPC) and transaction mode (
+TCC/Sage...), so it allows a mix of RM protocols and transaction modes.
 
-#### Support for concurrent execution of transactions
+### Support for concurrent execution of transactions
 
-Supports concurrent execution in layers. The participating RMs are layered by the set weights, and RMs in the same layer can be invoked concurrently, and the next layer is processed after one layer is finished. On this basis, when a RM has a call error, then the next layer will not be executed and the whole distributed transaction needs to be rolled back.
+Supports concurrent execution in layers. The participating RMs are layered by the set weights, and RMs in the same layer
+can be invoked concurrently, and the next layer is processed after one layer is finished. On this basis, when an RM has
+a call error, then the next layer will not be executed and the whole distributed transaction needs to be rolled back.
 
+### Service Registration and Discovery
 
+### Client-side load balancing
 
+**Support**：
 
+- IPHash
+- ConsistentHash
+- P2C
+- Random
+- R2
+- LeastLoad
+- Bounded
 
-More about easycar can check this article 
+## Examples of success
 
+![success](https://cdn.syst.top/success.png)
 
+## Examples of failed
+
+![success](https://cdn.syst.top/failed.png)
 
 ## State
 
-global state
-![global](https://cdn.syst.top/global.png)
+**global state**
+![global](https://cdn.syst.top/b-state.png)
 
-## RUN
+## Run
 
-### Modify configuration
-conf.yml file
+```shell
+cp conf.example.yml conf.ymal
+```
+
+**Modify configuration**
+
 ```ymal
 ## conf
-#httpListen: 127.0.0.1:8085
-automaticExecution2: false  #If it is true, when the first stage of execution ends, it will automatically commit or rollback
+automaticExecution2: true  #when the first stage of execution ends, it will commit automatically or rollback if it is true
 timeout: 7 #unit of second
 server:
   grpc:
@@ -49,7 +77,7 @@ server:
   http:
     listenOn: 127.0.0.1:8085
 
-db: # easycar server db
+db: #easycar server db
   driver: mongodb
   mysql:
     dbURL: easycar:easycar@tcp(127.0.0.1:3306)/easycar?charset=utf8&parseTime=True&loc=Local
@@ -61,41 +89,53 @@ db: # easycar server db
     minPool: 10
     maxPool: 20
 
-registry: #// If the registry is configured,we need to register the service to the  registry center when the server start
+registry: 
   etcd:
     user: ""
     pass: ""
     hosts:
       - 127.0.0.1:2379
-  ## add more
+  #add more
 
 tracing:
   jaegerUrl: http://localhost:14268/api/traces
 ```
 
-More configuration methods will be provided later
-
-
-When the configuration is complete, execute
-
+**run**
 ```shell
-go run cmd/main.go -mod file # The follow-up can also be env、etcd......
+go run cmd/main.go 
 ```
-If you use golang,use [client](https://github.com/easycar/client-go).
-of course, you can use directly http api.
 
 
+## client
+
+If you use Golang, the client-go is here [client](https://github.com/easycar/client-go).
 
 ## examples
 
-see more examples to:[examples](https://github.com/easycar/examples)
+more examples to:[examples](https://github.com/easycar/examples)
 
 ## todo list
+
+- [x] Saga
+- [x] TCC
 - [ ] XA
-- [ ] AT
-- retry
-- easycar client
+- [ ] client
+    - [x] client-go
+    - [ ] client-rust
+    - [ ] client-php
+    - [ ] client-python
+    - [ ] client-java
+- [x] retry
+- [ ] registry and discovery
+    - [x] etcd
+    - [ ] consul
+    - [ ]  zookeeper
+- [x] balancer
+- [ ] test
+- [ ] notify
+- [x] tracing
+- [ ] tool
 - more store
-- test
 - ......
 

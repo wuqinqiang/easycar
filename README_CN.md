@@ -1,34 +1,65 @@
 # easycar:A simple distributed transaction framework implemented by go
 
-#### easycar 是什么？
+## easycar 是什么？
 
-easycar 是一个用go实现的支持两阶段提交协议的分布式事务框架。它的全称是(easy commit and rollback)
+easycar 是一个用go实现的支持两阶段提交协议的分布式事务框架。它的全称是(easy commit and rollback).
 
-更多关于easycar可以查看这篇文章:[about easycar](https://www.syst.top/posts/go/easycar/)
+更多关于easycar看这篇文章:[easycar](https://www.syst.top/posts/go/easycar/)
 
-#### Features
+## 架构图
 
-##### 同时支持协议和事务模式混用
+![easycar](https://cdn.syst.top/easycar.png)
 
-在一个分布式事务中，支持每个RM协议混用(目前支持http和原生的grpc服务)，支持每个RM部分事务模式混用(目前支持TCC,Saga)。
+## Features
 
-##### 支持并发执行事务
+### 同时支持协议和事务模式混用
 
-支持分层并发执行。 对参与的RM通过设置的权重做分层，同一层的RM可以并发调用，一层处理完毕再接下一层。在这个基础上，当某个RM发生调用错误时，那么后面一层也不会执行，整个分布式事务需要回滚。
+在一组分布式事务中，每个RM可以使用不同的传输协议(HTTP/gRPC),也可以使用不同的事务模式(TCC/Sage...)，因此允许RM协议和事务模式的混合使用。
 
-#### State
+### 支持并发执行事务
 
-global state
-![global](https://cdn.syst.top/global.png)
+支持分层并发执行每个RM。 对参与的RM设置分层，同一层的RM可以并发调用，一层处理完毕再接下一层。在这个基础上，比如一阶段，一旦某个RM发生错误， 那么意味着本次分布式事务失败，也只需要回滚小于等于本层的RM组。
 
-#### RUN
+### 服务注册和发现
 
-##### 修改配置文件
-conf.yml 文件
+暂时只支持etcd。
+
+### 负责均衡
+
+**提供**：
+
+- IPHash
+- ConsistentHash
+- P2C
+- Random
+- R2
+- LeastLoad
+- Bounded
+
+
+## 成功的例子
+
+![success](https://cdn.syst.top/success.png)
+
+## 失败的例子
+![failed](https://cdn.syst.top/failed.png)
+
+## 状态
+
+![global](https://cdn.syst.top/b-state.png)
+
+## 运行
+
+```shell
+cp conf.example.yml conf.ymal
+```
+
+修改 conf.yml 文件
+
 ```ymal
 ## conf
 #httpListen: 127.0.0.1:8085
-automaticExecution2: false  #If it is true, when the first stage of execution ends, it will automatically commit or rollback
+automaticExecution2: false  # 如果是true，easycar 会自动根据第一阶段结果，执行第二阶段commit或者rollback
 timeout: 7 #unit of second
 server:
   grpc:
@@ -43,7 +74,7 @@ server:
     listenOn: 127.0.0.1:8085
 
 db: # easycar server db
-  driver: mongodb
+  driver: mysql
   mysql:
     dbURL: easycar:easycar@tcp(127.0.0.1:3306)/easycar?charset=utf8&parseTime=True&loc=Local
     maxLifetime: 7200
@@ -54,7 +85,7 @@ db: # easycar server db
     minPool: 10
     maxPool: 20
 
-registry: #// If the registry is configured,we need to register the service to the  registry center when the server start
+registry: #//配置了注册中心，那么服务启动的时候把服务注册到注册中心
   etcd:
     user: ""
     pass: ""
@@ -66,32 +97,41 @@ tracing:
   jaegerUrl: http://localhost:14268/api/traces
 ```
 
-后续会提供更多配置方式
-
-
-当配置完成,执行
+执行
 
 ```shell
-go run cmd/main.go -mod file # mod 后续还可以是env......
+go run cmd/main.go
 ```
 
-如果你使用的go服务，可以使用 [client](https://github.com/easycar/client-go) ,其他语言后续实现。
-当然你也可以直接调用http接口。
+## client
 
-#### examples
+如果你使用Golang，可以使用 [client](https://github.com/easycar/client-go) ,其他语言客户端后续提供。
 
-see more examples to:[examples](https://github.com/easycar/examples)
+## examples
 
+更多例子:[examples](https://github.com/easycar/examples)
 
+## todo list
 
-
-
-#### todo list
-
+- [x] Saga
+- [x] TCC
 - [ ] XA
-- [ ] AT
-- retry
-- easycar client
+- [ ] client
+    - [x] client-go
+    - [ ] client-rust
+    - [ ] client-php
+    - [ ] client-python
+    - [ ] client-java
+- [x] retry
+- [ ] registry and discovery
+    - [x] etcd
+    - [ ] consul
+    - [ ]  zookeeper
+- [x] balancer
+- [ ] test
+- [ ] notify
+- [x] tracing
+- [ ] tool
 - more store
 - ......
 
