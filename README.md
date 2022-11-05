@@ -1,4 +1,4 @@
-# easycar:A simple distributed transaction framework implemented by go
+# easycar
 
 [简体中文](https://github.com/wuqinqiang/easycar/blob/main/README_CN.md)
 
@@ -15,20 +15,21 @@ Architecture
 
 ## Features
 
-#### Supports both protocol and transaction mode mixing
+**Supports both protocol and transaction mode mixing**
 
 In a set of distributed transactions, each RM can use a different transport protocol (HTTP/gRPC) and transaction mode (
 TCC/Sage...), so it allows a mix of RM protocols and transaction modes.
 
-### Support for concurrent execution of transactions
+**Support for concurrent execution of transactions**
 
 Supports concurrent execution in layers. The participating RMs are layered by the set weights, and RMs in the same layer
-can be invoked concurrently, and the next layer is processed after one layer is finished. On this basis, when an RM has
-a call error, then the next layer will not be executed and the whole distributed transaction needs to be rolled back.
+can be invoked concurrently, and the next layer is processed after one layer is finished.
 
-### Service Registration and Discovery
+**Service Registration and Discovery**
 
-### Client-side load balancing
+Currently supports etcd.
+
+**Client-side load balancing**
 
 **Support**：
 
