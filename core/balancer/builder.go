@@ -78,6 +78,9 @@ func (p *Picker) Pick(info grpcBalancer.PickInfo) (grpcBalancer.PickResult, erro
 	if !ok {
 		return grpcBalancer.PickResult{}, grpcBalancer.ErrNoSubConnAvailable
 	}
+
+	p.balancer.Inc(addr)
+
 	return grpcBalancer.PickResult{
 		SubConn: subConn,
 		Done: func(info grpcBalancer.DoneInfo) {
