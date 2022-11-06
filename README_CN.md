@@ -8,7 +8,7 @@ easycar 是一个用go实现的支持两阶段提交协议的分布式事务框�
 
 ## 架构图
 
-![easycar](https://cdn.syst.top/easycar.png)
+![easycar](https://cdn.syst.top/easycar2.jpg)
 
 ## Features
 
@@ -39,14 +39,14 @@ easycar 是一个用go实现的支持两阶段提交协议的分布式事务框�
 
 ## 成功的例子
 
-![success](https://cdn.syst.top/success.png)
+![success](https://cdn.syst.top/success2.png)
 
 ## 失败的例子
-![failed](https://cdn.syst.top/failed.png)
+![failed](https://cdn.syst.top/failed2.png)
 
 ## 状态
 
-![global](https://cdn.syst.top/b-state.png)
+![global](https://cdn.syst.top/state3.png)
 
 ## 运行
 

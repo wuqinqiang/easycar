@@ -11,7 +11,7 @@ For more information about easycar see this post [easycar](https://www.syst.top/
 
 Architecture
 
-![easycar](https://cdn.syst.top/easycar.png)
+![easycar](https://cdn.syst.top/easycar2.jpg)
 
 ## Features
 
@@ -43,16 +43,16 @@ Currently supports etcd.
 
 ## Examples of success
 
-![success](https://cdn.syst.top/success.png)
+![success](https://cdn.syst.top/success2.png)
 
 ## Examples of failed
 
-![success](https://cdn.syst.top/failed.png)
+![success](https://cdn.syst.top/failed2.png)
 
 ## State
 
 **global state**
-![global](https://cdn.syst.top/b-state.png)
+![global](https://cdn.syst.top/state3.png)
 
 ## Run
 
