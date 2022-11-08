@@ -36,8 +36,7 @@ type (
 )
 
 func NewExecutor() *executor {
-	executor := DefaultExecutor
-	return executor
+	return DefaultExecutor
 }
 
 func (e *executor) Close(ctx context.Context) error {
@@ -55,7 +54,7 @@ func (e *executor) Phase2(ctx context.Context, global *entity.Global, branches e
 		if global.State == consts.Phase1Success {
 			return branch.TccConfirm()
 		}
-		// other phase1 failed
+		// phase1 failed
 		if branch.SAGACompensation() || branch.TccCancel() {
 			return true
 		}
@@ -92,61 +91,37 @@ func (e *executor) stratify(branches entity.BranchList, filterFn FilterFn) []ent
 }
 
 func (e *executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
-	layerList := e.stratify(branches, filterFn)
+	for _, branchGroup := range e.stratify(branches, filterFn) {
 
-	if len(layerList) == 0 {
-		return nil
-	}
-
-	for _, branchItems := range layerList {
-		if len(branchItems) == 0 {
+		if len(branchGroup) == 0 {
 			continue
 		}
 
 		errGroup, groupCtx := errgroup.WithContext(ctx)
 
-		for _, branch := range branchItems {
+		for _, branch := range branchGroup {
 			b := branch
 			errGroup.Go(func() error {
-				transporter, err := e.manager.GetTransporter(common.Net(b.Protocol))
-				if err != nil {
-					return fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
-				}
-				var (
-					reqOpts []common.Option
-				)
-				if b.Timeout > 0 {
-					reqOpts = append(reqOpts, common.WithTimeout(time.Duration(b.Timeout)*time.Second))
-				}
-				req := common.NewReq([]byte(b.ReqData), []byte(b.ReqHeader), reqOpts...)
-				req.AddEasyCarHeaders(b.GID, b.BranchId)
-
-				var (
-					branchState = consts.BranchSucceed
-					errmsg      string
-				)
 				bCtx, span := Tracer(ctx, "reqRM")
 				span.SetAttributes(
-					attribute.String("protocol", string(transporter.GetType())),
+					attribute.String("protocol", b.Protocol),
 					attribute.String("reqUrl", b.Url),
 					attribute.String("branchId", b.BranchId),
 				)
-				r := retry.New(3, retry.WithMaxBackOffTime(1*time.Second))
+				defer span.End()
 
-				err = r.Run(func() error {
-					_, err = transporter.Request(groupCtx, b.Url, req)
-					return err
-				})
+				var (
+					err         error
+					errmsg      string
+					branchState = consts.BranchSucceed
+				)
 
-				if err != nil {
-					if errors.Is(err, retry.ErrOverMaximumAttempt) {
-						logging.Warnf("over maximum attempt")
-					}
-					logging.Error(fmt.Sprintf("[Executor] Request branch:%vrequest error:%v", b, err))
-					errmsg = err.Error()
-					span.SetStatus(codes.Error, errmsg)
+				if err = e.request(groupCtx, b); err != nil {
 					branchState = consts.BranchFailState
+					span.SetStatus(codes.Error, err.Error())
+					errmsg = err.Error()
 				}
+
 				b.State = branchState
 
 				if _, erro := dao.GetTransaction().UpdateBranchStateByGid(bCtx, b.BranchId,
@@ -162,4 +137,37 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 		}
 	}
 	return nil
+}
+
+func (e *executor) request(ctx context.Context, b *entity.Branch) (err error) {
+	transporter, err := e.manager.GetTransporter(common.Net(b.Protocol))
+	if err != nil {
+		return fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
+	}
+
+	defer func() {
+		if err != nil {
+			if errors.Is(err, retry.ErrOverMaximumAttempt) {
+				logging.Warnf("over maximum attempt")
+			}
+			err = fmt.Errorf("[Executor] Request branchid:%vrequest error:%v", b.BranchId, err)
+		}
+	}()
+
+	var (
+		reqOpts []common.Option
+	)
+	if b.Timeout > 0 {
+		reqOpts = append(reqOpts, common.WithTimeout(time.Duration(b.Timeout)*time.Second))
+	}
+	req := common.NewReq([]byte(b.ReqData), []byte(b.ReqHeader), reqOpts...)
+	req.AddEasyCarHeaders(b.GID, b.BranchId)
+
+	r := retry.New(3, retry.WithMaxBackOffTime(1*time.Second))
+
+	err = r.Run(func() error {
+		_, err = transporter.Request(ctx, b.Url, req)
+		return err
+	})
+	return
 }

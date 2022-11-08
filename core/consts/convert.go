@@ -2,6 +2,7 @@ package consts
 
 import "github.com/wuqinqiang/easycar/proto"
 
+// ConvertStateToGrpc Convert global state to pb state
 func ConvertStateToGrpc(state GlobalState) proto.GlobalState {
 	switch state {
 	case Init:
@@ -31,6 +32,7 @@ func ConvertStateToGrpc(state GlobalState) proto.GlobalState {
 	return proto.GlobalState_GLOBAL_DEFAULT
 }
 
+// ConvertBranchStateToGrpc Convert branch state to pb state
 func ConvertBranchStateToGrpc(state BranchState) proto.BranchState {
 	switch state {
 	case BranchInit:
@@ -46,6 +48,7 @@ func ConvertBranchStateToGrpc(state BranchState) proto.BranchState {
 	return proto.BranchState_UN_KNOW_STATE
 }
 
+// ConvertBranchActionToGrpc Convert branch action to pb action
 func ConvertBranchActionToGrpc(action BranchAction) proto.Action {
 	switch action {
 	case Try:
@@ -63,6 +66,7 @@ func ConvertBranchActionToGrpc(action BranchAction) proto.Action {
 	return proto.Action_UN_KNOW_TRANSACTION_TYPE
 }
 
+// ConvertTranTypeToGrpc Convert branch tranType to pb tranType
 func ConvertTranTypeToGrpc(tranType TransactionType) proto.TranType {
 	switch tranType {
 	case TCC:
