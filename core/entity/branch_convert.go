@@ -52,6 +52,7 @@ func (b *Branch) AssignmentByPb(m *proto.RegisterReq_Branch) *Branch {
 	now := time.Now().Unix()
 	b.CreateTime = now
 	b.UpdateTime = now
+	b.Timeout = int64(m.Timeout)
 
 	var (
 		buffer bytes.Buffer

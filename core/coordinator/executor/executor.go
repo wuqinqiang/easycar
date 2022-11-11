@@ -32,6 +32,7 @@ type (
 
 	executor struct {
 		manager transport.Manager
+		timeout time.Duration
 	}
 )
 
@@ -44,13 +45,13 @@ func (e *executor) Close(ctx context.Context) error {
 }
 
 func (e *executor) Phase1(ctx context.Context, _ *entity.Global, branches entity.BranchList) error {
-	return e.execute(ctx, branches, func(branch *entity.Branch) bool {
+	return e.execute(ctx, true, branches, func(branch *entity.Branch) bool {
 		return branch.TccTry() || branch.SAGANormal()
 	})
 }
 
 func (e *executor) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
-	return e.execute(ctx, branches, func(branch *entity.Branch) bool {
+	return e.execute(ctx, false, branches, func(branch *entity.Branch) bool {
 		if global.State == consts.Phase1Success {
 			return branch.TccConfirm()
 		}
@@ -62,7 +63,7 @@ func (e *executor) Phase2(ctx context.Context, global *entity.Global, branches e
 	})
 }
 
-func (e *executor) stratify(branches entity.BranchList, filterFn FilterFn) []entity.BranchList {
+func (e *executor) stratify(branches entity.BranchList) []entity.BranchList {
 	layerList := make([]entity.BranchList, len(branches))
 	// sort branches by level
 	sort.Slice(branches, func(i, j int) bool {
@@ -75,9 +76,6 @@ func (e *executor) stratify(branches entity.BranchList, filterFn FilterFn) []ent
 	)
 
 	for i, branch := range branches {
-		if !filterFn(branch) {
-			continue
-		}
 		if i == 0 {
 			previousLevel = branch.Level
 		}
@@ -90,15 +88,30 @@ func (e *executor) stratify(branches entity.BranchList, filterFn FilterFn) []ent
 	return layerList
 }
 
-func (e *executor) execute(ctx context.Context, branches entity.BranchList, filterFn FilterFn) error {
-	for _, branchGroup := range e.stratify(branches, filterFn) {
+func (e *executor) execute(ctx context.Context, shouldStratify bool, branches entity.BranchList, filterFn FilterFn) error {
 
+	// filter branches
+	for i := 0; i < len(branches); {
+		if !filterFn(branches[i]) {
+			branches = append(branches[:i], branches[i+1:]...)
+		} else {
+			i++
+		}
+	}
+
+	// if it's phase2,no layering is required
+	// issue:https://github.com/wuqinqiang/easycar/issues/43
+	layeredList := []entity.BranchList{branches}
+	if shouldStratify {
+		layeredList = e.stratify(branches)
+	}
+
+	for _, branchGroup := range layeredList {
 		if len(branchGroup) == 0 {
 			continue
 		}
 
-		errGroup, groupCtx := errgroup.WithContext(ctx)
-
+		errGroup, _ := errgroup.WithContext(ctx)
 		for _, branch := range branchGroup {
 			b := branch
 			errGroup.Go(func() error {
@@ -116,22 +129,25 @@ func (e *executor) execute(ctx context.Context, branches entity.BranchList, filt
 					branchState = consts.BranchSucceed
 				)
 
-				if err = e.request(groupCtx, b); err != nil {
+				// request the RM
+				if err = e.request(ctx, b); err != nil {
+					logging.Error(fmt.Sprintf("[Executor] request branch %+v err:%v", b, err))
 					branchState = consts.BranchFailState
 					span.SetStatus(codes.Error, err.Error())
 					errmsg = err.Error()
 				}
 
+				// update branch state
 				b.State = branchState
-
 				if _, erro := dao.GetTransaction().UpdateBranchStateByGid(bCtx, b.BranchId,
 					b.State, errmsg); erro != nil {
 					logging.Error(fmt.Sprintf("[Executor]update branch state error:%v\n", erro))
 				}
-				span.End()
 				return err
 			})
 		}
+
+		//in phase1, we have to stop execution and don't go to the next level RM if some RM is wrong
 		if err := errGroup.Wait(); err != nil {
 			return err
 		}
@@ -157,9 +173,13 @@ func (e *executor) request(ctx context.Context, b *entity.Branch) (err error) {
 	var (
 		reqOpts []common.Option
 	)
+
+	timeout := e.timeout
 	if b.Timeout > 0 {
-		reqOpts = append(reqOpts, common.WithTimeout(time.Duration(b.Timeout)*time.Second))
+		timeout = time.Second * time.Duration(b.Timeout)
 	}
+	reqOpts = append(reqOpts, common.WithTimeout(timeout))
+
 	req := common.NewReq([]byte(b.ReqData), []byte(b.ReqHeader), reqOpts...)
 	req.AddEasyCarHeaders(b.GID, b.BranchId)
 
