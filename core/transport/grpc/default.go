@@ -16,12 +16,13 @@ func NewDefault(uri string) *Default {
 }
 
 func (d *Default) Get() (service string, method string, err error) {
-	sep := strings.IndexByte(d.uri, '/')
+	uri := d.uri
+	if strings.HasPrefix(d.uri, "grpc://") {
+		uri = uri[7:]
+	}
+	sep := strings.IndexByte(uri, '/')
 	if sep < 0 {
 		return "", "", fmt.Errorf("bad url: '%s'. no '/' found", d.uri)
 	}
-	if strings.Contains(d.uri, "://") {
-		return "", "", fmt.Errorf("call dtmdriver.Use() before you use custom scheme for '%s'", d.uri)
-	}
-	return d.uri[:sep], d.uri[sep:], nil
+	return uri[:sep], uri[sep:], nil
 }
