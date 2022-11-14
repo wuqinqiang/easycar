@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/wuqinqiang/easycar/core/servers/runner"
+
 	"github.com/wuqinqiang/easycar/logging"
 
 	"github.com/wuqinqiang/easycar/core/coordinator/executor"
@@ -66,6 +68,9 @@ func main() {
 		servers = append(servers, httpProxySrv)
 	}
 
+	// cron server
+	servers = append(servers, runner.NewRunner("@every 1s"))
+
 	var (
 		opts []core.Option
 	)
@@ -99,7 +104,6 @@ func getConf(mod, filePath string) (c conf.Conf) {
 	case conf.File:
 		c = file.NewFile(filePath)
 	case conf.Etcd:
-		// todo
 	case conf.Env:
 		return new(envx.Env)
 	default:
