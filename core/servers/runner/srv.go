@@ -2,6 +2,7 @@ package runner
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/wuqinqiang/easycar/logging"
@@ -11,19 +12,18 @@ import (
 
 type Job func(ctx context.Context)
 
-func NewRunner(spec string, job Job) (*Runner, error) {
+func NewRunner(spec string) *Runner {
 	runner := &Runner{
 		once: sync.Once{},
 		cron: cron.New(cron.WithParser(cron.NewParser(
 			cron.Second | cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.DowOptional | cron.Descriptor))),
 	}
-	_, err := runner.cron.AddJob(spec, cron.NewChain().Then(cron.FuncJob(func() {
-		job(context.Background())
-	})))
-	if err != nil {
-		return nil, err
+	if _, err := runner.cron.AddJob(spec, cron.NewChain().Then(cron.FuncJob(func() {
+		runner.job()
+	}))); err != nil {
+		panic(err)
 	}
-	return runner, nil
+	return runner
 }
 
 type Runner struct {
@@ -43,4 +43,8 @@ func (r *Runner) Stop(ctx context.Context) error {
 	})
 	logging.Info("[Runner] stopped")
 	return nil
+}
+
+func (r *Runner) job() {
+	fmt.Println("hello world")
 }
