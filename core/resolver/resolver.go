@@ -2,7 +2,6 @@ package resolver
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/wuqinqiang/easycar/core/endponit"
 
@@ -47,12 +46,12 @@ func (r *defaultResolver) updateState(list []*registry.EasyCarInstance) {
 	var (
 		state resolver.State
 	)
-	logging.Info(fmt.Sprintf("[defaultResolver]updateState:%v", list))
+	logging.Infof("[defaultResolver]updateState:%v", list)
 
 	for _, instance := range list {
 		e, err := endponit.GetHostByEndpoint(instance.Nodes, "grpc")
 		if err != nil {
-			logging.Error(fmt.Sprintf("[updateState]GetHostByEndpoint err:%v", err))
+			logging.Errorf("[updateState]GetHostByEndpoint err:%v", err)
 			continue
 		}
 		if e == "" {
@@ -72,7 +71,7 @@ func (r *defaultResolver) updateState(list []*registry.EasyCarInstance) {
 
 	err := r.cc.UpdateState(state)
 	if err != nil {
-		logging.Error(fmt.Sprintf("[updateState]UpdateState err:%v", err))
+		logging.Errorf("[updateState]UpdateState err:%v", err)
 		return
 	}
 }
@@ -82,6 +81,6 @@ func (r *defaultResolver) ResolveNow(options resolver.ResolveNowOptions) {}
 func (r *defaultResolver) Close() {
 	r.cancel()
 	if err := r.watcher.Stop(); err != nil {
-		logging.Error(fmt.Sprintf("defaultResolver close:%v", err))
+		logging.Errorf("defaultResolver close:%v", err)
 	}
 }

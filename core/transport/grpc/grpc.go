@@ -2,7 +2,6 @@ package grpc
 
 import (
 	"context"
-	"fmt"
 	"sync"
 
 	"github.com/wuqinqiang/easycar/logging"
@@ -67,7 +66,7 @@ func (g *Transport) Close(ctx context.Context) error {
 	g.m.Range(func(key, value any) bool {
 		conn := value.(*grpc.ClientConn)
 		if err := conn.Close(); err != nil {
-			logging.Error(fmt.Sprintf("[grpc] Transport close err:%v", err))
+			logging.Errorf("[grpc] Transport close err:%v", err)
 		}
 		return true
 	})

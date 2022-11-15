@@ -131,7 +131,7 @@ func (e *executor) execute(ctx context.Context, shouldStratify bool, branches en
 
 				// request the RM
 				if err = e.request(ctx, b); err != nil {
-					logging.Error(fmt.Sprintf("[Executor] request branch %+v err:%v", b, err))
+					logging.Errorf("[Executor] request branch %+v err:%v", b, err)
 					branchState = consts.BranchFailState
 					span.SetStatus(codes.Error, err.Error())
 					errmsg = err.Error()
@@ -141,7 +141,7 @@ func (e *executor) execute(ctx context.Context, shouldStratify bool, branches en
 				b.State = branchState
 				if _, erro := dao.GetTransaction().UpdateBranchStateByGid(bCtx, b.BranchId,
 					b.State, errmsg); erro != nil {
-					logging.Error(fmt.Sprintf("[Executor]update branch state error:%v\n", erro))
+					logging.Errorf("[Executor]update branch state error:%v", erro)
 				}
 				return err
 			})

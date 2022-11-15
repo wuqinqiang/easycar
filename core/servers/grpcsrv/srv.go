@@ -92,7 +92,7 @@ func (s *GrpcSrv) Run(ctx context.Context) error {
 			log.Fatal(err)
 		}
 	}()
-	elog.Info(fmt.Sprintf("[Grpc] grpc listen:%s", s.listenOn))
+	elog.Infof("[Grpc] grpc listen:%s", s.listenOn)
 	return nil
 }
 
@@ -134,7 +134,7 @@ func (s *GrpcSrv) Stop(ctx context.Context) (err error) {
 	if err = s.coordinator.Close(ctx); err != nil {
 		return
 	}
-	elog.Info("[GrpcSrv] stopped")
+	elog.Infof("[GrpcSrv] stopped")
 	return
 }
 

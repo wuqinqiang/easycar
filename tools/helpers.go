@@ -53,7 +53,7 @@ func runSafe(fn func()) {
 func FigureOutListen(listenOn string) string {
 	host, port, err := net.SplitHostPort(listenOn)
 	if err != nil {
-		logging.Warn(err.Error())
+		logging.Warnf(err.Error())
 		return listenOn
 	}
 	if len(host) > 0 && host != "0.0.0.0" {
