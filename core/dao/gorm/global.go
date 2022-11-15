@@ -2,6 +2,7 @@ package gorm
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"gorm.io/gen/field"
@@ -39,6 +40,22 @@ func (g GlobalImpl) GetGlobal(ctx context.Context, gid string) (entity.Global, e
 	}
 
 	return *m, nil
+}
+
+func (g GlobalImpl) FindProcessingList(ctx context.Context, limit int) (list []*entity.Global, err error) {
+	global := g.query.Global
+	now := time.Now()
+	before := now.Add(time.Minute * -2)
+	fmt.Println(now.Format("2006-01-02 15:04:05"))
+	fmt.Println(before.Format("2006-01-02 15:04:05"))
+	list, err = g.query.Global.WithContext(ctx).
+		Where(global.CreateTime.Gte(before.Unix())).
+		Where(global.CreateTime.Lte(now.Unix())).
+		Where(global.State.In(string(consts.Phase1Preparing),
+			string(consts.Phase2Committing), string(consts.Phase2Rollbacking))).
+		Limit(limit).
+		Find()
+	return
 }
 
 func (g GlobalImpl) UpdateGlobalStateByGid(ctx context.Context, gid string,

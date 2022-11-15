@@ -24,6 +24,26 @@ func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) (er
 	return
 }
 
+func (g GlobalImpl) FindProcessingList(ctx context.Context, limit int) (list []*entity.Global, err error) {
+	now := time.Now()
+	before := now.Add(time.Minute * -2)
+
+	filter := bson.M{
+		"create_time": bson.M{"$gte": before.Unix(), "$lte": now.Unix()},
+		"state": bson.M{"$in": []string{string(consts.Phase1Preparing),
+			string(consts.Phase2Committing), string(consts.Phase2Rollbacking)}},
+	}
+	var (
+		cur *mongo.Cursor
+	)
+	cur, err = g.GetCollection().Find(ctx, filter)
+	if err != nil {
+		return
+	}
+	err = cur.All(ctx, &list)
+	return
+}
+
 func (g GlobalImpl) GetGlobal(ctx context.Context, gid string) (global entity.Global, err error) {
 	filter := bson.D{{Key: "g_id", Value: gid}}
 	err = g.GetCollection().FindOne(ctx, filter).Decode(&global)
