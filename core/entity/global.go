@@ -35,11 +35,16 @@ func (g *Global) Phase1Failed() bool {
 	return g.State == consts.Phase1Failed
 }
 
-func (g *Global) Phase2Retrying() bool {
-	return g.State == consts.Phase1Retrying
-}
 func (g *Global) Phase1Retrying() bool {
 	return g.State == consts.Phase1Retrying
+}
+
+func (g *Global) Phase2Committing() bool {
+	return g.State == consts.Phase2Committing
+}
+
+func (g *Global) Phase2RollBacking() bool {
+	return g.State == consts.Phase2Rollbacking
 }
 
 func (g *Global) Init() bool {

@@ -59,7 +59,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	servers = append(servers, grpcSrv)
+	// cron server
+	cronServer := runner.NewRunner("@every 1s", newCoordinator)
+	servers = append(servers, grpcSrv, cronServer)
 
 	// create http server if needed
 	if settings.Grpc.OpenGateway() {
@@ -67,9 +69,6 @@ func main() {
 			grpcSrv.Handler(settings.Grpc.Gateway.CertFile, settings.Grpc.Gateway.ServerName))
 		servers = append(servers, httpProxySrv)
 	}
-
-	// cron server
-	servers = append(servers, runner.NewRunner("@every 1s"))
 
 	var (
 		opts []core.Option
