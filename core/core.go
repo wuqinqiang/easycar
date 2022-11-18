@@ -80,7 +80,7 @@ func (core *Core) Run(ctx context.Context) error {
 	}
 	// wait for all service is  start
 	core.runWaitGroup.Wait()
-	logging.Info("easycar start")
+	logging.Infof("easycar start")
 
 	if core.registry != nil {
 		if err := core.registry.Register(c1, core.instance); err != nil {

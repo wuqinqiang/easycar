@@ -64,10 +64,10 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 		return err
 	}
 	if c.automaticExecution2 {
-		logging.Infof("[Coordinator] Phase2 start", "gid", global.GID)
+		logging.Infof("[Coordinator] Phase2 start gid:%v", global.GID)
 		tools.GoSafe(func() {
 			if err := c.Phase2(context.Background(), global, branches); err != nil {
-				logging.Error(fmt.Sprintf("[Start] Phase2:err:%v", err))
+				logging.Errorf("[Start] Phase2:err:%v", err)
 				return
 			}
 		})
@@ -85,9 +85,9 @@ func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branche
 			phase1State = consts.Phase1Failed
 		}
 		global.State = phase1State
-		logging.Infof("[Coordinator] phase1 end", "gid", global.GetGId(), "state", global.State)
+		logging.Infof("[Coordinator] phase1 end gid:%v state:%v", global.GetGId(), global.State)
 		if erro := c.UpdateGlobalState(ctx, global.GetGId(), phase1State); erro != nil {
-			logging.Error(fmt.Sprintf("[Coordinator]Phase1 UpdateGlobalState:%v", erro))
+			logging.Errorf("[Coordinator]Phase1 UpdateGlobalState:%v", erro)
 		}
 	}()
 	err = c.executor.Phase1(ctx, global, branches)
@@ -114,10 +114,10 @@ func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branche
 		if err != nil {
 			overStateVal = tools.IF(global.Phase1Failed(), consts.Phase2RollbackFailed, consts.Phase2CommitFailed)
 		}
-		logging.Infof("[Coordinator] Phase2 end", "gid", global.GID, "state", overStateVal)
+		logging.Infof("[Coordinator] Phase2 end gid %v,state:%v", global.GID, overStateVal)
 		_, erro := c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(), overStateVal.(consts.GlobalState))
 		if erro != nil {
-			fmt.Printf("[Phase2]UpdateGlobalStateByGid gid:%v err:%v", global.GetGId(), erro)
+			logging.Errorf("[Phase2]UpdateGlobalStateByGid gid:%v err:%v", global.GetGId(), erro)
 		}
 	}()
 	err = c.executor.Phase2(ctx, global, branches)

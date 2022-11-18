@@ -42,7 +42,7 @@ type Runner struct {
 
 func (r *Runner) Run(ctx context.Context) error {
 	r.cron.Start()
-	logging.Info("[Runner] start")
+	logging.Infof("[Runner] start")
 	return nil
 }
 
@@ -50,7 +50,7 @@ func (r *Runner) Stop(ctx context.Context) error {
 	r.once.Do(func() {
 		r.cron.Stop()
 	})
-	logging.Info("[Runner] stopped")
+	logging.Infof("[Runner] stopped")
 	return nil
 }
 

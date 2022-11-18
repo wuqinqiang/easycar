@@ -2,7 +2,6 @@ package httpsrv
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/url"
 	"sync"
@@ -53,10 +52,10 @@ func (srv *HttpSrv) Run(ctx context.Context) error {
 	}
 	tools.GoSafe(func() {
 		if err = srv.httpServer.ListenAndServe(); err != nil {
-			logging.Error(fmt.Sprintf("[HttpSrv ]ListenAndServe err:%v", err))
+			logging.Errorf("[HttpSrv ]ListenAndServe err:%v", err)
 		}
 	})
-	logging.Info(fmt.Sprintf("[HttpSrv] http listen:%s", srv.listenOn))
+	logging.Infof("[HttpSrv] http listen:%s", srv.listenOn)
 	return nil
 }
 
@@ -67,7 +66,7 @@ func (srv *HttpSrv) Stop(ctx context.Context) (err error) {
 	srv.once.Do(func() {
 		err = srv.httpServer.Close()
 	})
-	logging.Info("[HttpSrv]Stopped")
+	logging.Infof("[HttpSrv]Stopped")
 	return
 }
 

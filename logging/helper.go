@@ -10,38 +10,24 @@ import (
 	"go.uber.org/zap"
 )
 
-var logger *zap.Logger
+var (
+	logger *zap.Logger
+)
 
-func Info(msg string) {
-	log(zapcore.InfoLevel, msg)
+func Infof(format string, keyVals ...interface{}) {
+	log(zapcore.InfoLevel, fmt.Sprintf(format, keyVals...))
 }
 
-func Infof(msg string, keyVals ...interface{}) {
-	log(zapcore.InfoLevel, msg, keyVals...)
+func Errorf(format string, keyVals ...interface{}) {
+	log(zapcore.ErrorLevel, fmt.Sprintf(format, keyVals...))
 }
 
-func Error(msg string) {
-	log(zapcore.ErrorLevel, msg)
+func Warnf(format string, keyVals ...interface{}) {
+	log(zapcore.WarnLevel, fmt.Sprintf(format, keyVals...))
 }
 
-func Errorf(msg string, keyVals ...interface{}) {
-	log(zapcore.ErrorLevel, msg, keyVals...)
-}
-
-func Warn(msg string) {
-	log(zapcore.WarnLevel, msg)
-}
-
-func Warnf(msg string, keyVals ...interface{}) {
-	log(zapcore.WarnLevel, msg, keyVals...)
-}
-
-func Debug(msg string) {
-	log(zapcore.DebugLevel, msg)
-}
-
-func Debugf(msg string, keyVals ...interface{}) {
-	log(zapcore.DebugLevel, msg, keyVals...)
+func Debugf(format string, keyVals ...interface{}) {
+	log(zapcore.DebugLevel, fmt.Sprintf(format, keyVals...))
 }
 
 func log(level zapcore.Level, msg string, keyvals ...interface{}) {
