@@ -17,6 +17,15 @@ import (
 type GlobalImpl struct {
 }
 
+func (g GlobalImpl) IncrTryTimes(ctx context.Context, gid string, nextCronTime int) error {
+	filter := bson.D{{Key: "g_id", Value: gid}}
+	updates := bson.M{"$set": bson.M{"next_cron_time": nextCronTime}, "$inc": bson.M{
+		"try_times": 1,
+	}}
+	_, err := g.GetCollection().UpdateOne(ctx, filter, updates)
+	return err
+}
+
 func (g GlobalImpl) GetCollection() *mongo.Collection {
 	return database.Collection("global")
 }
@@ -26,7 +35,7 @@ func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) (er
 	return
 }
 
-func (g GlobalImpl) FindProcessingList(ctx context.Context, limit int) (list []*entity.Global, err error) {
+func (g GlobalImpl) FindProcessingList(ctx context.Context, limit, maxTimes int) (list []*entity.Global, err error) {
 	now := time.Now()
 	before := now.Add(time.Hour * -2)
 
@@ -37,14 +46,24 @@ func (g GlobalImpl) FindProcessingList(ctx context.Context, limit int) (list []*
 	state = append(state, consts.P2InProgressStates...)
 
 	filter := bson.M{
-		"update_time": bson.M{"$gte": before.Unix(), "$lte": now.Unix()},
-		"state":       bson.M{"$in": state},
+		"$and": []bson.M{
+			{
+				"next_cron_time": bson.M{"$gte": before.Unix(), "$lte": now.Unix()},
+			},
+			{
+				"state": bson.M{"$in": state},
+			},
+			{
+				"try_times": bson.M{"$lt": maxTimes},
+			},
+		},
 	}
 	var (
 		cur *mongo.Cursor
 	)
 
-	cur, err = g.GetCollection().Find(ctx, filter, options.Find().SetSort(bson.M{"update_time": 1}))
+	cur, err = g.GetCollection().Find(ctx, filter,
+		options.Find().SetSort(bson.M{"update_time": 1}).SetLimit(int64(limit)))
 	if err != nil {
 		return
 	}

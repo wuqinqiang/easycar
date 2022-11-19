@@ -62,7 +62,8 @@ func main() {
 		log.Fatal(err)
 	}
 	// cron server
-	cronServer := runner.New(newCoordinator, dao)
+	cronServer := runner.New(newCoordinator, dao,
+		runner.WithMaxTimes(settings.Cron.MaxTimes), runner.WithTimeInterval(settings.Cron.TimeInterval))
 	servers = append(servers, grpcSrv, cronServer)
 
 	// create http server if needed

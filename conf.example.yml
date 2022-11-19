@@ -35,3 +35,10 @@ registry: #If the registry is configured,we need to register the service to the 
 
 tracing:
   jaegerUrl: http://localhost:14268/api/traces
+
+
+  #
+cron:
+  ## max retry times when rm is not available
+ maxTimes: 3
+ timeInterval: 5 #unit is minute. it means that the next retry is 5m later, not in strict mode

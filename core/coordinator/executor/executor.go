@@ -192,7 +192,7 @@ func (e *executor) request(ctx context.Context, b *entity.Branch) (err error) {
 	req := common.NewReq([]byte(b.ReqData), []byte(b.ReqHeader), reqOpts...)
 	req.AddEasyCarHeaders(b.GID, b.BranchId)
 
-	r := retry.New(3, retry.WithMaxBackOffTime(1*time.Second))
+	r := retry.New(2, retry.WithMaxBackOffTime(1*time.Second))
 
 	err = r.Run(func() error {
 		_, err = transporter.Request(ctx, b.Url, req)

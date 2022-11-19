@@ -15,8 +15,11 @@ CREATE TABLE `branch`
     `g_id`         varchar(25)   NOT NULL COMMENT 'global transaction id',
     `create_time`  int           NOT NULL DEFAULT '0',
     `update_time`  int           NOT NULL DEFAULT '0',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+    PRIMARY KEY (`id`),
+    KEY            `idx_gid` (`g_id`),
+    KEY            `idx_branch_id` (`branch_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb3;
+
 
 
 CREATE TABLE `global`
@@ -28,5 +31,8 @@ CREATE TABLE `global`
     `next_cron_time` int         NOT NULL DEFAULT '0' COMMENT 'pending',
     `create_time`    int         NOT NULL DEFAULT '0',
     `update_time`    int         NOT NULL DEFAULT '0',
-    PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+    `try_times`      int         NOT NULL DEFAULT '0',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `idx_gid` (`g_id`),
+    KEY              `idx_next_cron_time` (`next_cron_time`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8mb3;
