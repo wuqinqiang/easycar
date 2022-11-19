@@ -48,7 +48,9 @@ func main() {
 	settings.Init()
 
 	// Create a Coordinator,The core logic is here.
-	newCoordinator := coordinator.NewCoordinator(dao.GetTransaction(),
+	dao := dao.GetTransaction()
+
+	newCoordinator := coordinator.NewCoordinator(dao,
 		executor.NewExecutor(), settings.AutomaticExecution2)
 
 	var (
@@ -60,7 +62,7 @@ func main() {
 		log.Fatal(err)
 	}
 	// cron server
-	cronServer := runner.NewRunner("@every 1s", newCoordinator)
+	cronServer := runner.New(newCoordinator, dao)
 	servers = append(servers, grpcSrv, cronServer)
 
 	// create http server if needed

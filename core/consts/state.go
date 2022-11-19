@@ -14,18 +14,17 @@ const (
 
 	//**********Phase1************
 	Phase1Preparing GlobalState = "preparing"
-	Phase1Retrying  GlobalState = "p1_retrying"
 	Phase1Failed    GlobalState = "p1_failed"
 	Phase1Success   GlobalState = "p1_success"
 
 	//**********Phase2*************
-	Phase2Committing     GlobalState = "p2_committing"
-	Phase2CommitFailed   GlobalState = "p2_commit_failed"
-	Phase2CommitRetrying GlobalState = "p2_commit_retrying"
+	Phase2Committing   GlobalState = "p2_committing"
+	Phase2CommitFailed GlobalState = "p2_commit_failed"
+	//Phase2CommitRetrying GlobalState = "p2_commit_retrying"
 
-	Phase2Rollbacking      GlobalState = "p2_rollbacking"
-	Phase2RollbackFailed   GlobalState = "p2_rollback_failed"
-	Phase2RollbackRetrying GlobalState = "p2_rollback_retrying"
+	Phase2Rollbacking    GlobalState = "p2_rollbacking"
+	Phase2RollbackFailed GlobalState = "p2_rollback_failed"
+	//Phase2RollbackRetrying GlobalState = "p2_rollback_retrying"
 
 	Committed  GlobalState = "committed"
 	Rollbacked GlobalState = "rollbacked"
@@ -37,3 +36,17 @@ const (
 	BranchSucceed   BranchState = "succeed"
 	BranchFailState BranchState = "failed"
 )
+
+var P1InProgressStates = []string{
+	string(Phase1Preparing),
+}
+
+var P2InProgressStates = []string{
+	string(Phase1Success),
+	string(Phase2Committing),
+	string(Phase2CommitFailed),
+
+	string(Phase1Failed),
+	string(Phase2Rollbacking),
+	string(Phase2RollbackFailed),
+}

@@ -23,28 +23,24 @@ func NewGlobal(gId string) *Global {
 	}
 }
 
-func (g *Global) Phase2Failed() bool {
-	return g.State == consts.Phase1Failed
+func (g *Global) Phase1() bool {
+	return g.State == consts.Phase1Preparing
 }
 
-func (g *Global) Phase1Success() bool {
-	return g.State == consts.Phase1Success
+func (g *Global) Phase2() bool {
+	return g.GotoRollback() || g.GotoCommit()
 }
 
-func (g *Global) Phase1Failed() bool {
-	return g.State == consts.Phase1Failed
+func (g *Global) GotoCommit() bool {
+	return g.State == consts.Phase1Success ||
+		g.State == consts.Phase2Committing ||
+		g.State == consts.Phase2CommitFailed // retry
 }
 
-func (g *Global) Phase1Retrying() bool {
-	return g.State == consts.Phase1Retrying
-}
-
-func (g *Global) Phase2Committing() bool {
-	return g.State == consts.Phase2Committing
-}
-
-func (g *Global) Phase2RollBacking() bool {
-	return g.State == consts.Phase2Rollbacking
+func (g *Global) GotoRollback() bool {
+	return g.State == consts.Phase1Failed ||
+		g.State == consts.Phase2Rollbacking ||
+		g.State == consts.Phase2RollbackFailed
 }
 
 func (g *Global) Init() bool {

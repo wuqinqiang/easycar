@@ -48,6 +48,10 @@ func (b *Branch) SAGA() bool {
 	return b.TranType == consts.SAGA
 }
 
+func (b *Branch) Success() bool {
+	return b.State == consts.BranchSucceed
+}
+
 func (b *Branch) SAGANormal() bool {
 	return b.Action == consts.Normal && b.SAGA()
 }

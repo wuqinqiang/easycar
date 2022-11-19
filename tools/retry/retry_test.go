@@ -14,13 +14,13 @@ func TestNewRetry(t *testing.T) {
 	assert.Equal(t, time.Second, retry.Duration())
 	assert.Equal(t, uint32(3), retry.allowAttempt)
 	assert.Equal(t, uint32(3), retry.factor)
-	assert.Equal(t, uint32(0), retry.currentAttempt)
+	assert.Equal(t, uint32(1), retry.currentAttempt)
 	err := retry.Run(func() error {
 		return nil
 	})
 	assert.Equal(t, nil, err)
 	assert.Equal(t, time.Second, retry.Duration())
-	assert.Equal(t, uint32(1), retry.currentAttempt)
+	assert.Equal(t, uint32(2), retry.currentAttempt)
 }
 
 func TestRetry_Run(t *testing.T) {
@@ -40,7 +40,7 @@ func TestRetry_Run(t *testing.T) {
 		return nil
 	})
 	assert.Equal(t, err, nil)
-	assert.Equal(t, uint32(3), retry.currentAttempt)
+	assert.Equal(t, uint32(2), retry.currentAttempt)
 	assert.Equal(t, 100*time.Millisecond, retry.maxBackOffTime)
 
 }

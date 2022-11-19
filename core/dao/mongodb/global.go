@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"go.mongodb.org/mongo-driver/mongo/options"
+
 	"go.mongodb.org/mongo-driver/bson"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -26,17 +28,23 @@ func (g GlobalImpl) CreateGlobal(ctx context.Context, global *entity.Global) (er
 
 func (g GlobalImpl) FindProcessingList(ctx context.Context, limit int) (list []*entity.Global, err error) {
 	now := time.Now()
-	before := now.Add(time.Minute * -2)
+	before := now.Add(time.Hour * -2)
+
+	var (
+		state []string
+	)
+	state = append(state, consts.P1InProgressStates...)
+	state = append(state, consts.P2InProgressStates...)
 
 	filter := bson.M{
-		"create_time": bson.M{"$gte": before.Unix(), "$lte": now.Unix()},
-		"state": bson.M{"$in": []string{string(consts.Phase1Preparing),
-			string(consts.Phase2Committing), string(consts.Phase2Rollbacking)}},
+		"update_time": bson.M{"$gte": before.Unix(), "$lte": now.Unix()},
+		"state":       bson.M{"$in": state},
 	}
 	var (
 		cur *mongo.Cursor
 	)
-	cur, err = g.GetCollection().Find(ctx, filter)
+
+	cur, err = g.GetCollection().Find(ctx, filter, options.Find().SetSort(bson.M{"update_time": 1}))
 	if err != nil {
 		return
 	}
