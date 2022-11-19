@@ -40,6 +40,7 @@ type (
 		AutomaticExecution2 bool             `yaml:"automaticExecution2"`
 		Tracing             Tracing          `yaml:"tracing"`
 		Registry            RegistrySettings `yaml:"registry"`
+		Cron                Cron             `yaml:"cron"`
 	}
 
 	DB struct {
@@ -59,6 +60,10 @@ type (
 
 	Tracing struct {
 		JaegerUri string `yaml:"jaegerUrl"`
+	}
+	Cron struct {
+		MaxTimes     int `yaml:"maxTimes"`
+		TimeInterval int `yaml:"timeInterval"`
 	}
 )
 

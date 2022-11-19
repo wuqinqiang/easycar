@@ -21,7 +21,8 @@ type BranchDao interface {
 }
 
 type GlobalDao interface {
-	FindProcessingList(ctx context.Context, limit int) (list []*entity.Global, err error)
+	FindProcessingList(ctx context.Context, limit, maxTimes int) (list []*entity.Global, err error)
+	IncrTryTimes(ctx context.Context, gid string, nextCronTime int) error
 	CreateGlobal(ctx context.Context, global *entity.Global) error
 	GetGlobal(ctx context.Context, gid string) (entity.Global, error)
 	UpdateGlobalStateByGid(ctx context.Context, gid string,

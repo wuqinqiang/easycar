@@ -41,7 +41,7 @@ func (g GlobalImpl) GetGlobal(ctx context.Context, gid string) (entity.Global, e
 	return *m, nil
 }
 
-func (g GlobalImpl) FindProcessingList(ctx context.Context, limit int) (list []*entity.Global, err error) {
+func (g GlobalImpl) FindProcessingList(ctx context.Context, limit, maxTimes int) (list []*entity.Global, err error) {
 	global := g.query.Global
 	now := time.Now()
 	//five 2 hours rule.if RM does not recover in five hours,it will no long to automatically repair
@@ -54,13 +54,21 @@ func (g GlobalImpl) FindProcessingList(ctx context.Context, limit int) (list []*
 	state = append(state, consts.P2InProgressStates...)
 
 	list, err = g.query.Global.WithContext(ctx).
-		Where(global.UpdateTime.Gte(before.Unix())).
-		Where(global.UpdateTime.Lte(now.Unix())).
+		Where(global.NextCronTime.Gte(before.Unix())).
+		Where(global.NextCronTime.Lte(now.Unix())).
 		Where(global.State.In(state...)).
+		Where(global.TryTimes.Lt(int64(maxTimes))). //hard code
 		Order(global.UpdateTime).
 		Limit(limit).
 		Find()
 	return
+}
+
+func (g GlobalImpl) IncrTryTimes(ctx context.Context, gid string, nextCronTime int) error {
+	global := g.query.Global
+	_, err := g.query.Global.WithContext(ctx).Where(global.GID.Eq(gid)).
+		UpdateSimple(global.TryTimes.Add(1), global.NextCronTime.Value(int64(nextCronTime)))
+	return err
 }
 
 func (g GlobalImpl) UpdateGlobalStateByGid(ctx context.Context, gid string,

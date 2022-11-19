@@ -20,11 +20,9 @@ const (
 	//**********Phase2*************
 	Phase2Committing   GlobalState = "p2_committing"
 	Phase2CommitFailed GlobalState = "p2_commit_failed"
-	//Phase2CommitRetrying GlobalState = "p2_commit_retrying"
 
 	Phase2Rollbacking    GlobalState = "p2_rollbacking"
 	Phase2RollbackFailed GlobalState = "p2_rollback_failed"
-	//Phase2RollbackRetrying GlobalState = "p2_rollback_retrying"
 
 	Committed  GlobalState = "committed"
 	Rollbacked GlobalState = "rollbacked"

@@ -27,14 +27,16 @@ func newGlobal(db *gorm.DB) global {
 	_global.GID = field.NewString(tableName, "g_id")
 	_global.State = field.NewString(tableName, "state")
 	_global.EndTime = field.NewInt64(tableName, "end_time")
+	_global.TryTimes = field.NewInt64(tableName, "try_times")
 	_global.NextCronTime = field.NewInt64(tableName, "next_cron_time")
 	_global.CreateTime = field.NewInt64(tableName, "create_time")
 	_global.UpdateTime = field.NewInt64(tableName, "update_time")
 
-	_global.fieldMap = make(map[string]field.Expr, 6)
+	_global.fieldMap = make(map[string]field.Expr, 7)
 	_global.fieldMap["g_id"] = _global.GID
 	_global.fieldMap["state"] = _global.State
 	_global.fieldMap["end_time"] = _global.EndTime
+	_global.fieldMap["try_times"] = _global.TryTimes
 	_global.fieldMap["next_cron_time"] = _global.NextCronTime
 	_global.fieldMap["create_time"] = _global.CreateTime
 	_global.fieldMap["update_time"] = _global.UpdateTime
@@ -49,6 +51,7 @@ type global struct {
 	GID          field.String
 	State        field.String
 	EndTime      field.Int64
+	TryTimes     field.Int64
 	NextCronTime field.Int64
 	CreateTime   field.Int64
 	UpdateTime   field.Int64

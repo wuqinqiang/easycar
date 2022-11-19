@@ -51,7 +51,8 @@ func (r *Runner) loop() {
 	for {
 		select {
 		case <-r.ticker.C:
-			list, err := r.dao.FindProcessingList(r.ctx, 2)
+			//get two records one time.
+			list, err := r.dao.FindProcessingList(r.ctx, 2, r.options.MaxTimes)
 			if err != nil {
 				logging.Errorf("[runner] loop err:%v", err)
 				continue
@@ -71,6 +72,7 @@ func (r *Runner) loop() {
 			// reset to default value
 			r.ticker.Reset(r.options.duration)
 			r.backoff.Reset()
+
 		case <-r.ctx.Done():
 			return
 		}
@@ -103,6 +105,11 @@ func (r *Runner) runJob(list []*entity.Global) {
 				err = r.coordinator.Phase2(ctx, global, branches)
 			} else {
 				logging.Warnf("[Runner] global:%v state :%v is wrong", global.GID, global.State)
+			}
+
+			nextCronTime := time.Now().Add(r.options.timeInterval).Unix()
+			if err := r.dao.IncrTryTimes(ctx, global.GID, int(nextCronTime)); err != nil {
+				logging.Warnf("[Runner] update IncrTryTimes gid :%v  err:%v", global.GID, err)
 			}
 		})
 
