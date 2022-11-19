@@ -46,16 +46,25 @@ func (e *executor) Close(ctx context.Context) error {
 
 func (e *executor) Phase1(ctx context.Context, _ *entity.Global, branches entity.BranchList) error {
 	return e.execute(ctx, true, branches, func(branch *entity.Branch) bool {
+		if branch.Success() {
+			return false
+		}
+
 		return branch.TccTry() || branch.SAGANormal()
 	})
 }
 
 func (e *executor) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
 	return e.execute(ctx, false, branches, func(branch *entity.Branch) bool {
-		if global.State == consts.Phase1Success {
+		if branch.Success() {
+			return false
+		}
+		// for commit
+		if global.GotoCommit() {
 			return branch.TccConfirm()
 		}
-		// phase1 failed
+
+		// phase1 failed、rollbackIng and rollbackFailed
 		if branch.SAGACompensation() || branch.TccCancel() {
 			return true
 		}

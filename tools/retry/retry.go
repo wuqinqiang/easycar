@@ -45,6 +45,10 @@ func New(allowAttempt uint32, fns ...RetryFn) *Retry {
 	return retry
 }
 func (b *Retry) Duration() time.Duration {
+	if atomic.LoadUint32(&b.currentAttempt) >= b.allowAttempt {
+		return b.maxBackOffTime
+	}
+	atomic.AddUint32(&b.currentAttempt, 1)
 	backDuration := time.Duration(math.Pow(float64(b.factor),
 		float64(b.currentAttempt))) * time.Second
 	if backDuration > b.maxBackOffTime {
@@ -53,11 +57,20 @@ func (b *Retry) Duration() time.Duration {
 	return backDuration
 }
 
+func (b *Retry) MaxBackOffTime() time.Duration {
+	return b.maxBackOffTime
+}
+
+func (b *Retry) Reset() {
+	atomic.SwapUint32(&b.currentAttempt, 0)
+}
+
 func (b *Retry) Run(fn ExecuteFn) error {
-	if b.currentAttempt > b.allowAttempt {
+	if atomic.LoadUint32(&b.currentAttempt) >= atomic.LoadUint32(&b.allowAttempt) {
 		return ErrOverMaximumAttempt
 	}
-	atomic.AddUint32(&b.currentAttempt, 1)
+
+	//atomic.AddUint32(&b.currentAttempt, 1)
 	<-b.timer.C
 	err := fn()
 	if err == nil {

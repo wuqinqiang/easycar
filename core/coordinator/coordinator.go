@@ -95,24 +95,27 @@ func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branche
 }
 
 func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) (err error) {
-	_, span := tracing.Tracer(ctx, "Phase2"+tools.IF(global.Phase1Failed(), "Rollback", "Commit").(string),
+
+	isGotoRollback := global.GotoRollback()
+
+	_, span := tracing.Tracer(ctx, "Phase2"+tools.IF(isGotoRollback, "Rollback", "Commit").(string),
 		"gid", global.GetGId())
 	defer span.End()
 
 	var (
 		processingStateVal, overStateVal interface{}
 	)
-	processingStateVal = tools.IF(global.Phase1Failed(), consts.Phase2Rollbacking, consts.Phase2Committing)
+	processingStateVal = tools.IF(isGotoRollback, consts.Phase2Rollbacking, consts.Phase2Committing)
 	if _, err = c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(),
 		processingStateVal.(consts.GlobalState)); err != nil {
 		return
 	}
 
-	overStateVal = tools.IF(global.Phase1Failed(), consts.Rollbacked, consts.Committed)
+	overStateVal = tools.IF(isGotoRollback, consts.Rollbacked, consts.Committed)
 
 	defer func() {
 		if err != nil {
-			overStateVal = tools.IF(global.Phase1Failed(), consts.Phase2RollbackFailed, consts.Phase2CommitFailed)
+			overStateVal = tools.IF(isGotoRollback, consts.Phase2RollbackFailed, consts.Phase2CommitFailed)
 		}
 		logging.Infof("[Coordinator] Phase2 end gid %v,state:%v", global.GID, overStateVal)
 		_, erro := c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(), overStateVal.(consts.GlobalState))
