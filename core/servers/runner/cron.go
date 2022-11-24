@@ -85,10 +85,7 @@ func (r *Runner) runJob(list []*entity.Global) {
 
 	for i := 0; i < len(list); i++ {
 		global := list[i]
-		branches, err := r.coordinator.GetBranchList(ctx, global.GetGId())
-		if err != nil {
-			continue
-		}
+
 		tools.GoSafe(func() {
 			var (
 				err error
@@ -100,9 +97,9 @@ func (r *Runner) runJob(list []*entity.Global) {
 			}()
 
 			if global.Phase1() {
-				err = r.coordinator.Phase1(ctx, global, branches)
+				err = r.coordinator.Phase1(ctx, global)
 			} else if global.Phase2() {
-				err = r.coordinator.Phase2(ctx, global, branches)
+				err = r.coordinator.Phase2(ctx, global)
 			} else {
 				logging.Warnf("[Runner] global:%v state :%v is wrong", global.GID, global.State)
 			}

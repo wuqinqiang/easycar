@@ -100,6 +100,10 @@ registry:
 
 tracing:
   jaegerUrl: http://localhost:14268/api/traces
+
+cron:
+  maxTimes: 2   #max retry times when rm is not available
+  timeInterval: 1 #unit is minute. it means that the next retry is 1m later, not in strict mode  
 ```
 
 **run**
