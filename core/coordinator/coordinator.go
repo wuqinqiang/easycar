@@ -52,21 +52,21 @@ func (c *Coordinator) Close(ctx context.Context) error {
 	return c.closeFn(ctx)
 }
 
-func (c *Coordinator) Register(ctx context.Context, gId string, branches entity.BranchList) error {
+func (c *Coordinator) Register(ctx context.Context, branches entity.BranchList) error {
 	if len(branches) == 0 {
 		return nil
 	}
 	return c.dao.CreateBatches(ctx, branches)
 }
 
-func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
-	if err := c.Phase1(ctx, global, branches); err != nil {
+func (c *Coordinator) Start(ctx context.Context, global *entity.Global) error {
+	if err := c.Phase1(ctx, global); err != nil {
 		return err
 	}
 	if c.automaticExecution2 {
 		logging.Infof("[Coordinator] Phase2 start gid:%v", global.GID)
 		tools.GoSafe(func() {
-			if err := c.Phase2(context.Background(), global, branches); err != nil {
+			if err := c.Phase2(context.Background(), global); err != nil {
 				logging.Errorf("[Start] Phase2:err:%v", err)
 				return
 			}
@@ -75,7 +75,7 @@ func (c *Coordinator) Start(ctx context.Context, global *entity.Global, branches
 	return nil
 }
 
-func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branches entity.BranchList) (err error) {
+func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global) (err error) {
 	_, span := tracing.Tracer(ctx, "Phase1", "gid", global.GetGId())
 	defer span.End()
 
@@ -90,11 +90,11 @@ func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global, branche
 			logging.Errorf("[Coordinator]Phase1 UpdateGlobalState:%v", erro)
 		}
 	}()
-	err = c.executor.Phase1(ctx, global, branches)
+	err = c.executor.Phase1(ctx, global)
 	return
 }
 
-func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) (err error) {
+func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global) (err error) {
 
 	isGotoRollback := global.GotoRollback()
 
@@ -123,22 +123,22 @@ func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global, branche
 			logging.Errorf("[Phase2]UpdateGlobalStateByGid gid:%v err:%v", global.GetGId(), erro)
 		}
 	}()
-	err = c.executor.Phase2(ctx, global, branches)
+	err = c.executor.Phase2(ctx, global)
 	return
 }
 
-func (c *Coordinator) Commit(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
+func (c *Coordinator) Commit(ctx context.Context, global *entity.Global) error {
 	if c.automaticExecution2 {
 		return ErrAutomatic
 	}
-	return c.Phase2(ctx, global, branches)
+	return c.Phase2(ctx, global)
 }
 
-func (c *Coordinator) Rollback(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
+func (c *Coordinator) Rollback(ctx context.Context, global *entity.Global) error {
 	if c.automaticExecution2 {
 		return ErrAutomatic
 	}
-	return c.Phase2(ctx, global, branches)
+	return c.Phase2(ctx, global)
 }
 
 func (c *Coordinator) GetGlobal(ctx context.Context, gid string) (entity.Global, error) {

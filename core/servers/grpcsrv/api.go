@@ -38,7 +38,7 @@ func (s *GrpcSrv) Register(ctx context.Context, req *proto.RegisterReq) (*emptyp
 	//todo  check register branches are match?
 
 	branchList := entity.GetBranchList(req.GetGId(), req.Branches)
-	if err := s.coordinator.Register(ctx, req.GetGId(), branchList); err != nil {
+	if err := s.coordinator.Register(ctx, branchList); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
@@ -62,39 +62,26 @@ func (s *GrpcSrv) Start(ctx context.Context, req *proto.StartReq) (*emptypb.Empt
 	}); err != nil {
 		return nil, err
 	}
-
-	var (
-		branches entity.BranchList
-	)
-	if branches, err = s.coordinator.GetBranchList(ctx, global.GetGId()); err != nil {
-		return nil, err
-	}
 	global.SetState(consts.Phase1Preparing)
 	if err = s.coordinator.UpdateGlobalState(ctx, global.GetGId(), global.State); err != nil {
 		return nil, err
 	}
 
-	if err = s.coordinator.Start(ctx, &global, branches); err != nil {
+	if err = s.coordinator.Start(ctx, &global); err != nil {
 		return nil, err
 	}
 	return &emptypb.Empty{}, nil
 }
 
 func (s *GrpcSrv) commonPhase2(ctx context.Context, gid string,
-	filterFn func(g *entity.Global) error, executeFn func(context.Context, *entity.Global, entity.BranchList) error) (err error) {
+	filterFn func(g *entity.Global) error, executeFn func(context.Context, *entity.Global) error) (err error) {
 	var (
 		global entity.Global
 	)
 	if global, err = s.check(ctx, gid, filterFn); err != nil {
 		return
 	}
-	var (
-		branches entity.BranchList
-	)
-	if branches, err = s.coordinator.GetBranchList(ctx, global.GetGId()); err != nil {
-		return
-	}
-	return executeFn(ctx, &global, branches)
+	return executeFn(ctx, &global)
 
 }
 

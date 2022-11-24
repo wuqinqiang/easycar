@@ -44,7 +44,11 @@ func (e *executor) Close(ctx context.Context) error {
 	return e.manager.Close(ctx)
 }
 
-func (e *executor) Phase1(ctx context.Context, _ *entity.Global, branches entity.BranchList) error {
+func (e *executor) Phase1(ctx context.Context, g *entity.Global) error {
+	branches, err := dao.GetTransaction().GetBranches(ctx, g.GetGId())
+	if err != nil {
+		return err
+	}
 	return e.execute(ctx, true, branches, func(branch *entity.Branch) bool {
 		if branch.Success() {
 			return false
@@ -54,13 +58,18 @@ func (e *executor) Phase1(ctx context.Context, _ *entity.Global, branches entity
 	})
 }
 
-func (e *executor) Phase2(ctx context.Context, global *entity.Global, branches entity.BranchList) error {
+func (e *executor) Phase2(ctx context.Context, g *entity.Global) error {
+	branches, err := dao.GetTransaction().GetBranches(ctx, g.GetGId())
+	if err != nil {
+		return err
+	}
+
 	return e.execute(ctx, false, branches, func(branch *entity.Branch) bool {
 		if branch.Success() {
 			return false
 		}
 		// for commit
-		if global.GotoCommit() {
+		if g.GotoCommit() {
 			return branch.TccConfirm()
 		}
 
