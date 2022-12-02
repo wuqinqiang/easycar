@@ -27,7 +27,7 @@ type Core struct {
 	cancel       func()
 	once         sync.Once
 	registry     registry.Registry
-	instance     *registry.EasyCarInstance
+	instance     *registry.Instance
 }
 
 func WithServers(srvs ...Server) Option {
@@ -59,7 +59,7 @@ func (core *Core) Run(ctx context.Context) error {
 	c1, core.cancel = context.WithCancel(ctx)
 	core.errGroup, core.stopCtx = errgroup.WithContext(c1)
 
-	core.instance = registry.NewEasyCarInstance()
+	core.instance = registry.NewInstance()
 
 	for _, server := range core.servers {
 		core.runWaitGroup.Add(1)

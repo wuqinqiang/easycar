@@ -80,7 +80,7 @@ func main() {
 
 	// If the registry is configured,
 	//we need to register the service to the  registry center when the server start
-	if !settings.EmptyRegistry() {
+	if settings.SetRegistry() {
 		registry, err := settings.GetRegistry()
 		if err != nil {
 			log.Fatal(err)

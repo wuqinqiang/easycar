@@ -134,8 +134,7 @@ more examples to:[examples](https://github.com/easycar/examples)
 - [x] retry
 - [ ] registry and discovery
     - [x] etcd
-    - [ ] consul
-    - [ ]  zookeeper
+    - [x] consul
 - [x] balancer
 - [ ] test
 - [ ] notify

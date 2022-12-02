@@ -4,6 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/hashicorp/consul/api"
+
+	"github.com/wuqinqiang/easycar/core/registry/consulx"
+
 	"github.com/wuqinqiang/easycar/core/servers/httpsrv"
 
 	"github.com/wuqinqiang/easycar/core/transport/common"
@@ -55,7 +59,8 @@ type (
 	}
 
 	RegistrySettings struct {
-		Etcd etcdx.Conf `yaml:"etcd"`
+		Etcd   etcdx.Conf   `yaml:"etcd"`
+		Consul consulx.Conf `yaml:"consul"`
 	}
 
 	Tracing struct {
@@ -97,13 +102,19 @@ func (s *Settings) Init() {
 	}
 }
 
-func (s *Settings) EmptyRegistry() bool {
-	return s.Registry.Etcd.IsEmpty()
+func (s *Settings) SetRegistry() bool {
+	return !s.Registry.Etcd.Empty() || !s.Registry.Consul.Empty()
 	// todo add more registry center
 }
 func (s *Settings) GetRegistry() (registry.Registry, error) {
-	if !s.Registry.Etcd.IsEmpty() {
-		return etcdx.NewRegistry(s.Registry.Etcd)
+	if !s.Registry.Etcd.Empty() {
+		return etcdx.New(s.Registry.Etcd)
 	}
-	return nil, nil
+
+	// consul and add others?
+	client, err := api.NewClient(s.Registry.Consul.Conf())
+	if err != nil {
+		return nil, err
+	}
+	return consulx.New(client), nil
 }

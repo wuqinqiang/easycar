@@ -129,8 +129,7 @@ go run cmd/main.go
 - [x] retry
 - [ ] registry and discovery
     - [x] etcd
-    - [ ] consul
-    - [ ]  zookeeper
+    - [x] consul
 - [x] balancer
 - [ ] test
 - [ ] notify

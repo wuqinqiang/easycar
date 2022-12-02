@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
+	"github.com/google/uuid"
 )
 
 const (
@@ -11,7 +13,7 @@ const (
 	Version    string = "v1"
 )
 
-type EasyCarInstance struct {
+type Instance struct {
 	Id      string `json:"id"`
 	Name    string `json:"name"`
 	Version string `json:"version"`
@@ -21,35 +23,36 @@ type EasyCarInstance struct {
 	Nodes []string `json:"node"`
 }
 
-func (instance *EasyCarInstance) String() string {
+func (instance *Instance) String() string {
 	return fmt.Sprintf("%+v", *instance)
 }
 
-func NewEasyCarInstance() *EasyCarInstance {
-	return &EasyCarInstance{
+func NewInstance() *Instance {
+	return &Instance{
 		Name:    ServerName,
 		Version: Version,
+		Id:      uuid.NewString(),
 	}
 }
 
-func Unmarshal(val []byte) (*EasyCarInstance, error) {
+func Unmarshal(val []byte) (*Instance, error) {
 	var (
-		instance EasyCarInstance
+		instance Instance
 	)
 	err := json.Unmarshal(val, &instance)
 	return &instance, err
 }
 
-func (instance *EasyCarInstance) Marshal() string {
+func (instance *Instance) Marshal() string {
 	val, _ := json.Marshal(instance)
 	return string(val)
 }
 
-func (instance *EasyCarInstance) Key() string {
+func (instance *Instance) InstanceName() string {
 	return fmt.Sprintf("/%s/%s", instance.Name, instance.Id)
 }
 
 type Registry interface {
-	Register(ctx context.Context, instance *EasyCarInstance) error
-	DeRegister(ctx context.Context, instance *EasyCarInstance) error
+	Register(ctx context.Context, instance *Instance) error
+	DeRegister(ctx context.Context, instance *Instance) error
 }

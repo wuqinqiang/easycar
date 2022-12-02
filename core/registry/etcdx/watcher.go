@@ -30,10 +30,10 @@ func NewWatcher(ctx context.Context, client *clientv3.Client, key string) (*watc
 	return w, nil
 }
 
-func (w *watcher) Next() ([]*registry.EasyCarInstance, error) {
+func (w *watcher) Next() ([]*registry.Instance, error) {
 	if w.first {
 		w.first = false
-		return w.getInstances()
+		return w.GetInstances()
 	}
 	select {
 	case <-w.ctx.Done():
@@ -42,18 +42,18 @@ func (w *watcher) Next() ([]*registry.EasyCarInstance, error) {
 		if resp.Err() != nil {
 			return nil, resp.Err()
 		}
-		return w.getInstances()
+		return w.GetInstances()
 	}
 }
 
-func (w *watcher) getInstances() ([]*registry.EasyCarInstance, error) {
+func (w *watcher) GetInstances() ([]*registry.Instance, error) {
 	resp, err := w.client.KV.Get(w.ctx, w.key, clientv3.WithPrefix())
 	if err != nil {
 		return nil, err
 	}
 
 	var (
-		list []*registry.EasyCarInstance
+		list []*registry.Instance
 	)
 	for _, kv := range resp.Kvs {
 		instance, err := registry.Unmarshal(kv.Value)
