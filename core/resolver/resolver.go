@@ -35,13 +35,14 @@ func (r *defaultResolver) watch() {
 		}
 		instances, err := r.watcher.Next()
 		if err != nil {
+			logging.Errorf("[defaultResolver] watch err:%v", err)
 			return
 		}
 		r.updateState(instances)
 	}
 }
 
-func (r *defaultResolver) updateState(list []*registry.EasyCarInstance) {
+func (r *defaultResolver) updateState(list []*registry.Instance) {
 
 	var (
 		state resolver.State

@@ -31,8 +31,9 @@ registry: #If the registry is configured,we need to register the service to the 
     pass: ""
     hosts:
       - #127.0.0.1:2379
-  #add more
-
+  consul:
+    default: false
+  ## add more
 tracing:
   jaegerUrl: http://localhost:14268/api/traces
 

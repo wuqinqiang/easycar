@@ -16,7 +16,7 @@ type Conf struct {
 	InsecureSkipVerify bool `json:""`
 }
 
-func (c *Conf) IsEmpty() bool {
+func (c *Conf) Empty() bool {
 	return len(c.Hosts) == 0
 }
 

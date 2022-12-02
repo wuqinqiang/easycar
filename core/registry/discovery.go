@@ -5,10 +5,11 @@ import (
 )
 
 type Discovery interface {
-	Watch(ctx context.Context, key string) (Watcher, error)
+	Watch(ctx context.Context, serviceName string) (Watcher, error)
 }
 
 type Watcher interface {
-	Next() ([]*EasyCarInstance, error)
+	GetInstances() ([]*Instance, error)
+	Next() ([]*Instance, error)
 	Stop() error
 }
