@@ -2,6 +2,8 @@ package conf
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 	"time"
 
 	"github.com/hashicorp/consul/api"
@@ -23,6 +25,8 @@ import (
 	"github.com/wuqinqiang/easycar/core/registry"
 
 	"github.com/wuqinqiang/easycar/core/registry/etcdx"
+
+	_ "net/http/pprof"
 )
 
 type (
@@ -90,6 +94,11 @@ func (db *DB) Init() {
 func (s *Settings) Init() {
 	s.DB.Init()
 	tracing.Init(s.Tracing.JaegerUri)
+
+	// todo custom port
+	go func() {
+		log.Println(http.ListenAndServe("0.0.0.0:6060", nil))
+	}()
 
 	if s.Http.ListenOn == "" {
 		s.Http.ListenOn = "0.0.0.0:8085"
