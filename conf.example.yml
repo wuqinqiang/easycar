@@ -1,5 +1,5 @@
 ## conf
-automaticExecution2: true  #when the first stage of execution ends, it will commit automatically or rollback if it is true
+automaticExecution2: false  #when the first stage of execution ends, it will commit automatically or rollback if it is true
 timeout: 7 #unit of second
 server:
   grpc:

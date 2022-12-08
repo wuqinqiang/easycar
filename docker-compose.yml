@@ -5,6 +5,14 @@ networks:
     driver: ${NETWORKS_DRIVER}
 
 services:
+  easycar:
+    image: wuqinqiang/easycar:0.0.2
+    ports:
+      - "8087:8087"
+      - "8089:8089"
+    depends_on:
+      - mysql
+
   ### MySQL ################################################
   mysql:
     build:

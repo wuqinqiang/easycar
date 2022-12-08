@@ -5,7 +5,7 @@ WORKDIR /src
 
 RUN GOPROXY=https://goproxy.cn && make build
 
-FROM buildpack-deps:bullseye-curl
+FROM debian:stable-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates  \
@@ -22,4 +22,4 @@ WORKDIR /app
 EXPOSE 8089
 EXPOSE 8085
 
-CMD ["./easycar","-m","file"]
+CMD ["./easycar"]
