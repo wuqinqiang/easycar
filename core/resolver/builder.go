@@ -15,7 +15,7 @@ type Builder struct {
 	watchTimeout time.Duration
 }
 
-func Init(d registry.Discovery) {
+func Register(d registry.Discovery) {
 	resolver.Register(newBuilder(d))
 }
 

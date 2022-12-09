@@ -19,7 +19,6 @@ func NewTccGroup(tryUri, confirmUri, cancelUri string) *Group {
 		NewBranch(confirmUri, consts.Confirm),
 		NewBranch(cancelUri, consts.Cancel),
 	}
-	//g.SetProtocol(g.protocol)
 	return g
 }
 

@@ -51,9 +51,6 @@ func New(uri string, options ...Option) (client *Client, err error) {
 		currentLevel: 1,
 		options:      opts,
 	}
-	//if opts.discovery != nil {
-	//	resolver.Init(client.options.discovery)
-	//}
 	client.easycarCli, err = client.getConn(ctx)
 	return
 }
@@ -154,28 +151,14 @@ func (client *Client) getConn(ctx context.Context) (cli proto.EasyCarClient, err
 	if client.easycarCli != nil {
 		return client.easycarCli, nil
 	}
-
-	uri := fmt.Sprintf("direct:///%s", client.uri)
-	if client.options.discovery != nil {
-		uri = fmt.Sprintf("discovery:///%s", client.uri)
-	}
-	client.uri = uri
 	options := client.options.dailOpts
-
 	creds := insecure.NewCredentials()
 	if client.options.tls != nil {
 		creds = credentials.NewTLS(client.options.tls)
 	}
-	//var balancerOpts []balancer.Option
-	//if client.options.tactics.Name() != "" {
-	//	balancerOpts = append(balancerOpts, balancer.WithTactics(client.options.tactics))
-	//}
-	//
-	//// register the custom balancer builder to grpc
-	//balancer.Register(balancerOpts...)
 
 	options = append(options, grpc.WithTransportCredentials(creds))
-	//options = append(options, grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"easycarBalancer":{}}]}`))
+	options = append(options, grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"easycarBalancer":{}}]}`))
 
 	conn, err := grpc.DialContext(ctx, client.uri,
 		options...)
