@@ -129,14 +129,16 @@ func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global) (err er
 
 func (c *Coordinator) Commit(ctx context.Context, global *entity.Global) error {
 	if c.automaticExecution2 {
-		return ErrAutomatic
+		logging.Warnf("[Commit] gid:%v,warn:%v", global.GetGId(), ErrAutomatic)
+		return nil
 	}
 	return c.Phase2(ctx, global)
 }
 
 func (c *Coordinator) Rollback(ctx context.Context, global *entity.Global) error {
 	if c.automaticExecution2 {
-		return ErrAutomatic
+		logging.Warnf("[Rollback] gid:%v,warn:%v", global.GetGId(), ErrAutomatic)
+		return nil
 	}
 	return c.Phase2(ctx, global)
 }

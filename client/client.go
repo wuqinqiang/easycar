@@ -35,6 +35,8 @@ type Client struct {
 	// easycarcli client
 	easycarCli proto.EasyCarClient
 	options    *Options
+
+	// todo @add hooks
 }
 
 func New(uri string, options ...Option) (client *Client, err error) {

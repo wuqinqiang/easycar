@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/wuqinqiang/easycar/logging"
+
 	"github.com/wuqinqiang/easycar/core/consts"
 	"github.com/wuqinqiang/easycar/core/entity"
 	"github.com/wuqinqiang/easycar/proto"
@@ -88,7 +90,7 @@ func (s *GrpcSrv) commonPhase2(ctx context.Context, gid string,
 func (s *GrpcSrv) Commit(ctx context.Context, req *proto.CommitReq) (*emptypb.Empty, error) {
 	err := s.commonPhase2(ctx, req.GetGId(), func(g *entity.Global) error {
 		if !g.GotoCommit() {
-			return fmt.Errorf("gid:%v can not commit", req.GetGId())
+			logging.Warnf("[Commit] gid:%v can not commit", req.GetGId())
 		}
 		return nil
 	}, s.coordinator.Commit)
@@ -101,7 +103,7 @@ func (s *GrpcSrv) Commit(ctx context.Context, req *proto.CommitReq) (*emptypb.Em
 func (s *GrpcSrv) Rollback(ctx context.Context, req *proto.RollBckReq) (*emptypb.Empty, error) {
 	err := s.commonPhase2(ctx, req.GetGId(), func(g *entity.Global) error {
 		if !g.GotoRollback() {
-			return fmt.Errorf("gid:%v can not bollback", req.GetGId())
+			logging.Warnf("gid:%v can not rollback", req.GetGId())
 		}
 		return nil
 	}, s.coordinator.Rollback)

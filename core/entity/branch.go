@@ -25,7 +25,7 @@ type (
 	BranchList []*Branch
 )
 
-func (b Branch) TableName() string {
+func (b *Branch) TableName() string {
 	return "branch"
 }
 
