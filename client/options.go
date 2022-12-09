@@ -4,8 +4,6 @@ import (
 	"crypto/tls"
 	"time"
 
-	"github.com/wuqinqiang/easycar/core/balancer"
-	"github.com/wuqinqiang/easycar/core/registry"
 	"google.golang.org/grpc"
 )
 
@@ -18,14 +16,9 @@ type Option func(options *Options)
 
 type Options struct {
 	// connTimeout conn easycar timeout
-	connTimeout time.Duration
-	// discovery service discovery
-	discovery registry.Discovery
-	// tls
-	tls *tls.Config
-	// tactics of balancer
-	tactics  balancer.TacticsName
-	dailOpts []grpc.DialOption
+	connTimeout time.Duration // tls
+	tls         *tls.Config
+	dailOpts    []grpc.DialOption
 }
 
 func WithConnTimeout(seconds time.Duration) Option {
@@ -33,12 +26,6 @@ func WithConnTimeout(seconds time.Duration) Option {
 		if seconds > 0 {
 			options.connTimeout = seconds
 		}
-	}
-}
-
-func WithTactics(name balancer.TacticsName) Option {
-	return func(options *Options) {
-		options.tactics = name
 	}
 }
 
@@ -51,11 +38,5 @@ func WithGrpcDailOpts(opts []grpc.DialOption) Option {
 func WithTls(tls *tls.Config) Option {
 	return func(options *Options) {
 		options.tls = tls
-	}
-}
-
-func WithDiscovery(discovery registry.Discovery) Option {
-	return func(options *Options) {
-		options.discovery = discovery
 	}
 }
