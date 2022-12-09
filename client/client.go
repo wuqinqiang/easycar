@@ -17,25 +17,18 @@ import (
 )
 
 var (
-	EmptyGroup = errors.New("The Group cannot be empty")
+	ErrEmpty = errors.New("The Group cannot be empty")
 )
 
 // Client easycar client
 type Client struct {
 	//  easycar service uri. the format rules: direct: "ip:port,ip:port" and  discovery:"easycar"
 	uri string
-	// currentLevel for set branches currentLevel
-	currentLevel consts.Level
-	// groups a group of branches
-	groups []*Group
-	//gid global of one distributed transaction
-	gid string
 	// grpc client conn
 	grpcConn *grpc.ClientConn
 	// easycarcli client
 	easycarCli proto.EasyCarClient
 	options    *Options
-
 	// todo @add hooks
 }
 
@@ -49,55 +42,29 @@ func New(uri string, options ...Option) (client *Client, err error) {
 	defer cancel()
 
 	client = &Client{
-		uri:          uri,
-		currentLevel: 1,
-		options:      opts,
+		uri:     uri,
+		options: opts,
 	}
 	client.easycarCli, err = client.getConn(ctx)
 	return
 }
 
-func (client *Client) AddGroup(skip bool, groups ...*Group) *Client {
-	if skip {
-		client.currentLevel++
-	}
-	for _, group := range groups {
-		group.SetLevel(client.currentLevel)
-		client.groups = append(client.groups, group)
-	}
-	return client
-}
-
-func (client *Client) SetGid(gid string) *Client {
-	client.setGid(gid)
-	return client
-}
-
-func (client *Client) setGid(gid string) {
-	client.gid = gid
-}
-
 func (client *Client) Begin(ctx context.Context) (gid string, err error) {
-	if err != nil {
-		return "", err
-	}
 	resp, err := client.easycarCli.Begin(ctx, &emptypb.Empty{})
 	if err != nil {
 		return "", err
 	}
-	client.setGid(resp.GetGId())
-	return client.gid, nil
+	return resp.GetGId(), nil
 }
 
-func (client *Client) Register(ctx context.Context) error {
-	if len(client.groups) == 0 {
-		return EmptyGroup
+func (client *Client) Register(ctx context.Context, gid string, groups []*Group) error {
+	if len(groups) == 0 {
+		return ErrEmpty
 	}
-	var (
-		req proto.RegisterReq
-	)
-	req.GId = client.gid
-	for _, group := range client.groups {
+	var req proto.RegisterReq
+	req.GId = gid
+
+	for _, group := range groups {
 		for _, branch := range group.branches {
 			b := branch.Convert()
 			b.TranType = consts.ConvertTranTypeToGrpc(group.GetTranType())
@@ -108,22 +75,22 @@ func (client *Client) Register(ctx context.Context) error {
 	return err
 }
 
-func (client *Client) Start(ctx context.Context) (err error) {
-	var (
-		req proto.StartReq
-	)
-	req.GId = client.gid
+func (client *Client) Start(ctx context.Context, gid string) (err error) {
+	var req proto.StartReq
+
+	req.GId = gid
+
 	defer func() {
 		if err != nil {
-			fmt.Printf("gid:%v Start err:%v\n", client.gid, err)
-			if err = client.rollback(ctx); err != nil {
-				fmt.Printf("gid:%v rollback err:%v\n", client.gid, err)
+			fmt.Printf("gid:%v Start err:%v\n", gid, err)
+			if err = client.Rollback(ctx, gid); err != nil {
+				fmt.Printf("gid:%v rollback err:%v\n", gid, err)
 				return
 			}
 			return
 		}
-		if err = client.commit(ctx); err != nil {
-			fmt.Printf("gid:%v commit err:%v\n", client.gid, err)
+		if err = client.Commit(ctx, gid); err != nil {
+			fmt.Printf("gid:%v commit err:%v\n", gid, err)
 		}
 	}()
 
@@ -131,20 +98,20 @@ func (client *Client) Start(ctx context.Context) (err error) {
 	return err
 }
 
-func (client *Client) commit(ctx context.Context) error {
+func (client *Client) Commit(ctx context.Context, gid string) error {
 	var (
 		req proto.CommitReq
 	)
-	req.GId = client.gid
+	req.GId = gid
 	_, err := client.easycarCli.Commit(ctx, &req)
 	return err
 }
 
-func (client *Client) rollback(ctx context.Context) error {
+func (client *Client) Rollback(ctx context.Context, gid string) error {
 	var (
 		req proto.RollBckReq
 	)
-	req.GId = client.gid
+	req.GId = gid
 	_, err := client.easycarCli.Rollback(ctx, &req)
 	return err
 }
