@@ -1,7 +1,7 @@
 package file
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 
 	"github.com/wuqinqiang/easycar/conf"
@@ -28,7 +28,7 @@ func (f *File) Load() (*conf.Settings, error) {
 		return nil, err
 	}
 	defer file.Close() //nolint:errcheck
-	byteAll, err := ioutil.ReadAll(file)
+	byteAll, err := io.ReadAll(file)
 	if err != nil {
 		return nil, err
 	}
