@@ -16,7 +16,7 @@ type Global struct {
 	UpdateTime   int64              `gorm:"update_time;autoCreateTime" json:"update_time" bson:"update_time"`        // last update time
 }
 
-func (g Global) TableName() string {
+func (g *Global) TableName() string {
 	return "global"
 }
 
