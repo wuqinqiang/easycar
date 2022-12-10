@@ -2,6 +2,10 @@ package client
 
 import "github.com/wuqinqiang/easycar/core/consts"
 
+type (
+	MOption func(manger *Manger)
+)
+
 type Manger struct {
 	groups []*Group
 	// level current level
@@ -15,8 +19,8 @@ func NewManger() *Manger {
 	}
 }
 
-func (m *Manger) AddGroup(skip bool, groups ...*Group) *Manger {
-	if skip {
+func (m *Manger) AddGroup(incrLevel bool, groups ...*Group) *Manger {
+	if incrLevel {
 		m.level++
 	}
 	for _, group := range groups {

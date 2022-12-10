@@ -12,12 +12,12 @@ func init() {
 	balancer.Register()
 }
 
-// RegisterBalancerWithTactics
-func RegisterBalancerWithTactics(name balancer.TacticsName) {
-	balancer.Register(balancer.WithTactics(name))
+// RegisterBalancerWithAlgorithm register grpc balancer with algorithm
+func RegisterBalancerWithAlgorithm(name balancer.Algorithm) {
+	balancer.Register(balancer.WithAlgorithm(name))
 }
 
-// RegisterBuilder
+// RegisterBuilder register Builder with discovery
 func RegisterBuilder(discovery registry.Discovery) {
 	resolver.Register(discovery)
 }

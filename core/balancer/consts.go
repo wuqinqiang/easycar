@@ -1,10 +1,10 @@
 package balancer
 
-// TacticsName is tactics of balancer
-type TacticsName int
+// Algorithm is algorithm of balancer
+type Algorithm int
 
 const (
-	IPHashBalancer TacticsName = iota + 1
+	IPHashBalancer Algorithm = iota + 1
 	ConsistentHashBalancer
 	P2CBalancer
 	RandomBalancer
@@ -13,7 +13,7 @@ const (
 	BoundedBalancer
 )
 
-func (l TacticsName) Name() string {
+func (l Algorithm) Name() string {
 	switch l {
 	case IPHashBalancer:
 		return "ip-hash"

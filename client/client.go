@@ -20,7 +20,7 @@ var (
 	ErrEmpty = errors.New("The Group cannot be empty")
 )
 
-// Client easycar client
+// Client client-go
 type Client struct {
 	//  easycar service uri. the format rules: direct: "ip:port,ip:port" and  discovery:"easycar"
 	uri string

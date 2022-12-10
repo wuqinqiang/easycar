@@ -32,19 +32,21 @@ type (
 
 func NewBranch(uri string, action consts.BranchAction) *Branch {
 	b := &Branch{
-		uri:      uri,
-		action:   action,
-		level:    1,
-		protocol: getProtocol(uri),
+		action:  action,
+		level:   1,
+		timeout: 3, // default
 	}
+	b.uri, b.protocol = protocol(uri)
 	return b
 }
 
 // SetLevel set branch currentLevel
-func (branch *Branch) SetLevel(level consts.Level) {
-	if level > 1 {
-		branch.level = level
+func (branch *Branch) SetLevel(level consts.Level) *Branch {
+	if level == 0 {
+		return branch
 	}
+	branch.level = level
+	return branch
 }
 
 // SetProtocol set branch network protocol
@@ -86,13 +88,18 @@ func (branch *Branch) Convert() *proto.RegisterReq_Branch {
 	return &req
 }
 
-func getProtocol(uri string) Protocol {
+func protocol(uri string) (string, Protocol) {
 	if strings.HasPrefix(uri, "http://") || strings.HasPrefix(uri, "https://") {
-		return HTTP
+		return uri, HTTP
 	}
 
 	if strings.HasPrefix(uri, "grpc://") {
-		return GRPC
+		return uri, GRPC
 	}
-	return GRPC
+	// 127.0.0.1:50060/order.Order/Cancel
+	keys := strings.Split(uri, "//")
+	if len(keys) == 1 && keys[0] == uri {
+		return "grpc://" + uri, GRPC
+	}
+	return uri, Undefined
 }
