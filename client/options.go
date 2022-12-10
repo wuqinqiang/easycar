@@ -19,6 +19,7 @@ type Options struct {
 	connTimeout time.Duration // tls
 	tls         *tls.Config
 	dailOpts    []grpc.DialOption
+	isDiscovery bool
 }
 
 func WithConnTimeout(seconds time.Duration) Option {
@@ -26,6 +27,11 @@ func WithConnTimeout(seconds time.Duration) Option {
 		if seconds > 0 {
 			options.connTimeout = seconds
 		}
+	}
+}
+func WithDiscovery() Option {
+	return func(options *Options) {
+		options.isDiscovery = true
 	}
 }
 
