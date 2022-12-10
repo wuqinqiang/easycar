@@ -111,11 +111,6 @@ cron:
 go run cmd/main.go 
 ```
 
-
-## client
-
-If you use Golang, the client-go is here [client](https://github.com/easycar/client-go).
-
 ## examples
 
 more examples to:[examples](https://github.com/easycar/examples)

@@ -33,16 +33,20 @@ type Client struct {
 }
 
 func New(uri string, options ...Option) (client *Client, err error) {
+	server := BuildDirectTarget(uri)
 	opts := DefaultOptions
-
 	for _, fn := range options {
 		fn(opts)
 	}
+	if opts.isDiscovery {
+		server = BuildDiscoveryTarget(uri)
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), opts.connTimeout)
 	defer cancel()
 
 	client = &Client{
-		uri:     uri,
+		uri:     server,
 		options: opts,
 	}
 	client.easycarCli, err = client.getConn(ctx)

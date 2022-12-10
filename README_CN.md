@@ -107,10 +107,6 @@ cron:
 go run cmd/main.go
 ```
 
-## client
-
-如果你使用Golang，可以使用 [client](https://github.com/easycar/client-go) ,其他语言客户端后续提供。
-
 ## examples
 
 更多例子:[examples](https://github.com/easycar/examples)

@@ -17,7 +17,7 @@ import (
 	"log"
 	"time"
 
-	client "github.com/easycar/client-go"
+	"github.com/wuqinqiang/easycar/client"
 )
 
 func main() {
@@ -42,11 +42,11 @@ func main() {
 		groups []*client.Group
 	)
 	// register  branches to easycar service (tc)
-	if err = cli.AddGroup(false, groups...).Register(ctx); err != nil {
+	if err = cli.Register(ctx,gid,groups); err != nil {
 		log.Fatal(err)
 	}
 	// Trigger the execution of this distributed transaction
-	if err := cli.Start(ctx); err != nil {
+	if err := cli.Start(ctx,gid); err != nil {
 		fmt.Println("start err:", err)
 	}
 	fmt.Println("end gid:", gid)
