@@ -15,18 +15,18 @@ var (
 type Option func(options *Options)
 
 type Options struct {
-	tactics TacticsName
+	algorithm Algorithm
 }
 
-func WithTactics(tacticsName TacticsName) Option {
+func WithAlgorithm(algorithm Algorithm) Option {
 	return func(options *Options) {
-		options.tactics = tacticsName
+		options.algorithm = algorithm
 	}
 }
 
 func Register(fns ...Option) {
-	// RandomBalancer default tactics
-	initOption := &Options{tactics: RandomBalancer}
+	// RandomBalancer default algorithm
+	initOption := &Options{algorithm: RandomBalancer}
 	for _, fn := range fns {
 		fn(initOption)
 	}
@@ -55,7 +55,7 @@ func (b *Builder) Build(info base.PickerBuildInfo) grpcBalancer.Picker {
 	var (
 		err error
 	)
-	picker.balancer, err = balancer.Build(b.options.tactics.Name(), hosts)
+	picker.balancer, err = balancer.Build(b.options.algorithm.Name(), hosts)
 	if err != nil {
 		return base.NewErrPicker(err)
 	}
