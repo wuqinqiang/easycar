@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"crypto/tls"
 	"time"
 
@@ -12,6 +13,8 @@ var DefaultOptions = &Options{
 	connTimeout: 15 * time.Second,
 }
 
+type HandlerFn func(ctx context.Context) error
+
 type Option func(options *Options)
 
 type Options struct {
@@ -20,6 +23,8 @@ type Options struct {
 	tls         *tls.Config
 	dailOpts    []grpc.DialOption
 	isDiscovery bool
+	beforeFunc  HandlerFn
+	afterFunc   HandlerFn
 }
 
 func WithConnTimeout(seconds time.Duration) Option {
@@ -29,6 +34,19 @@ func WithConnTimeout(seconds time.Duration) Option {
 		}
 	}
 }
+
+func WithBeforeFunc(before HandlerFn) Option {
+	return func(options *Options) {
+		options.beforeFunc = before
+	}
+}
+
+func WithAfterFunc(after HandlerFn) Option {
+	return func(options *Options) {
+		options.afterFunc = after
+	}
+}
+
 func WithDiscovery() Option {
 	return func(options *Options) {
 		options.isDiscovery = true

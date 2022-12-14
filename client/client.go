@@ -29,7 +29,6 @@ type Client struct {
 	// easycarcli client
 	easycarCli proto.EasyCarClient
 	options    *Options
-	// todo @add hooks
 }
 
 func New(uri string, options ...Option) (client *Client, err error) {
@@ -80,10 +79,16 @@ func (client *Client) Register(ctx context.Context, gid string, groups []*Group)
 }
 
 func (client *Client) Start(ctx context.Context, gid string) (err error) {
-	var req proto.StartReq
-
-	req.GId = gid
-
+	if client.options.beforeFunc != nil {
+		if err = client.options.beforeFunc(ctx); err != nil {
+			return
+		}
+	}
+	if client.options.afterFunc != nil {
+		defer func() {
+			err = client.options.afterFunc(ctx)
+		}()
+	}
 	defer func() {
 		if err != nil {
 			fmt.Printf("gid:%v Start err:%v\n", gid, err)
@@ -98,7 +103,11 @@ func (client *Client) Start(ctx context.Context, gid string) (err error) {
 		}
 	}()
 
+	var req proto.StartReq
+	req.GId = gid
+
 	_, err = client.easycarCli.Start(ctx, &req)
+
 	return err
 }
 

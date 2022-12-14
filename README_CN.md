@@ -127,7 +127,6 @@ go run cmd/main.go
     - [x] etcd
     - [x] consul
 - [x] balancer
-- [ ] test
 - [ ] notify
 - [x] tracing
 - [ ] tool
