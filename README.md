@@ -131,7 +131,6 @@ more examples to:[examples](https://github.com/easycar/examples)
     - [x] etcd
     - [x] consul
 - [x] balancer
-- [ ] test
 - [ ] notify
 - [x] tracing
 - [ ] tool
