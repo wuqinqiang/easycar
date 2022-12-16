@@ -11,6 +11,10 @@ import (
 // DefaultOptions default for a Client Options
 var DefaultOptions = &Options{
 	connTimeout: 15 * time.Second,
+	dailOpts: []grpc.DialOption{
+		//default grpc dail option
+		grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"easycarBalancer":{}}]}`),
+	},
 }
 
 type HandlerFn func(ctx context.Context) error

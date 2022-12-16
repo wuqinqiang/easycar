@@ -1,11 +1,5 @@
 # easycar client for go
 
-## install
-
-```shell
-go get -u github.com/easycar/client-go
-```
-
 ## How to use
 
 ```go
