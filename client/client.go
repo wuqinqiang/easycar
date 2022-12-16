@@ -48,7 +48,7 @@ func New(uri string, options ...Option) (client *Client, err error) {
 		uri:     server,
 		options: opts,
 	}
-	client.easycarCli, err = client.getConn(ctx)
+	err = client.conn(ctx)
 	return
 }
 
@@ -129,29 +129,24 @@ func (client *Client) Rollback(ctx context.Context, gid string) error {
 	return err
 }
 
-func (client *Client) getConn(ctx context.Context) (cli proto.EasyCarClient, err error) {
-	if client.easycarCli != nil {
-		return client.easycarCli, nil
-	}
-	options := client.options.dailOpts
+func (client *Client) conn(ctx context.Context) error {
+	var grpcOptions []grpc.DialOption
+	grpcOptions = append(grpcOptions, client.options.dailOpts...)
+
 	creds := insecure.NewCredentials()
 	if client.options.tls != nil {
 		creds = credentials.NewTLS(client.options.tls)
 	}
-
-	options = append(options, grpc.WithTransportCredentials(creds))
-	options = append(options, grpc.WithDefaultServiceConfig(`{"loadBalancingConfig": [{"easycarBalancer":{}}]}`))
+	grpcOptions = append(grpcOptions, grpc.WithTransportCredentials(creds))
 
 	conn, err := grpc.DialContext(ctx, client.uri,
-		options...)
+		grpcOptions...)
 	if err != nil {
-		return nil, err
+		return err
 	}
-
 	client.grpcConn = conn
-	cli = proto.NewEasyCarClient(client.grpcConn)
-	client.easycarCli = cli
-	return
+	client.easycarCli = proto.NewEasyCarClient(client.grpcConn)
+	return nil
 }
 
 func (client *Client) Close(ctx context.Context) error {
