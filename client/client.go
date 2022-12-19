@@ -2,7 +2,8 @@ package client
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/wuqinqiang/easycar/logging"
 
 	"github.com/wuqinqiang/easycar/core/consts"
 
@@ -91,15 +92,15 @@ func (client *Client) Start(ctx context.Context, gid string) (err error) {
 	}
 	defer func() {
 		if err != nil {
-			fmt.Printf("gid:%v Start err:%v\n", gid, err)
+			logging.Errorf("gid:%v Start err:%v\n", gid, err)
 			if err = client.Rollback(ctx, gid); err != nil {
-				fmt.Printf("gid:%v rollback err:%v\n", gid, err)
+				logging.Errorf("gid:%v rollback err:%v\n", gid, err)
 				return
 			}
 			return
 		}
 		if err = client.Commit(ctx, gid); err != nil {
-			fmt.Printf("gid:%v commit err:%v\n", gid, err)
+			logging.Errorf("gid:%v commit err:%v\n", gid, err)
 		}
 	}()
 

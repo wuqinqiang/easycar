@@ -7,7 +7,7 @@ import (
 )
 
 // DefaultExecutor executor
-var DefaultExecutor = &executor{
+var DefaultExecutor = &Default{
 	manager: transport.NewManager(),
 	// default timeout for branches
 	timeout: 8 * time.Second,

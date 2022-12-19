@@ -30,21 +30,21 @@ type (
 	// FilterFn is a function that filters branches
 	FilterFn func(branch *entity.Branch) bool
 
-	executor struct {
+	Default struct {
 		manager transport.Manager
 		timeout time.Duration
 	}
 )
 
-func NewExecutor() *executor {
+func NewExecutor() *Default {
 	return DefaultExecutor
 }
 
-func (e *executor) Close(ctx context.Context) error {
+func (e *Default) Close(ctx context.Context) error {
 	return e.manager.Close(ctx)
 }
 
-func (e *executor) Phase1(ctx context.Context, g *entity.Global) error {
+func (e *Default) Phase1(ctx context.Context, g *entity.Global) error {
 	branches, err := dao.GetTransaction().GetBranches(ctx, g.GetGId())
 	if err != nil {
 		return err
@@ -58,7 +58,7 @@ func (e *executor) Phase1(ctx context.Context, g *entity.Global) error {
 	})
 }
 
-func (e *executor) Phase2(ctx context.Context, g *entity.Global) error {
+func (e *Default) Phase2(ctx context.Context, g *entity.Global) error {
 	branches, err := dao.GetTransaction().GetBranches(ctx, g.GetGId())
 	if err != nil {
 		return err
@@ -81,7 +81,7 @@ func (e *executor) Phase2(ctx context.Context, g *entity.Global) error {
 	})
 }
 
-func (e *executor) stratify(branches entity.BranchList) []entity.BranchList {
+func (e *Default) stratify(branches entity.BranchList) []entity.BranchList {
 	layerList := make([]entity.BranchList, len(branches))
 	// sort branches by level
 	sort.Slice(branches, func(i, j int) bool {
@@ -106,7 +106,7 @@ func (e *executor) stratify(branches entity.BranchList) []entity.BranchList {
 	return layerList
 }
 
-func (e *executor) execute(ctx context.Context, shouldStratify bool, branches entity.BranchList, filterFn FilterFn) error {
+func (e *Default) execute(ctx context.Context, shouldStratify bool, branches entity.BranchList, filterFn FilterFn) error {
 
 	// filter branches
 	for i := 0; i < len(branches); {
@@ -149,7 +149,7 @@ func (e *executor) execute(ctx context.Context, shouldStratify bool, branches en
 
 				// request the RM
 				if err = e.request(ctx, b); err != nil {
-					logging.Errorf("[Executor] request branch %+v err:%v", b, err)
+					logging.Errorf("[Executor] request branch: %s err:%v", b.BranchId, err)
 					branchState = consts.BranchFailState
 					span.SetStatus(codes.Error, err.Error())
 					errmsg = err.Error()
@@ -159,7 +159,7 @@ func (e *executor) execute(ctx context.Context, shouldStratify bool, branches en
 				b.State = branchState
 				if _, erro := dao.GetTransaction().UpdateBranchStateByGid(bCtx, b.BranchId,
 					b.State, errmsg); erro != nil {
-					logging.Errorf("[Executor]update branch state error:%v", erro)
+					logging.Errorf("[Executor]update branch:%s state error:%v", b.BranchId, erro)
 				}
 				return err
 			})
@@ -173,10 +173,10 @@ func (e *executor) execute(ctx context.Context, shouldStratify bool, branches en
 	return nil
 }
 
-func (e *executor) request(ctx context.Context, b *entity.Branch) (err error) {
+func (e *Default) request(ctx context.Context, b *entity.Branch) (err error) {
 	transporter, err := e.manager.GetTransporter(common.Net(b.Protocol))
 	if err != nil {
-		return fmt.Errorf("[Executor]branchid:%vget transport error:%v", b.BranchId, err)
+		return fmt.Errorf("[Executor]branchid:%s get transport error:%v", b.BranchId, err)
 	}
 
 	defer func() {
@@ -184,7 +184,7 @@ func (e *executor) request(ctx context.Context, b *entity.Branch) (err error) {
 			if errors.Is(err, retry.ErrOverMaximumAttempt) {
 				logging.Warnf("over maximum attempt")
 			}
-			err = fmt.Errorf("[Executor] Request branchid:%vrequest error:%v", b.BranchId, err)
+			err = fmt.Errorf("[Executor] Request branchid:%s request error:%v", b.BranchId, err)
 		}
 	}()
 
