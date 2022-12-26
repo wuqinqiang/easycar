@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/wuqinqiang/easycar/core/notify"
+
 	"github.com/wuqinqiang/easycar/core/servers/runner"
 
 	"github.com/wuqinqiang/easycar/logging"
@@ -44,9 +46,9 @@ func main() {
 
 	// Create a Coordinator,The core logic is here.
 	dao := dao.GetTransaction()
-
+	n := notify.New(context.Background(), settings.Notify.Senders())
 	newCoordinator := coordinator.NewCoordinator(dao,
-		executor.NewExecutor(), settings.AutomaticExecution2)
+		executor.NewExecutor(), n, settings.AutomaticExecution2)
 
 	var (
 		servers []core.Server
