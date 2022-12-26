@@ -27,7 +27,7 @@ can be invoked concurrently, and the next layer is processed after one layer is 
 
 **Service Registration and Discovery**
 
-Currently supports etcd.
+Currently supports etcd and consul.
 
 **Client-side load balancing**
 

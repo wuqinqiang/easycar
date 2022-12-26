@@ -20,23 +20,18 @@ import (
 
 	"github.com/wuqinqiang/easycar/core/servers/grpcsrv"
 
-	"github.com/wuqinqiang/easycar/conf/envx"
-
 	"github.com/wuqinqiang/easycar/core"
 
 	"github.com/wuqinqiang/easycar/conf/file"
-
-	"github.com/wuqinqiang/easycar/conf"
 )
 
 var (
-	mod      = flag.String("m", GetEnvOrDefault("CONF_MOD", "file"), "configuration module")
 	filePath = flag.String("f", GetEnvOrDefault("FILE_PATH", "/conf.yml"), "configuration file")
 )
 
 func main() {
 	flag.Parse()
-	c := getConf(*mod, *filePath)
+	c := file.NewFile(*filePath)
 
 	// load conf settings from (file|etcd|env......)
 	settings, err := c.Load()
@@ -97,21 +92,6 @@ func main() {
 		log.Fatal(err)
 	}
 	logging.Infof("easycar server is stopped")
-}
-
-func getConf(mod, filePath string) (c conf.Conf) {
-	flag.Parse()
-
-	switch conf.Mode(mod) {
-	case conf.File:
-		c = file.NewFile(filePath)
-	case conf.Etcd:
-	case conf.Env:
-		return new(envx.Env)
-	default:
-		panic("conf mod not set")
-	}
-	return c
 }
 
 func GetEnvOrDefault(key, defaultValue string) string {
