@@ -6,6 +6,14 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/wuqinqiang/easycar/core/notify"
+
+	"github.com/wuqinqiang/easycar/core/notify/dingtalk"
+
+	"github.com/wuqinqiang/easycar/core/notify/telegram"
+
+	"github.com/wuqinqiang/easycar/core/notify/lark"
+
 	"github.com/hashicorp/consul/api"
 
 	"github.com/wuqinqiang/easycar/core/registry/consulx"
@@ -49,12 +57,21 @@ type (
 		Tracing             Tracing          `yaml:"tracing"`
 		Registry            RegistrySettings `yaml:"registry"`
 		Cron                Cron             `yaml:"cron"`
+		Notify              Notify           `yaml:"notify"`
 	}
 
+	//DB Config
 	DB struct {
 		Driver  string           `yaml:"driver"`
 		Mysql   gormx.Settings   `yaml:"mysql"`
 		Mongodb mongodb.Settings `yaml:"mongodb"`
+	}
+
+	//Notify Config
+	Notify struct {
+		Lark     lark.NotifyConfig     `yaml:"lark"`
+		Tg       telegram.NotifyConfig `yaml:"tg"`
+		Dingtalk dingtalk.NotifyConfig `yaml:"dingtalk"`
 	}
 
 	Server struct {
@@ -126,4 +143,17 @@ func (s *Settings) GetRegistry() (registry.Registry, error) {
 		return nil, err
 	}
 	return consulx.New(client), nil
+}
+
+func (n *Notify) Senders() (sender []notify.Sender) {
+	if n.Tg.Token != "" && n.Tg.ChatID != "" {
+		sender = append(sender, n.Tg)
+	}
+	if n.Lark.WebhookURL != "" {
+		sender = append(sender, n.Lark)
+	}
+	if n.Dingtalk.SignSecret != "" && n.Dingtalk.WebhookURL != "" {
+		sender = append(sender, n.Dingtalk)
+	}
+	return
 }

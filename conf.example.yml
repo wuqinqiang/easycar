@@ -43,3 +43,16 @@ cron:
   ## max retry times when rm is not available
  maxTimes: 3
  timeInterval: 5 #unit is minute. it means that the next retry is 5m later, not in strict mode
+
+
+# --------------------- Notification Configuration ---------------------
+
+#notify:
+#   telegram:
+#      token: xxxxxxx # Bot Token
+#      chat_id: -123456789 # Channel / Group ID
+#   dingtalk:
+#       webhook: "https://oapi.dingtalk.com/robot/send?access_token=xxxx"
+#       secret: "" # sign secret if set
+#   lark:
+#       webhook: "https://open.feishu.cn/open-apis/bot/v2/hook/xxxxxxx"

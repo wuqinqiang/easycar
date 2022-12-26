@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/wuqinqiang/easycar/core/notify"
+
 	"github.com/wuqinqiang/easycar/logging"
 	"github.com/wuqinqiang/easycar/tracing"
 
@@ -25,14 +27,16 @@ type Coordinator struct {
 	automaticExecution2 bool
 	executor            Executor
 	closeFn             func(ctx context.Context) error
+	notify              notify.Notify
 }
 
-func NewCoordinator(dao dao.TransactionDao, executor Executor, automaticExecution2 bool) *Coordinator {
+func NewCoordinator(dao dao.TransactionDao, executor Executor, notify notify.Notify, automaticExecution2 bool) *Coordinator {
 	c := &Coordinator{
 		dao:                 dao,
 		automaticExecution2: automaticExecution2,
 		executor:            executor,
 		closeFn:             executor.Close,
+		notify:              notify,
 	}
 	return c
 }
@@ -83,6 +87,7 @@ func (c *Coordinator) Phase1(ctx context.Context, global *entity.Global) (err er
 	defer func() {
 		if err != nil {
 			phase1State = consts.Phase1Failed
+			c.notify.Notify(notify.NewContext(global.GetGId(), err))
 		}
 		global.State = phase1State
 		logging.Infof("[Coordinator] phase1 end gid:%v state:%v", global.GetGId(), global.State)
@@ -116,6 +121,7 @@ func (c *Coordinator) Phase2(ctx context.Context, global *entity.Global) (err er
 	defer func() {
 		if err != nil {
 			overStateVal = tools.IF(isGotoRollback, consts.Phase2RollbackFailed, consts.Phase2CommitFailed)
+			c.notify.Notify(notify.NewContext(global.GetGId(), err))
 		}
 		logging.Infof("[Coordinator] Phase2 end gid %v,state:%v", global.GID, overStateVal)
 		_, erro := c.dao.UpdateGlobalStateByGid(ctx, global.GetGId(), overStateVal.(consts.GlobalState))
