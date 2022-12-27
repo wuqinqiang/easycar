@@ -9,6 +9,7 @@ import (
 
 type Notify interface {
 	Notify(content Content)
+	Stop()
 }
 
 type Sender interface {
@@ -17,16 +18,17 @@ type Sender interface {
 
 type notify struct {
 	ctx     context.Context
+	cancel  func()
 	senders []Sender
 	ch      chan Content
 }
 
-func New(ctx context.Context, senders []Sender) Notify {
+func New(senders []Sender) Notify {
 	n := &notify{
-		ctx:     ctx,
 		senders: senders,
 		ch:      make(chan Content, 50),
 	}
+	n.ctx, n.cancel = context.WithCancel(context.Background())
 	go n.waitEvent()
 	return n
 }
@@ -37,18 +39,19 @@ func (n *notify) Notify(content Content) {
 	}
 	n.ch <- content
 }
+func (n *notify) Stop() {
+	n.cancel()
+}
+
 func (n *notify) waitEvent() {
-	logging.Infof("notify start")
 	for {
 		select {
 		case <-n.ctx.Done():
-			logging.Infof("Received the done signal")
 			return
 		case content := <-n.ch:
-			_ = content
 			for _, sender := range n.senders {
 				tools.GoSafe(func() {
-					err := sender.Send("easycar", "err")
+					err := sender.Send("easycar", content.Msg())
 					if err != nil {
 						logging.Errorf("[waitEvent]:%v", err)
 					}

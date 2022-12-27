@@ -1,12 +1,11 @@
 package lark
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"time"
+
+	. "github.com/wuqinqiang/easycar/tools"
 )
 
 // NotifyConfig is the lark notification configuration
@@ -19,34 +18,34 @@ func (c NotifyConfig) Send(title, msg string) error {
 	return c.SendLarkNotification(msg)
 }
 
+type b struct {
+	MsgType string  `json:"msg_type"`
+	Context Context `json:"content"`
+}
+
+type Context struct {
+	Text string `json:"text"`
+}
+
 // SendLarkNotification will post to an 'Robot Webhook' url in Lark Apps. It accepts
 // some text and the Lark robot will send it in group.
 func (c NotifyConfig) SendLarkNotification(msg string) error {
-	req, err := http.NewRequest(http.MethodPost, c.WebhookURL, bytes.NewBuffer([]byte(msg)))
+	b := b{
+		MsgType: "text",
+	}
+	b.Context.Text = msg
+
+	resp, err := RestyCli.SetTimeout(5*time.Second).SetRetryCount(3).R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(b).Post(c.WebhookURL)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Add("Content-Type", "application/json")
-	req.Close = true
-
-	client := &http.Client{Timeout: 5 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	if resp.Body != nil {
-		defer resp.Body.Close()
-	}
-
-	buf, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
 	ret := make(map[string]interface{})
-	err = json.Unmarshal(buf, &ret)
+	err = json.Unmarshal(resp.Body(), &ret)
 	if err != nil {
-		return fmt.Errorf("error response from Lark [%d] - [%s]", resp.StatusCode, string(buf))
+		return fmt.Errorf("error response from Lark [%d] - [%s]", resp.StatusCode(), string(resp.Body()))
 	}
 	// Server returns {"Extra":null,"StatusCode":0,"StatusMessage":"success"} on success
 	// otherwise it returns {"code":9499,"msg":"Bad Request","data":{}}

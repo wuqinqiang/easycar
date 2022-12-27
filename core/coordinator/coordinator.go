@@ -53,6 +53,7 @@ func (c *Coordinator) Begin(ctx context.Context) (string, error) {
 }
 
 func (c *Coordinator) Close(ctx context.Context) error {
+	c.notify.Stop()
 	return c.closeFn(ctx)
 }
 
