@@ -1,0 +1,42 @@
+name: Go
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        go: [1.16, 1.17, 1.18, 1.19]
+    name: build & test
+    runs-on: ubuntu-latest
+    services:
+      etcd:
+        image: gcr.io/etcd-development/etcd:v3.5.0
+        ports:
+          - 2379:2379
+        env:
+          ETCD_LISTEN_CLIENT_URLS: http://0.0.0.0:2379
+          ETCD_ADVERTISE_CLIENT_URLS: http://0.0.0.0:2379
+      consul:
+        image: consul:1.12.3
+        ports:
+          - 8500:8500
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v3.3.1
+        with:
+          go-version: ${{ matrix.go }}
+
+      - name: Upload coverage to Codecov
+        run: bash <(curl -s https://codecov.io/bash)
+      - name: Easycar
+        run: |
+          go test ./...

@@ -6,12 +6,7 @@ import (
 	"net/http"
 
 	"github.com/wuqinqiang/easycar/core/transport/common"
-
-	"github.com/go-resty/resty/v2"
-)
-
-var (
-	restyCli = resty.New()
+	. "github.com/wuqinqiang/easycar/tools"
 )
 
 type (
@@ -32,7 +27,7 @@ func (cli *Transport) Request(ctx context.Context, uri string, req *common.Req) 
 }
 
 func (cli *Transport) req(ctx context.Context, uri string, req *common.Req) (*common.Resp, error) {
-	resp, err := restyCli.SetTimeout(req.Timeout).R().
+	resp, err := RestyCli.SetTimeout(req.Timeout).R().
 		SetContext(ctx).
 		SetHeaders(req.Headers).
 		SetBody(req.Body).

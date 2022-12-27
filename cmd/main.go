@@ -46,7 +46,7 @@ func main() {
 
 	// Create a Coordinator,The core logic is here.
 	dao := dao.GetTransaction()
-	n := notify.New(context.Background(), settings.Notify.Senders())
+	n := notify.New(settings.Notify.Senders())
 	newCoordinator := coordinator.NewCoordinator(dao,
 		executor.NewExecutor(), n, settings.AutomaticExecution2)
 

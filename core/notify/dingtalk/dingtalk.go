@@ -1,16 +1,15 @@
 package dingtalk
 
 import (
-	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"net/url"
 	"time"
+
+	. "github.com/wuqinqiang/easycar/tools"
 
 	"github.com/wuqinqiang/easycar/logging"
 )
@@ -35,31 +34,17 @@ func (c NotifyConfig) Send(title, msg string) error {
 		}
 	}
 	`, title, msg)
-	req, err := http.NewRequest(http.MethodPost, c.addSign(c.WebhookURL, c.SignSecret), bytes.NewBuffer([]byte(msgContent)))
-	if err != nil {
-		return err
-	}
 
-	req.Header.Add("Content-Type", "application/json")
-	req.Close = true
-
-	client := &http.Client{Timeout: 5 * time.Second}
-	resp, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	if resp.Body != nil {
-		defer resp.Body.Close()
-	}
-
-	buf, err := io.ReadAll(resp.Body)
+	resp, err := RestyCli.SetTimeout(5*time.Second).SetRetryCount(3).R().
+		SetHeader("Content-Type", "application/json").
+		SetBody(msgContent).Post(c.addSign(c.WebhookURL, c.SignSecret))
 	if err != nil {
 		return err
 	}
 	ret := make(map[string]interface{})
-	err = json.Unmarshal(buf, &ret)
+	err = json.Unmarshal(resp.Body(), &ret)
 	if err != nil || ret["errmsg"] != "ok" {
-		return fmt.Errorf("error response from Dingtalk [%d] - [%s]", resp.StatusCode, string(buf))
+		return fmt.Errorf("error response from Dingtalk [%d] - [%s]", resp.StatusCode(), string(resp.Body()))
 	}
 	return nil
 }
