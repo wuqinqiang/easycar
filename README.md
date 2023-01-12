@@ -121,17 +121,17 @@ more examples to:[examples](https://github.com/easycar/examples)
 - [x] TCC
 - [ ] XA
 - [ ] client
-    - [x] client-go
-    - [ ] client-rust
-    - [ ] client-php
-    - [ ] client-python
-    - [ ] client-java
+  - [x] client-go
+  - [ ] client-rust
+  - [ ] client-php
+  - [ ] client-python
+  - [ ] client-java
 - [x] retry
-- [ ] registry and discovery
-    - [x] etcd
-    - [x] consul
+- [x] registry and discovery
+  - [x] etcd
+  - [x] consul
 - [x] balancer
-- [ ] notify
+- [x] notify
 - [x] tracing
 - [ ] tool
 - more store
