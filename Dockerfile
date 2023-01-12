@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 
 COPY --from=Builder /src/bin /app
-COPY --from=Builder /src/conf.yml /app/
+COPY --from=Builder /src/conf.example.yml /app/conf.yml
 
 WORKDIR /app
 

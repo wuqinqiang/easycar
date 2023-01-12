@@ -123,11 +123,11 @@ go run cmd/main.go
     - [ ] client-python
     - [ ] client-java
 - [x] retry
-- [ ] registry and discovery
+- [x] registry and discovery
     - [x] etcd
     - [x] consul
 - [x] balancer
-- [ ] notify
+- [x] notify
 - [x] tracing
 - [ ] tool
 - more store
