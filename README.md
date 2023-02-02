@@ -135,5 +135,3 @@ more examples to:[examples](https://github.com/easycar/examples)
 - [x] tracing
 - [ ] tool
 - more store
-- ......
-

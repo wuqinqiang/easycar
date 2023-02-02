@@ -117,19 +117,17 @@ go run cmd/main.go
 - [x] TCC
 - [ ] XA
 - [ ] client
-    - [x] client-go
-    - [ ] client-rust
-    - [ ] client-php
-    - [ ] client-python
-    - [ ] client-java
+  - [x] client-go
+  - [ ] client-rust
+  - [ ] client-php
+  - [ ] client-python
+  - [ ] client-java
 - [x] retry
 - [x] registry and discovery
-    - [x] etcd
-    - [x] consul
+  - [x] etcd
+  - [x] consul
 - [x] balancer
 - [x] notify
 - [x] tracing
 - [ ] tool
 - more store
-- ......
-

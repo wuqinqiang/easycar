@@ -2,10 +2,6 @@ package client
 
 import "github.com/wuqinqiang/easycar/core/consts"
 
-type (
-	MOption func(manger *Manger)
-)
-
 type Manger struct {
 	groups []*Group
 	// level current level
