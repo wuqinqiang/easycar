@@ -5,6 +5,7 @@ import (
 	"net"
 	"os"
 	"runtime/debug"
+	"strconv"
 	"strings"
 
 	"github.com/wuqinqiang/easycar/logging"
@@ -51,14 +52,24 @@ func runSafe(fn func()) {
 }
 
 func FigureOutListen(listenOn string) string {
+	fields := strings.Split(listenOn, ":")
+	if len(fields) == 1 {
+		if _, err := strconv.Atoi(fields[0]); err != nil {
+			return ""
+		}
+		return ":" + listenOn
+	}
+
 	host, port, err := net.SplitHostPort(listenOn)
 	if err != nil {
 		logging.Warnf(err.Error())
 		return listenOn
 	}
+
 	if len(host) > 0 && host != "0.0.0.0" {
 		return listenOn
 	}
+
 	ip := os.Getenv("POD_IP")
 	if len(ip) == 0 {
 		ip = InternalIp()
