@@ -7,7 +7,7 @@ type (
 	BranchAction string
 
 	// Level branch level,	0 is first level,same level can executed concurrently
-	Level uint8
+	Level uint32
 )
 
 const (
