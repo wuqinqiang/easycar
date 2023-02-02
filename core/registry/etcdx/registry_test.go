@@ -20,13 +20,13 @@ func TestRegistry_Register(t *testing.T) {
 	})
 	if err != nil {
 		t.Errorf("new etcd client=%v", err)
+		return
 	}
 	defer r.client.Close() //nolint:errcheck
 
 	type want struct {
 		service *registry.Instance
 	}
-
 	tests := []struct {
 		name string
 		args args

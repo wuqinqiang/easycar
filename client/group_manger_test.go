@@ -61,7 +61,11 @@ func TestManger_AddGroup(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got := NewManger()
 			for i := range tt.args.groups {
-				got.AddGroup(tt.args.skip, tt.args.groups[i])
+				if tt.args.skip {
+					got.AddNextWaitGroups(tt.args.groups[i])
+					continue
+				}
+				got.addGroups(tt.args.groups[i])
 			}
 			if len(got.groups) != len(tt.want) {
 				t.Errorf("got groups len=%v,want %v", len(got.groups), len(tt.want))
