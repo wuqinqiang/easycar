@@ -12,8 +12,6 @@ import (
 	"github.com/wuqinqiang/easycar/tools"
 )
 
-var DefaultListen = "127.0.0.1:8085"
-
 type HttpSrv struct {
 	listenOn   string
 	fn         Handler
@@ -24,14 +22,9 @@ type HttpSrv struct {
 }
 
 func New(conf Http, fn Handler) *HttpSrv {
-	listenOn := DefaultListen
-	if conf.ListenOn != "" {
-		listenOn = conf.ListenOn
-	}
-	listenOn = tools.FigureOutListen(listenOn)
 	h := &HttpSrv{
 		fn:       fn,
-		listenOn: listenOn,
+		listenOn: tools.FigureOutListen(conf.ListenOn),
 		once:     sync.Once{},
 		timeout:  10 * time.Second,
 	}

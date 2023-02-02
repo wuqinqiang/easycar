@@ -37,8 +37,6 @@ var (
 	ErrGIdNotExist                     = errors.New("gid is not exist")
 )
 
-const DefaultListenOn = "127.0.0.1:8089"
-
 type GrpcSrv struct {
 	proto.UnimplementedEasyCarServer
 	coordinator *coordinator.Coordinator
@@ -53,15 +51,10 @@ type GrpcSrv struct {
 }
 
 func New(settings Grpc, coordinator *coordinator.Coordinator) (*GrpcSrv, error) {
-	listenOn := DefaultListenOn
-	if settings.ListenOn != "" {
-		listenOn = settings.ListenOn
-	}
-	listenOn = tools.FigureOutListen(listenOn)
 	srv := &GrpcSrv{
 		coordinator: coordinator,
 		timeout:     10 * time.Second,
-		listenOn:    listenOn,
+		listenOn:    tools.FigureOutListen(settings.ListenOn),
 		once:        sync.Once{},
 	}
 	// setup tls
@@ -77,7 +70,7 @@ func New(settings Grpc, coordinator *coordinator.Coordinator) (*GrpcSrv, error) 
 		srv.grpcOpts = append(srv.grpcOpts, grpc.Creds(credentials.NewTLS(tlsConf)))
 	}
 	srv.grpcOpts = append(srv.grpcOpts, grpc.MaxRecvMsgSize(5*1024*1024)) //5M:max Recv msg size
-	srv.lis, err = net.Listen("tcp", listenOn)
+	srv.lis, err = net.Listen("tcp", srv.listenOn)
 	return srv, err
 }
 
