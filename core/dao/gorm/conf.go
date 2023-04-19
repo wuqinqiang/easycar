@@ -1,7 +1,10 @@
 package gorm
 
 import (
+	"context"
 	"time"
+
+	"github.com/wuqinqiang/easycar/init/sqls"
 
 	"github.com/wuqinqiang/easycar/core/dao"
 	"github.com/wuqinqiang/easycar/tools"
@@ -25,7 +28,6 @@ func (m *Settings) Init() {
 	tools.ErrToPanic(err)
 
 	d, err := db.DB()
-
 	tools.ErrToPanic(err)
 
 	if m.MaxLifetime > 0 {
@@ -39,5 +41,14 @@ func (m *Settings) Init() {
 		d.SetMaxIdleConns(m.MaxIdleConns)
 	}
 
+	//execute init sql
+	ctx, cancel := context.WithTimeout(context.Background(), 8*time.Second)
+	defer cancel()
+	for _, tableSql := range sqls.Sql() {
+		_, err = d.ExecContext(ctx, tableSql)
+		tools.ErrToPanic(err)
+	}
+
+	//set transaction dao
 	dao.SetTransaction(NewDao(db))
 }
