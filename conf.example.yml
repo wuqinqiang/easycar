@@ -3,7 +3,7 @@ automaticExecution2: false  #when the first stage of execution ends, it will com
 timeout: 7 #unit of second
 server:
   grpc:
-    listenOn: 127.0.0.1:8088
+    listenOn: 8088
     keyFile:   #server key
     certFile:  #server cert
     gateway:
@@ -11,12 +11,12 @@ server:
       certFile:  #client cert
       serverName: #server name
   http:
-    listenOn: 127.0.0.1:8085
+    listenOn: 8085
 
 db: #easycar server db
   driver: mysql
   mysql:
-    dbURL: easycar:easycar@tcp(127.0.0.1:3306)/easycar?charset=utf8&parseTime=True&loc=Local
+    dbURL: easycar:easycar@tcp(mysql:3306)/easycar?charset=utf8&parseTime=True&loc=Local
     maxLifetime: 7200
     maxIdleConns: 10
     maxOpenConns: 20
@@ -30,7 +30,6 @@ registry: #If the registry is configured,we need to register the service to the 
     user: ""
     pass: ""
     hosts:
-      - #127.0.0.1:2379
   consul:
     default: false
   ## add more
