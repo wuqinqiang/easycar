@@ -22,4 +22,4 @@ WORKDIR /app
 EXPOSE 8089
 EXPOSE 8085
 
-CMD ["./easycar"]
+CMD ["./easycar","-f","/conf.yml"]

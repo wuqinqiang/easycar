@@ -6,12 +6,15 @@ networks:
 
 services:
   easycar:
-    image: wuqinqiang/easycar:0.0.2
+    image: wuqinqiang/easycar:1.0.0
+    networks:
+     - easycar
     ports:
       - "8087:8087"
-      - "8089:8089"
+      - "8088:8088"
     depends_on:
       - mysql
+
 
   ### MySQL ################################################
   mysql:
