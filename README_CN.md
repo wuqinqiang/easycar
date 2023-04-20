@@ -54,6 +54,11 @@ easycar 是一个用go实现的支持两阶段提交协议的分布式事务框�
 cp conf.example.yml conf.ymal
 ```
 
+**docker-compose**
+```shell
+docker-compose up -d easycar
+```
+
 修改 conf.yml 文件
 
 ```ymal

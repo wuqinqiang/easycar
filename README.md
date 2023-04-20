@@ -111,6 +111,11 @@ cron:
 go run cmd/main.go 
 ```
 
+**docker-compose**
+```shell
+docker-compose up -d easycar
+```
+
 ## examples
 
 more examples to:[examples](https://github.com/easycar/examples)

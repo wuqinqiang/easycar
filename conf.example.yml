@@ -11,7 +11,7 @@ server:
       certFile:  #client cert
       serverName: #server name
   http:
-    listenOn: 8085
+    listenOn: 8087
 
 db: #easycar server db
   driver: mysql
