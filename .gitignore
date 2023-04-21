@@ -52,3 +52,7 @@ ca.crt
 ca.csr
 ca.key
 conf.yml
+
+release/
+packages/
+build

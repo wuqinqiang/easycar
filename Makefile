@@ -24,3 +24,7 @@ proto: checkbuf
 .PHONY: build
 build:
 	mkdir -p bin/ && go build -ldflags "-X main.Version=$(VERSION)" -o ./bin/easycar cmd/main.go
+
+
+all:
+	$(shell sh build.sh)
