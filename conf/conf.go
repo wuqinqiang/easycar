@@ -113,14 +113,14 @@ func (s *Settings) Init() {
 	tracing.Init(s.Tracing.JaegerUri)
 
 	go func() {
-		log.Println(http.ListenAndServe("0.0.0.0:6060", nil))
+		log.Println(http.ListenAndServe(":6060", nil))
 	}()
 
 	if s.Http.ListenOn == "" {
-		s.Http.ListenOn = "127.0.0.1:8085"
+		s.Http.ListenOn = "8087"
 	}
 	if s.Grpc.ListenOn == "" {
-		s.Grpc.ListenOn = "127.0.0.1:8088"
+		s.Grpc.ListenOn = "8089"
 	}
 	if s.Timeout > 0 {
 		common.ReplaceTimeout(time.Duration(s.Timeout) * time.Second)
