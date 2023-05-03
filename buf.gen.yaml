@@ -14,8 +14,7 @@ plugins:
     opt:
       - paths=source_relative
       - generate_unbound_methods=true
-  - remote: buf.build/jirkad/plugins/protoc-gen-validate
+  - plugin: buf.build/bufbuild/validate-go
     out: .
     opt:
       - paths=source_relative
-      - lang=go
