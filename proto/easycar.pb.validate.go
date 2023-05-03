@@ -998,7 +998,7 @@ func (m *RegisterReq_Branch) validate(all bool) error {
 	if _, ok := _RegisterReq_Branch_TranType_InLookup[m.GetTranType()]; !ok {
 		err := RegisterReq_BranchValidationError{
 			field:  "TranType",
-			reason: "value must be in list [1 2]",
+			reason: "value must be in list [TCC SAGE]",
 		}
 		if !all {
 			return err
@@ -1020,7 +1020,7 @@ func (m *RegisterReq_Branch) validate(all bool) error {
 	if _, ok := _RegisterReq_Branch_Action_InLookup[m.GetAction()]; !ok {
 		err := RegisterReq_BranchValidationError{
 			field:  "Action",
-			reason: "value must be in list [1 2 3 4 5]",
+			reason: "value must be in list [TRY CONFIRM CANCEL NORMAL COMPENSATION]",
 		}
 		if !all {
 			return err
